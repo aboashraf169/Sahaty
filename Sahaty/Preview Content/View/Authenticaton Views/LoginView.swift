@@ -127,10 +127,10 @@ struct LoginView: View {
                 
            //مؤقت
                 .navigationDestination(isPresented: $NavigateToDoctorView) {
-                    DoctorDashboardView()
+                    DoctorTabBarView()
                        }
                 .navigationDestination(isPresented: $NavigatToPationtView) {
-                    PatientDashboardView()
+                    PatientTabBarView()
                        }
         // هيتم اعتماد هذه الكود بعد لانتهاء من اضافة api
                 
