@@ -11,12 +11,13 @@ import SwiftUI
 
 struct DoctorHomeScreen: View {
     // نصيحة
+    @StateObject private var adviceViewModel = AdviceViewModel()
     @State private var advice : String = "اشرب 8 أكواب ماء يوميًا للحفاظ على ترطيب جسمك"
     @State private var description : String = "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار."
     @State private var name : String = "محمد أشرف"
     @State private var userName : String = "midoMj@"
     @State private var addTime : String = "ساعتين"
-
+    @State private var showAddAdviceView : Bool  = false
 
     var body: some View {
         NavigationStack{
@@ -35,7 +36,8 @@ struct DoctorHomeScreen: View {
                     .font(.headline)
                     .fontWeight(.regular)
                 Button {
-                    // ظهور شاشة اضافة النصيحة
+                    showAddAdviceView.toggle()
+
                 } label: {
                     Image(systemName: "plus.circle")
                         .resizable()
@@ -47,16 +49,27 @@ struct DoctorHomeScreen: View {
             }
             .padding(.horizontal,20)
             .padding(.bottom,10)
+            .sheet(isPresented: $showAddAdviceView){
+                AddAdviceSheetView()
+                    .presentationDetents([.fraction(0.45)])
+                    .presentationCornerRadius(30)
+
+                    
+            }
             
             // النصائح
-        ScrollView(.vertical,showsIndicators: true){
-                AdviceScetion(advice: advice)
-                AdviceScetion(advice: description)
-                AdviceScetion(advice: advice)
-                AdviceScetion(advice: description)
+            List {
+                ForEach(adviceViewModel.Advicies) { advice in
+                    AdviceView(advice: advice)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            swipeActions(for: advice)
+                        }
+                }
             }
+            .listStyle(.plain)
             .frame(maxWidth: .infinity)
             .frame(height: 120)
+            .padding(.horizontal)
     
 
             // عنوان المنشور
@@ -72,8 +85,30 @@ struct DoctorHomeScreen: View {
                 }
             }
         }
+    func swipeActions(for advice: AdviceModel) -> some View {
+       Group {
+           // Edit Action
+           Button {
+               adviceViewModel.startEditing(advice: advice)
+           } label: {
+               Label("تعديل", systemImage: "pencil")
+           }
+           .tint(.blue)
+           
+           // Delete Action
+           Button() {
+               if let index = adviceViewModel.Advicies.firstIndex(where: { $0.id == advice.id }) {
+                   adviceViewModel.deleteAdvice(at: IndexSet(integer: index))
+               }
+           } label: {
+               Label("حذف", systemImage: "trash")
+           }
+           .tint(.red)
+       }
+   }
     
 }
+
 
 
 
@@ -81,41 +116,9 @@ struct DoctorHomeScreen: View {
     DoctorHomeScreen()
 }
 
-struct AdviceScetion: View {
-     var advice : String
-    var body: some View {
-            HStack{
-                
-                Button(action: {
-                    
-                }) {
-                    Image(systemName: "trash")
-                        .foregroundStyle(.black)
-                }
-                    .padding(.trailing)
-                Button(action: {
-                    
-                }) {
-                    Image(systemName: "pencil")
-                        .foregroundStyle(.black)
 
-                }
-                
-                Spacer()
-                Text(advice)
-                    .font(.caption)
-                    .multilineTextAlignment(.trailing)
-                    .lineLimit(4)
-                    .opacity(0.5)
-                RoundedRectangle(cornerRadius: 10)
-                    .frame(width: 5,height: 20)
-                    .foregroundStyle(.accent)
-            }
-            .padding(.top,10)
-            .padding(.leading)
-            .padding(.trailing,40)
-    }
-}
+
+
 
 
 

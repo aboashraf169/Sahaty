@@ -9,9 +9,10 @@ import SwiftUI
 
 struct HeaderHomeSectionView: View {
     @StateObject private var ViewModel = AuthenticationViewModel()
+    @State private var showAddArticleSheet = false
     var body: some View {
         HStack{
-            if ViewModel.model.userType != .patient {
+//            if ViewModel.model.userType != .patient {
                 // ظهور شاشة اضافة مقال جديد
                 RoundedRectangle(cornerRadius: 15)
                     .frame(width: 50)
@@ -19,7 +20,7 @@ struct HeaderHomeSectionView: View {
                     .foregroundStyle(Color(.systemGray6))
                     .overlay {
                         Button {
-                            // تفعيل الظهور
+                            showAddArticleSheet.toggle()
                         } label: {
                             Image(systemName: "text.badge.plus")
                                 .scaledToFit()
@@ -27,8 +28,7 @@ struct HeaderHomeSectionView: View {
                         }
                         
                     }
-            }
-            
+//            }
             // صندوق البحث
             RoundedRectangle(cornerRadius: 15)
                 .frame(maxWidth: .infinity)
@@ -77,6 +77,15 @@ struct HeaderHomeSectionView: View {
         .padding(.horizontal)
         .padding(.bottom,20)
         .padding(.top,20)
+        .sheet(isPresented: $showAddArticleSheet) {
+//            CommentScreen()
+            AddArticleSheetView()
+                .presentationDetents([.fraction(0.8)])
+                .presentationCornerRadius(30)
+
+        }
+            
+        
     }
 }
 
