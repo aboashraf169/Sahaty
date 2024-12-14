@@ -146,6 +146,10 @@ struct ShowPost : View {
 struct FotterPost: View {
     @State private var stateLike = false
     @State private var stateSave = false
+    @State private var showCommentView = false
+    @State private var showShereSheet = false
+
+
 
     var body: some View {
         VStack {
@@ -154,7 +158,7 @@ struct FotterPost: View {
                 Button {
                     stateSave.toggle()
                 } label: {
-                    if stateSave {
+                    if !stateSave {
                         Image(systemName: "bookmark")
                             .font(.title2)
                             .fontWeight(.ultraLight)
@@ -171,7 +175,7 @@ struct FotterPost: View {
                 Spacer()
                                 
                 Button {
-                
+                    showShereSheet.toggle()
                 } label: {
                     Image(systemName: "square.and.arrow.up")
                         .font(.title2)
@@ -179,7 +183,7 @@ struct FotterPost: View {
                         .foregroundStyle(.black)
                 }
                 Button {
-                   
+                    showCommentView.toggle()
                 } label: {
                     Image(systemName: "message")
                         .font(.title2)
@@ -190,7 +194,7 @@ struct FotterPost: View {
                     stateLike.toggle()
                     
                 } label: {
-                    if stateLike {
+                    if !stateLike {
                         Image(systemName: "heart")
                             .font(.title2)
                             .fontWeight(.ultraLight)
@@ -205,9 +209,37 @@ struct FotterPost: View {
                
                 }
             }
+            .actionSheet(isPresented: $showShereSheet){
+                getActionSheet()
+            }
+            .sheet(isPresented: $showCommentView){
+                CommentScreen()
+                    .presentationDragIndicator(.visible)
+                    .presentationDetents([.fraction(0.7)])
+            }
+            
             //خط فاصل
             Divider()
                 .padding(.top,5)
         }
     }
+    
+    func getActionSheet() -> ActionSheet {
+        
+        let title = Text("ماذا تريد ان تفعل")
+        let ShereButton : ActionSheet.Button =  .default(Text("مشاركة")){
+            
+        }
+        
+        let CancelButton : ActionSheet.Button = .cancel(Text("الغاء"))
+        
+    
+            return  ActionSheet(
+                title: title,
+                message: Text("") ,
+                buttons: [ShereButton,CancelButton]
+            )
+        
+        }
+
 }
