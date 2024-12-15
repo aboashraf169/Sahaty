@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct HeaderHomeSectionView: View {
-    @StateObject private var ViewModel = AuthenticationViewModel()
+    @StateObject private var authenticationViewModel = AuthenticationViewModel()
+    @StateObject private var articalsViewModel = ArticalsViewModel()
+
     @State private var showAddArticleSheet = false
     var body: some View {
         HStack{
@@ -79,7 +81,7 @@ struct HeaderHomeSectionView: View {
         .padding(.top,20)
         .sheet(isPresented: $showAddArticleSheet) {
 //            CommentScreen()
-            AddArticleSheetView()
+            AddArticleSheetView(articalsViewModel: articalsViewModel)
                 .presentationDetents([.fraction(0.8)])
                 .presentationCornerRadius(30)
 

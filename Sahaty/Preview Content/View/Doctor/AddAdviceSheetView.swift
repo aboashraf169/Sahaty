@@ -11,7 +11,7 @@ struct AddAdviceSheetView: View {
     
      @Environment(\.presentationMode) var presentationMode
 
-    @StateObject private var viewModel = AdviceViewModel()
+    @ObservedObject var viewModel : AdviceViewModel
 
     var body: some View {
         VStack{
@@ -58,7 +58,6 @@ struct AddAdviceSheetView: View {
 
 struct AdviceView: View {
     
-    @StateObject private var adviceViewModel = AdviceViewModel()
     var advice : AdviceModel
     
     var body: some View {
@@ -103,5 +102,7 @@ struct AdviceView: View {
 
 
 #Preview {
-    AddAdviceSheetView()
+    AddAdviceSheetView(viewModel: AdviceViewModel())
 }
+
+
