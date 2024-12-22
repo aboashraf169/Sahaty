@@ -187,11 +187,12 @@
 				};
 			};
 			buildConfigurationList = AD31E73E2D01CCE300748293 /* Build configuration list for PBXProject "Sahaty" */;
-			developmentRegion = en;
+			developmentRegion = ar;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ar,
 			);
 			mainGroup = AD31E73A2D01CCE300748293;
 			minimizedProjectReferenceProxies = 1;

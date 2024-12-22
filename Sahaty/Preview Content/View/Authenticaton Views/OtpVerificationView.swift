@@ -1,35 +1,33 @@
 import SwiftUI
-import SwiftUI
 
 struct OtpVerificationView: View {
-    @StateObject private var viewModel = AuthenticationViewModel()
+    @StateObject private var otpViewModel = OtpVerificationViewModel()
     @State private var otpDigits: [String] = ["", "", "", ""] // إدخالات لكل رقم
     @State private var resendTimer: Int = 60 // العداد الزمني
     @State private var canResend: Bool = false
     @State private var timer: Timer?
     @State private var isSuccessAlertPresented = false
-    @State private var ShowNewPasswordView = false // عرض شاشة كلمة جديد
-    
-// MARK: - View
-    
+    @State private var showNewPasswordView = false // عرض شاشة كلمة جديد
+
+    // MARK: - View
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                // العنوان
-                VStack(alignment: .trailing, spacing: 8) {
+                // MARK: - Header
+                VStack(alignment: .leading, spacing: 8) {
                     Text("قمنا بإرسال رسالة SMS قصيرة تحتوي على رمز التفعيل")
                         .font(.headline)
                         .foregroundColor(Color.accentColor)
-                        .multilineTextAlignment(.trailing)
+                        .multilineTextAlignment(.leading)
                     
-                    Text(viewModel.model.email)
+                    Text(otpViewModel.model.email)
                         .font(.callout)
                         .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal, 20)
-                
-                // إدخال رمز OTP
+
+                // MARK: - OTP Input
                 HStack(spacing: 25) {
                     ForEach(0..<4) { index in
                         TextField("", text: $otpDigits[index])
@@ -43,23 +41,23 @@ struct OtpVerificationView: View {
                                     otpDigits[index] = String(newValue.prefix(1)) // تقبل رقم واحد فقط
                                 }
                             }
-                          
                     }
                 }
                 .padding(.horizontal, 20)
-                // رسالة الخطأ
-                if !viewModel.otpErrorMessage.isEmpty {
-                    Text(viewModel.otpErrorMessage)
+
+                // Error Message
+                if !otpViewModel.otpErrorMessage.isEmpty {
+                    Text(otpViewModel.otpErrorMessage)
                         .font(.caption)
                         .foregroundColor(.red)
                         .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
-                // زر التحقق
+
+                // MARK: - Verify Button
                 Button(action: {
-                    viewModel.otpCode = otpDigits.joined() // دمج الأرقام المدخلة
-                    if viewModel.validateOtp() {
+                    otpViewModel.model.otpCode = otpDigits.joined() // دمج الأرقام المدخلة
+                    if otpViewModel.validateOtp() {
                         isSuccessAlertPresented = true
                     }
                 }) {
@@ -72,8 +70,8 @@ struct OtpVerificationView: View {
                         .cornerRadius(10)
                 }
                 .padding(.top, 20)
-                
-                // عداد إعادة إرسال الرمز
+
+                // MARK: - Resend Timer
                 if !canResend {
                     HStack(spacing: 5) {
                         Text("إعادة إرسال الرمز في")
@@ -95,23 +93,22 @@ struct OtpVerificationView: View {
             .padding()
             .onAppear(perform: startTimer)
             .onDisappear(perform: stopTimer)
-            
-            // رسالة النجاح
-            .alert(viewModel.successMessage, isPresented: $isSuccessAlertPresented) {
+
+            // Success Alert
+            .alert(otpViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
                 Button("موافق", role: .cancel) {
-                    ShowNewPasswordView = true
+                    showNewPasswordView = true
                 }
             }
-            
-            // الانتقال لشاشة الكلمة مرور جديدة
-            .navigationDestination(isPresented: $ShowNewPasswordView) {
-                NewPassworView()
-            }
-          
 
+            // Navigate to New Password View
+            .navigationDestination(isPresented: $showNewPasswordView) {
+                NewPasswordView()
+            }
         }
     }
-    // لانشأء التايمر
+
+    // MARK: - Timer Management
     private func startTimer() {
         resendTimer = 60
         canResend = false
@@ -124,23 +121,20 @@ struct OtpVerificationView: View {
             }
         }
     }
-    
-    // لايقاف التايمر
+
     private func stopTimer() {
         timer?.invalidate()
         timer = nil
     }
-    
-    //اعادة تشغيل التايمر
+
     private func resendOtp() {
         stopTimer() // أوقف العداد قبل البدء من جديد
         startTimer() // أعد تشغيل العداد
-        print("تم إعادة إرسال رمز OTP")
+        otpViewModel.resendOtp()
     }
 }
 
 // MARK: - Preview
-
 #Preview {
     OtpVerificationView()
 }

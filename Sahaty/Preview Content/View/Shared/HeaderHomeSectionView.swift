@@ -1,96 +1,85 @@
-//
-//  HeaderHomeSectionView.swift
-//  Sahaty
-//
-//  Created by mido mj on 12/13/24.
-//
-
 import SwiftUI
 
 struct HeaderHomeSectionView: View {
-    @StateObject private var authenticationViewModel = AuthenticationViewModel()
-    @StateObject private var articalsViewModel = ArticalsViewModel()
+    var userType: UserType // نوع المستخدم
+    @Binding var searchText: String // نص البحث
+    var onProfileTap: () -> Void // الإجراء عند النقر على صورة المستخدم
+    var onAddTap: (() -> Void)? = nil // الإجراء عند النقر على زر الإضافة (للدكتور فقط)
+    var onSearch: (String) -> Void // الإجراء عند تحديث نص البحث
 
-    @State private var showAddArticleSheet = false
     var body: some View {
-        HStack{
-//            if ViewModel.model.userType != .patient {
-                // ظهور شاشة اضافة مقال جديد
-                RoundedRectangle(cornerRadius: 15)
-                    .frame(width: 50)
-                    .frame(height: 40)
-                    .foregroundStyle(Color(.systemGray6))
-                    .overlay {
-                        Button {
-                            showAddArticleSheet.toggle()
-                        } label: {
-                            Image(systemName: "text.badge.plus")
-                                .scaledToFit()
-                                .foregroundStyle(.black)
-                        }
-                        
-                    }
-//            }
-            // صندوق البحث
-            RoundedRectangle(cornerRadius: 15)
-                .frame(maxWidth: .infinity)
-                .frame(height: 40)
-                .foregroundStyle(Color(.systemGray6))
-                .overlay {
-                    HStack{
-                        Button {
-                            // عمل فلتر للبحث
-                        } label: {
-                            Image(systemName: "line.3.horizontal.decrease")
-                                .foregroundStyle(.black)
-                        }
-                        Spacer()
-                        Text("ابحث عن الواجهة")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                        Button {
-                            // عمل بحث
-                        } label: {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundStyle(.black)
-                        }
-                        
-                        
-                    }
-                    .padding()
-                }
-                .onTapGesture {
-                    
-                }
-            
-            // صورة الشخصية
+        HStack {
+            // صورة المستخدم
             Button {
+                onProfileTap()
             } label: {
                 Image(systemName: "person.fill")
                     .resizable()
                     .scaledToFit()
-                    .foregroundStyle(.white)
-                    .padding(.horizontal,7)
-                    .frame(width: 40,height: 40)
-                    .background(Color.accentColor)
-                    .cornerRadius(20)
+                    .padding(.top, 5)
+                    .frame(width: 40, height: 40)
+                    .background(Color(.systemGray6))
+                    .clipShape(Circle())
+            }
+
+            // صندوق البحث
+            TextField("ابحث في الواجهة", text: $searchText, onEditingChanged: { _ in
+                // عند بدء أو إنهاء التعديل
+            }, onCommit: {
+                // عند الضغط على زر الإدخال
+                onSearch(searchText)
+            })
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .padding(10)
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .overlay(
+                    HStack {
+                        Spacer()
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.secondary)
+                            .padding(.trailing, 10)
+                    }
+                )
+
+            // زر إضافة المقال (للدكتور فقط)
+            if userType == .doctor, let onAddTap = onAddTap {
+                Button {
+                    onAddTap()
+                } label: {
+                    RoundedRectangle(cornerRadius: 15)
+                        .frame(width: 50)
+                        .frame(height: 40)
+                        .foregroundStyle(Color(.systemGray6))
+                        .overlay {
+                            Image(systemName: "text.badge.plus")
+                                .scaledToFit()
+                                .foregroundStyle(.primary)
+                        }
+                }
             }
         }
         .padding(.horizontal)
-        .padding(.bottom,20)
-        .padding(.top,20)
-        .sheet(isPresented: $showAddArticleSheet) {
-//            CommentScreen()
-            AddArticleSheetView(articalsViewModel: articalsViewModel)
-                .presentationDetents([.fraction(0.8)])
-                .presentationCornerRadius(30)
-
-        }
-            
-        
+        .padding(.vertical, 20)
     }
 }
 
+// MARK: - Preview
 #Preview {
-    HeaderHomeSectionView()
+    HeaderHomeSectionView(
+        userType: .doctor,
+        searchText: .constant(""),
+        onProfileTap: {
+            print("Profile tapped")
+        },
+        onAddTap: {
+            print("Add button tapped")
+        },
+        onSearch: { searchText in
+            print("Searching for: \(searchText)")
+        }
+    )
 }
+
+

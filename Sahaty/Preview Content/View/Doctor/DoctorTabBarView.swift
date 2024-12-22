@@ -9,33 +9,61 @@
 import SwiftUI
 // واجهة قيد الانشاء
 struct DoctorTabBarView: View {
-    
-    @State var selectedPage = 0
+    @StateObject var appState = AppState()
+
+    @State var doctor = DoctorModel(
+        fullName: "د. محمد أشرف",
+        email: "doctor@example.com",
+        password: "123456",
+        specialization: "طب الأطفال",
+        licenseNumber: "12345",
+        profilePicture: nil,
+        biography: nil,
+        articlesCount: 10,
+        advicesCount: 20,
+        followersCount: 50,
+        articles: [],
+        advices: [],
+        comments: [],
+        likedArticles: []
+    )
+
 
     var body: some View {
         
-        TabView(selection: $selectedPage){
+        TabView(selection: $appState.selectedTabDoctors){
 
-            Text("الاعدادات")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-            .tabItem{
-                HStack{
-                    Text("الاعدادات")
-                    Image(systemName: "gear")
-                }
-            }
-            .tag(4)
-            
-            
-                Text("المرضى")
+            DoctorHomeScreen(doctor: doctor)
                     .tabItem{
                         HStack{
-                            Text("المرضى")
-                            Image(systemName: "person.2")
+                            Text("الرئيسية")
+                            Image(systemName: "house.fill")
                         }
                     }
-                    .tag(1)
+                    .tag(TabDoctor.home)
+            
+            
+                 ProfileView(viewModel: ProfileViewModel(doctor: doctor))
+                 .tabItem{
+                     HStack{
+                         Text("الملف الشخصي")
+                         Image(systemName: "person.fill")
+                     }
+                 }
+                 .tag(TabDoctor.profile)
+
+            
+                Text("المحادثات")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                .tabItem{
+                    HStack{
+                        Text("المحادثات")
+                        Image(systemName: "message")
+                    }
+                }
+                .tag(TabDoctor.chat)
+                .badge(3)
 
             
             Text("الاشعارات")
@@ -47,38 +75,33 @@ struct DoctorTabBarView: View {
                     Image(systemName: "heart.fill")
                 }
             }
-            .tag(2)
+            .tag(TabDoctor.Notificatons)
             .badge(10)
     
-        
-            Text("الملف الشخصي")
+    
+            Text("الاعدادات")
                     .font(.largeTitle)
                     .fontWeight(.bold)
             .tabItem{
                 HStack{
-                    Text("الملف الشخصي")
-                    Image(systemName: "person.fill")
+                    Text("الاعدادات")
+                    Image(systemName: "gear")
                 }
             }
-            .tag(3)
-            
-                DoctorHomeScreen()
-                    .tabItem{
-                        HStack{
-                            Text("الرئيسية")
-                            Image(systemName: "house.fill")
-                        }
-                    }
-                    .tag(0)
-
-            
+            .tag(TabDoctor.settings)
+  
             }
+        .environmentObject(appState) // مشاركة حالة التطبيق مع جميع الشاشات
+
         
     }
+    
 }
 
 #Preview{
+    let appState = AppState() // إنشاء كائن البيئة
     DoctorTabBarView()
+        .environmentObject(appState) // تمرير AppState للمعاينة
 }
 
 

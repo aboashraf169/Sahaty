@@ -1,74 +1,67 @@
 import SwiftUI
 
-
-struct NewPassworView: View {
-    
-    @StateObject private var authenticationViewModel = AuthenticationViewModel()
-    @State private var ShowLoginView = false
+struct NewPasswordView: View {
+    @StateObject private var newPasswordViewModel = NewPasswordViewModel()
+    @State private var showLoginView = false
     @State private var isSuccessAlertPresented = false
-    @State private var ShowAleartLoginView = false
-    
-// MARK: - View
-    
+
+    // MARK: - View
     var body: some View {
         NavigationStack {
-            VStack{
-                
-                // العنوان والوصف
-                VStack(alignment: .trailing, spacing: 8) {
-                  Text("قم بادخال كلمة المرور الجديدة")
+            VStack {
+                // MARK: - Header
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("قم بادخال كلمة المرور الجديدة")
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color.accentColor)
                 }
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.top, 100)
-                
-                
-                // كلمة المرور
+
+                // MARK: - Password Field
                 PasswordField(
-                    password: $authenticationViewModel.model.password,
+                    password: $newPasswordViewModel.model.password,
                     placeholder: "أدخل كلمة المرور",
                     label: "كلمة المرور"
                 )
-                .padding(.horizontal,20)
-                .padding(.top,20)
-                
-                // رسالة الخطأ
-                if !authenticationViewModel.passwordErrorMessage.isEmpty {
-                    Text(authenticationViewModel.passwordErrorMessage)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+
+                // Error Message for Password
+                if !newPasswordViewModel.passwordErrorMessage.isEmpty {
+                    Text(newPasswordViewModel.passwordErrorMessage)
                         .font(.caption)
                         .foregroundColor(.red)
                         .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
 
-                // تأكيد كلمة المرور
+                // MARK: - Confirm Password Field
                 PasswordField(
                     password: Binding(
-                        get: { authenticationViewModel.model.confirmPassword ?? "" },
-                        set: { authenticationViewModel.model.confirmPassword = $0.isEmpty ? nil : $0 }
+                        get: { newPasswordViewModel.model.confirmPassword ?? "" },
+                        set: { newPasswordViewModel.model.confirmPassword = $0.isEmpty ? nil : $0 }
                     ),
                     placeholder: "تأكيد كلمة المرور",
                     label: "تأكيد كلمة المرور"
                 )
-                .padding(.horizontal,20)
-                .padding(.top,20)
-                
-                // رسالة الخطأ
-                if !authenticationViewModel.confirmPasswordErrorMessage.isEmpty {
-                    Text(authenticationViewModel.confirmPasswordErrorMessage)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+
+                // Error Message for Confirm Password
+                if !newPasswordViewModel.confirmPasswordErrorMessage.isEmpty {
+                    Text(newPasswordViewModel.confirmPasswordErrorMessage)
                         .font(.caption)
                         .foregroundColor(.red)
                         .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
-                // زر تسجيل الدخول
+
+                // MARK: - Submit Button
                 Button(action: {
-                    if authenticationViewModel.validateNewPassword() {
+                    if newPasswordViewModel.validateNewPassword() {
                         isSuccessAlertPresented = true
                     }
                 }) {
@@ -81,26 +74,25 @@ struct NewPassworView: View {
                         .cornerRadius(10)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top,40)
-                
-                // لاظهار رسالة نجاح
-                .alert(authenticationViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
+                .padding(.top, 40)
+
+                // Success Alert
+                .alert(newPasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
                     Button("موافق", role: .cancel) {
-                        ShowLoginView = true
+                        showLoginView = true
                     }
                 }
-                .navigationDestination(isPresented: $ShowLoginView) {
+                .navigationDestination(isPresented: $showLoginView) {
                     LoginView()
                 }
-        
+
                 Spacer()
             }
-            
         }
     }
 }
 
 // MARK: - Preview
 #Preview {
-    NewPassworView()
+    NewPasswordView()
 }

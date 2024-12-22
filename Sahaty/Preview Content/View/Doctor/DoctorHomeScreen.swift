@@ -1,208 +1,234 @@
-
-//
-//  testScreen.swift
-//  Sahaty
-//
-//  Created by mido mj on 12/12/24.
-//
-
 import SwiftUI
 
-
 struct DoctorHomeScreen: View {
-    // نصيحة
-    @StateObject  var adviceViewModel = AdviceViewModel()
-    @StateObject  var articalsViewModel = ArticalsViewModel()
+    
+    @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
 
-    @State private var advice : String = "اشرب 8 أكواب ماء يوميًا للحفاظ على ترطيب جسمك"
-    @State private var description : String = "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار."
-    @State private var name : String = "محمد أشرف"
-    @State private var userName : String = "midoMj@"
-    @State private var addTime : String = "ساعتين"
-    @State private var showAddAdviceView : Bool  = false
-    @State private var showAddArticalView : Bool  = false
+    var currentUser: CommentAuthor?
 
-
+    @StateObject  var adviceViewModel: AdviceViewModel
+    @StateObject  var articlesViewModel: ArticalsViewModel
+    @State private var showAddAdviceView: Bool = false
+    @State private var showAddArticleView: Bool = false
+    @State private var selectedArticle: ArticalModel? = nil
+    @State private var showEditArticleSheet = false
+    
+    init(doctor: DoctorModel) {
+        let adviceViewModel = AdviceViewModel(author: doctor)
+        let articlesViewModel = ArticalsViewModel(currentUser: .doctor(doctor))
+        _adviceViewModel = StateObject(wrappedValue: adviceViewModel)
+        _articlesViewModel = StateObject(wrappedValue: articlesViewModel)
+    }
+    
     var body: some View {
-        NavigationStack{
-            
-            // MARK: - Header Section
-            VStack{
-                // قسم البحث واضافة المقال والصورة الشخصية
-                HeaderHomeSectionView()
-                
-                // MARK: - Center Section
-                
-                // اضافة نصيحة
-                HStack {
-                    Spacer()
-                    Text("نصائح اليوم")
-                        .font(.headline)
-                        .fontWeight(.regular)
-                    if !adviceViewModel.Advicies.isEmpty{
-                        Button {
-                            showAddAdviceView.toggle()
-                            
-                        } label: {
-                            Image(systemName: "plus.circle")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width:20,height: 20)
-                                .foregroundStyle(.black)
-                        }
-                }
-                }
-                .padding(.horizontal,20)
-                .padding(.bottom,10)
-                .sheet(isPresented: $showAddAdviceView){
-                    AddAdviceSheetView(viewModel: adviceViewModel)
-                        .presentationDetents([.fraction(0.45)])
-                        .presentationCornerRadius(30)
-                    
-                    
-                }
-                
-                if adviceViewModel.Advicies.isEmpty {
-                    VStack(spacing: 20) {
-                        Image(systemName: "lightbulb.slash.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 80, height: 80)
-                            .foregroundColor(.gray.opacity(0.7))
-
-                        Text("لا توجد نصائح حتى الآن!")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.primary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 30)
-
-                        Text("ابدأ بإضافة نصيحة جديدة لتحفيز الآخرين.")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 40)
-                        // زر صغير مع أيقونة فقط
-                        Button(action: {
-                            showAddAdviceView.toggle()
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .foregroundColor(Color.accentColor)
-                        }
-                        .padding(.bottom, 20)
+        NavigationStack {
+            VStack {
+                // MARK: - Header Section
+//                HeaderHomeSectionView(userType: .doctor)
+                HeaderHomeSectionView(
+                    userType: .doctor,
+                    searchText: .constant(""), // تمرير نص البحث كـ Binding
+                    onProfileTap: {
+                        appState.selectedTabDoctors = .profile
+                        print("تم النقر على صورة المستخدم (الدكتور)")
+                    },
+                    onAddTap: {
+                        showAddArticleView.toggle()
+                    }, onSearch: { text in
+                        print("تم النقر على البحث المستخدم (الدكتور)")
                     }
-                    .padding(.top)
-                } else {
-                    List {
-                        ForEach(adviceViewModel.Advicies) { advice in
-                            AdviceView(advice: advice)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    swipeActions(for: advice)
-                                }
-                        }
-                    }
-                    .listStyle(.plain)
-                    .frame(height: 120)
-                }
+                )
+                // MARK: - Advice Section
+                adviceSection
 
+                // MARK: - Articles Section
+                articlesSection
 
-                
-                
-                // عنوان المنشور
-                titleCategory(title: "مقالة جديدة")
-                
-                // المنشور
-                NavigationStack {
-                    if $articalsViewModel.Articals.isEmpty {
-                        // Show "No Data" View
-                        VStack {
-                            Image(systemName: "tray")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(.gray.opacity(0.7))
-                            Text("لا توجد مقالات حاليًا")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 30)
-
-                            Text("ابدأ بإضافة مقالة جديدة لمساعدة الآخرين.")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 40)
-                            Button(action: {
-                                showAddArticalView.toggle()
-                            }) {
-                                Image(systemName: "plus.circle.fill")
-                                    .resizable()
-                                    .frame(width: 50, height: 50)
-                                    .foregroundColor(Color.accentColor)
-                            }
-                            .padding(.bottom, 20)
-                        }
-                        .padding(.top)
-                    }else{
-                        List {
-                            ForEach(articalsViewModel.Articals) {article in
-                                ShowArtical(artical: article)
-                            }
-                        }
-                        .listStyle(.inset)
-                    }
-                }
-                .sheet(isPresented: $showAddArticalView){
-                    AddArticleSheetView(articalsViewModel: articalsViewModel)
-                    
-                    .presentationDetents([.fraction(0.8)])
-                    .presentationCornerRadius(30)
-                    
-                    
-                }
-                
                 Spacer()
             }
         }
     }
-    func swipeActions(for advice: AdviceModel) -> some View {
-       Group {
-           // Edit Action
-           Button {
-               adviceViewModel.startEditing(advice: advice)
-           } label: {
-               Label("تعديل", systemImage: "pencil")
-           }
-           .tint(.blue)
-           
-           // Delete Action
-           Button() {
-               if let index = adviceViewModel.Advicies.firstIndex(where: { $0.id == advice.id }) {
-                   adviceViewModel.deleteAdvice(at: IndexSet(integer: index))
-               }
-           } label: {
-               Label("حذف", systemImage: "trash")
-           }
-           .tint(.red)
-       }
-   }
+
+    // MARK: - Advice Section
+    private var adviceSection: some View {
+        VStack {
+            HStack {
+                if !$adviceViewModel.advices.isEmpty {
+                    Button {
+                        showAddAdviceView.toggle()
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(.primary)
+                    }
+                }
+                Text("نصائح اليوم")
+                    .font(.headline)
+                    .fontWeight(.regular)
+                Spacer()
     
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 10)
+            .sheet(isPresented: $showAddAdviceView) {
+                AddAdviceSheetView(adviceViewModel: adviceViewModel)
+                    .presentationDetents([.fraction(0.45)])
+                    .presentationCornerRadius(30)
+            }
+
+            if adviceViewModel.advices.isEmpty {
+                noDataView(
+                    imageName: "lightbulb.slash.fill",
+                    title: "لا توجد نصائح حتى الآن!",
+                    description: "ابدأ بإضافة نصيحة جديدة لتحفيز الآخرين.",
+                    action: { showAddAdviceView.toggle()
+                    }
+                )
+            } else {
+                List {
+
+                        ForEach(adviceViewModel.advices) { advice in
+                            AdviceView(advice: advice)
+                                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                    swipeActions(for: advice)
+                                }
+                        }
+                }
+                .listStyle(.plain)
+                .frame(height: 130)
+            }
+        }
+    }
+    
+    // MARK: - Swipe Actions for Advice
+     func swipeActions(for advice: AdviceModel) -> some View {
+        Group {
+            Button {
+                adviceViewModel.startEditing(advice: advice)
+                showAddAdviceView.toggle()
+            } label: {
+                Label("تعديل", systemImage: "pencil")
+            }
+            .tint(.accent)
+
+            Button {
+                if let index = adviceViewModel.advices.firstIndex(where: { $0.id == advice.id }) {
+                    adviceViewModel.deleteAdvice(at: IndexSet(integer: index))
+                }
+            } label: {
+                Label("حذف", systemImage: "trash")
+            }
+            .tint(.red)
+        }
+    }
+
+    // MARK: - Articles Section
+    private var articlesSection: some View {
+        VStack {
+            HStack {
+                if !articlesViewModel.Articals.isEmpty {
+                    Button {
+                        showAddArticleView.toggle()
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundStyle(.primary)
+                    }
+                }
+                Text("مقالات جديدة")
+                    .font(.headline)
+                    .fontWeight(.regular)
+                Spacer()
+       
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 10)
+            .sheet(isPresented: $showAddArticleView) {
+                AddArticleSheetView(articalsViewModel: articlesViewModel)
+                    .presentationDetents([.fraction(0.8)])
+                    .presentationCornerRadius(30)
+            }
+
+            if articlesViewModel.Articals.isEmpty {
+                noDataView(
+                    imageName: "tray",
+                    title: "لا توجد مقالات حاليًا",
+                    description: "ابدأ بإضافة مقالة جديدة لمساعدة الآخرين.",
+                    action: { showAddArticleView.toggle() }
+                )
+            } else {
+                ScrollView {
+                    LazyVStack {
+                        ForEach(articlesViewModel.Articals) { article in
+                            ArticleView(
+                                articlesModel: article,  // استخدام المقالة الأصلية مباشرة
+                                articlesViewModel: articlesViewModel,
+                                userType: .doctor
+                            )
+                            
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    // MARK: - No Data View
+    private func noDataView(imageName: String, title: String, description: String, action: @escaping () -> Void) -> some View {
+        VStack(spacing: 20) {
+            Image(systemName: imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .foregroundColor(.gray.opacity(0.7))
+
+            Text(title)
+                .font(.title2)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
+
+            Text(description)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+
+            Button(action: action) {
+                Image(systemName: "plus.circle.fill")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(Color.accentColor)
+            }
+            .padding(.bottom, 20)
+        }
+        .padding(.top)
+    }
 }
-
-
-
 
 #Preview {
-    DoctorHomeScreen()
+    let doctor = DoctorModel(
+        fullName: "د. محمد أشرف",
+        email: "doctor@example.com",
+        password: "123456",
+        specialization: "طب الأطفال",
+        licenseNumber: "12345",
+        profilePicture: "post",
+        biography: nil,
+        articlesCount: 10,
+        advicesCount: 20,
+        followersCount: 50,
+        articles: [],
+        advices: [],
+        comments: [],
+        likedArticles: []
+    )
+
+    DoctorHomeScreen(doctor: doctor)
 }
-
-
-
-
-
-
-
-

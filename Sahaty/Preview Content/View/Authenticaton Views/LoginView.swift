@@ -2,115 +2,108 @@ import SwiftUI
 
 struct LoginView: View {
     
-    @StateObject private var authenticationViewModel = AuthenticationViewModel()
-    @State private var NavigateToDoctorView = false
-    @State private var NavigatToPationtView = false
+    @StateObject private var loginViewModel = LoginViewModel()
+    @State private var navigateToDoctorView = false
+    @State private var navigateToPatientView = false
 
- // لتغير لون picker للون الازرق
+    // لتغير لون picker للون الأزرق
     init() {
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor.accent
         
         let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white]
         UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .selected)
     }
-// MARK: - View
-    
+
+    // MARK: - View
     var body: some View {
         NavigationStack {
-            VStack{
-// MARK: - Header
-                // العنوان
+            VStack {
+                // MARK: - Header
                 VStack(alignment: .trailing, spacing: 8) {
                     Text("قم بتسجيل الدخول الآن")
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color.accentColor)
                 }
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
-                
+
                 // اختيار نوع المستخدم
-                Picker("", selection: $authenticationViewModel.model.userType) {
+                Picker("", selection: $loginViewModel.model.userType) {
                     Text("مريض").tag(UserType.patient)
                     Text("طبيب").tag(UserType.doctor)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(20)
-                
-                
-                
-                
-// MARK: - Center
-                // البريد الإلكتروني
-                VStack(alignment: .trailing, spacing: 5) {
+
+                // MARK: - Center
+                VStack(alignment: .leading, spacing: 5) {
+                    // البريد الإلكتروني
                     Text("البريد الإلكتروني")
                         .font(.callout)
-                        .foregroundColor(.black).opacity(0.7)
+                        .foregroundColor(.secondary).opacity(0.7)
                     
-                    TextField("أدخل عنوان بريدك الإلكتروني..", text: $authenticationViewModel.model.email)
+                    TextField("أدخل عنوان بريدك الإلكتروني..", text: $loginViewModel.model.email)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(Color(.systemGray6)).cornerRadius(10)
-                        .multilineTextAlignment(.trailing)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                        .multilineTextAlignment(.leading)
+
+                    if !loginViewModel.emailErrorMessage.isEmpty {
+                        Text(loginViewModel.emailErrorMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(.horizontal, 20)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top,20)
-                // نص الخطأ للبريد
-                if !authenticationViewModel.emailErrorMessage.isEmpty {
-                    Text(authenticationViewModel.emailErrorMessage)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
+                .padding(.top, 20)
 
-                
-                // كلمة المرور
-                VStack(alignment: .trailing, spacing: 5) {
+                VStack(alignment: .leading, spacing: 5) {
+                    // كلمة المرور
                     Text("كلمة المرور")
                         .font(.callout)
-                        .foregroundColor(.black).opacity(0.7)
+                        .foregroundColor(.secondary).opacity(0.7)
                     
-                    SecureField("أدخل كلمة المرور", text: $authenticationViewModel.model.password)
+                    SecureField("أدخل كلمة المرور", text: $loginViewModel.model.password)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(Color(.systemGray6)).cornerRadius(10)
-                        .multilineTextAlignment(.trailing)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
+                        .multilineTextAlignment(.leading)
+
+                    if !loginViewModel.passwordErrorMessage.isEmpty {
+                        Text(loginViewModel.passwordErrorMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(.horizontal, 20)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top,20)
-                
-                // نص الخطأ للبريد
-                if !authenticationViewModel.passwordErrorMessage.isEmpty {
-                    Text(authenticationViewModel.passwordErrorMessage)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
+                .padding(.top, 20)
 
-                
-       
                 // رابط "نسيت كلمة المرور؟"
                 HStack {
-                    Spacer()
-                    NavigationLink("هل نسيت كلمة المرور؟", destination: ForgotPasswordView(userType: authenticationViewModel.model.userType))
+                    NavigationLink("هل نسيت كلمة المرور؟", destination: ForgotPasswordView(userType: loginViewModel.model.userType))
                         .font(.callout)
-                        .foregroundColor(.black.opacity(0.7))
+                        .foregroundColor(.secondary.opacity(0.7))
+                    Spacer()
                 }
                 .padding(.horizontal, 25)
-                .padding(.top,10)
-                
+                .padding(.top, 10)
 
                 // زر تسجيل الدخول
                 Button(action: {
-                    if authenticationViewModel.validateLogin() {
-                        if authenticationViewModel.model.userType == .doctor {
-                            NavigateToDoctorView = true
-                        }else{
-                            NavigatToPationtView = true
+                    if loginViewModel.validateLogin() {
+                        if loginViewModel.model.userType == .doctor {
+                            navigateToDoctorView = true
+                        } else {
+                            navigateToPatientView = true
                         }
                     }
                 }) {
@@ -123,23 +116,15 @@ struct LoginView: View {
                         .cornerRadius(10)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top,20)
-                
-           //مؤقت
-                .navigationDestination(isPresented: $NavigateToDoctorView) {
+                .padding(.top, 20)
+                .navigationDestination(isPresented: $navigateToDoctorView) {
                     DoctorTabBarView()
-                       }
-                .navigationDestination(isPresented: $NavigatToPationtView) {
+                }
+                .navigationDestination(isPresented: $navigateToPatientView) {
                     PatientTabBarView()
-                       }
-        // هيتم اعتماد هذه الكود بعد لانتهاء من اضافة api
-                
-//                .fullScreenCover(isPresented: $shouldNavigateToDoctorView) {
-//                    DoctorDashboardView()
-//                      }
-                
-// MARK: - Fotear
-                // تسجيل من خلال
+                }
+
+                // MARK: - Footer
                 VStack(spacing: 10) {
                     HStack {
                         Rectangle()
@@ -147,14 +132,14 @@ struct LoginView: View {
                             .foregroundColor(.secondary.opacity(0.4))
                         Text("التسجيل من خلال")
                             .font(.system(size: 15))
-                            .foregroundColor(.black).opacity(0.7)
+                            .foregroundColor(.secondary).opacity(0.7)
                         Rectangle()
                             .frame(height: 1)
                             .foregroundColor(.secondary.opacity(0.4))
                     }
-                    .padding(.horizontal,30)
-                    .padding(.top,20)
-                    //
+                    .padding(.horizontal, 30)
+                    .padding(.top, 20)
+
                     HStack(spacing: 15) {
                         Button(action: {
                             // هنا سيتم الانتقال لحساب جوجل
@@ -166,16 +151,15 @@ struct LoginView: View {
                                 .foregroundColor(.accent)
                         }
                         .frame(width: 100, height: 60)
-                            .background(Color.clear) // خلفية شفافة
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.secondary, lineWidth: 1).opacity(0.5) // الحدود بلون الحواف
-                            )
-                            .cornerRadius(10)
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
+                        )
+                        .cornerRadius(10)
 
-                
                         Button(action: {
-                            // هنا سيتم الانتقال لحساب الفيس بوك
+                            // هنا سيتم الانتقال لحساب الفيسبوك
                         }) {
                             Image("facebook")
                                 .resizable()
@@ -184,14 +168,13 @@ struct LoginView: View {
                                 .foregroundColor(Color.accentColor)
                         }
                         .frame(width: 100, height: 60)
-                            .background(Color.clear) // خلفية شفافة
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.secondary, lineWidth: 1).opacity(0.5) // الحدود بلون الحواف
-                            )
-                            .cornerRadius(10)
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
+                        )
+                        .cornerRadius(10)
 
-                        
                         Button(action: {
                             // هنا سيتم الانتقال لحساب التويتر
                         }) {
@@ -202,25 +185,22 @@ struct LoginView: View {
                                 .foregroundColor(.accent)
                         }
                         .frame(width: 100, height: 60)
-                            .background(Color.clear) // خلفية شفافة
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.secondary, lineWidth: 1).opacity(0.5) // الحدود بلون الحواف
-                            )
-                            .cornerRadius(10)
-                        
-
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
+                        )
+                        .cornerRadius(10)
                     }
                     .padding(.top)
                 }
-                
-                // الانتقال لشاشة انشاء حساب
+
+                // الانتقال لشاشة إنشاء حساب
                 NavigationLink("إنشاء حساب جديد؟", destination: SignUpView())
                     .font(.callout)
-                    .foregroundColor(.black)
-                    .padding(.top,20)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 20)
             }
-            
         }
     }
 }

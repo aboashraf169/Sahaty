@@ -9,34 +9,58 @@ import SwiftUI
 
 struct PatientTabBarView: View {
     
-    @State var selectedPage = 0
+    @StateObject var appState = AppState()
+
 
     var body: some View {
         
-        TabView(selection: $selectedPage){
+        TabView(selection: $appState.selectedTabPatients){
 
-            Text("الاعدادات")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-            .tabItem{
-                HStack{
-                    Text("الاعدادات")
-                    Image(systemName: "gear")
-                }
-            }
-            .tag(4)
+            PatientHomeScreen(patient: PatientModel(
+                id: UUID(),
+                fullName: "محمد علي",
+                email: "patient@example.com",
+                password: "password123",
+                profilePicture: nil,
+                followedDoctors: [],
+                favoriteArticles: [],
+                favoriteAdvices: [],
+                likedArticles: [],
+                articleComments: []
+            ))
+                    .tabItem{
+                        HStack{
+                            Text("الرئيسية")
+                            Image(systemName: "house.fill")
+                        }
+                    }
+                    .tag(TabPatient.home)
+
+   
             
             
-                Text("الاطباء")
+            SpecializationsDoctorsView()
                     .tabItem{
                         HStack{
                             Text("الاطباء")
                             Image(systemName: "person.2")
                         }
                     }
-                    .tag(1)
+                    .tag(TabPatient.Doctors)
 
-            
+
+            Text("المحادثات")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+            .tabItem{
+                HStack{
+                    Text("المحادثات")
+                    Image(systemName: "message")
+                }
+            }
+            .tag(TabPatient.chat)
+            .badge(3)
+
             Text("الاشعارات")
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -46,32 +70,30 @@ struct PatientTabBarView: View {
                     Image(systemName: "heart.fill")
                 }
             }
-            .tag(2)
+            .tag(TabPatient.Notificatons)
             .badge(5)
     
-        
-            Text("الملف الشخصي")
+            
+           
+            
+            
+            Text("الاعدادات")
                     .font(.largeTitle)
                     .fontWeight(.bold)
             .tabItem{
                 HStack{
-                    Text("الملف الشخصي")
-                    Image(systemName: "person.fill")
+                    Text("الاعدادات")
+                    Image(systemName: "gear")
                 }
             }
-            .tag(3)
-            
-            PationtHomeScreen()
-                    .tabItem{
-                        HStack{
-                            Text("الرئيسية")
-                            Image(systemName: "house.fill")
-                        }
-                    }
-                    .tag(0)
+            .tag(TabPatient.settings)
 
             
+            
+   
             }
+        .environmentObject(appState) // مشاركة حالة التطبيق مع جميع الشاشات
+
         
     }
 }
