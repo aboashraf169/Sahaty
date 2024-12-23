@@ -7,10 +7,8 @@
 
 
 import Foundation
-
 class SignUpViewModel: ObservableObject {
-    // خاصية مساعدة للتعامل مع الحقول الاختيارية كسلسلة نصية عادية
-        @Published var confirmPasswordText: String = ""
+    @Published var confirmPasswordText: String = ""
 
     @Published var model = SignUpModel(
         fullName: "",
@@ -21,19 +19,74 @@ class SignUpViewModel: ObservableObject {
         licenseNumber: nil,
         userType: .patient
     )
-    
 
-
-    // رسائل الأخطاء
     @Published var fullNameErrorMessage: String = ""
     @Published var emailErrorMessage: String = ""
     @Published var passwordErrorMessage: String = ""
     @Published var confirmPasswordErrorMessage: String = ""
     @Published var specializationErrorMessage: String = ""
     @Published var licenseNumberErrorMessage: String = ""
-    @Published var successMessage: String = ""
+    @Published var signUpSuccessMessage: String = ""
+    @Published var isLoading: Bool = false
 
-    // التحقق من إنشاء الحساب
+
+    /// التحقق من البيانات وتحويلها إلى النموذج المناسب
+    func registerUser(completion: (Result<UserModel, Error>) -> Void) {
+        // 1. التحقق من صحة البيانات
+        guard validateSignUp() else {
+            completion(.failure(SignUpError.invalidData))
+            return
+        }
+        
+        // 2. إنشاء UserModel
+        let user = UserModel(
+            fullName: model.fullName,
+            email: model.email,
+            profilePicture: nil,
+            age: nil,
+            gender: .male, // يمكن تعيينها حسب الاختيار
+            userType: model.userType
+        )
+        
+        isLoading = true
+          DispatchQueue.global().asyncAfter(deadline: .now() + 2) { [weak self] in
+              guard let self = self else { return }
+              self.isLoading = false
+
+              // محاكاة نجاح التسجيل
+              DispatchQueue.main.async {
+                  self.signUpSuccessMessage = "تم تسجيل الحساب بنجاح!"
+              }
+          }
+
+        // 3. إنشاء DoctorModel أو PatientModel
+        if model.userType == .doctor {
+            guard let specialization = model.specialization,
+                  let licenseNumber = model.licenseNumber else {
+                completion(.failure(SignUpError.missingDoctorFields))
+                return
+            }
+            let doctor = DoctorModel(
+                user: user,
+                specialization: specialization,
+                licenseNumber: licenseNumber,
+                biography: nil
+            )
+            saveDoctor(doctor)
+            completion(.success(user))
+        } else {
+            let patient = PatientModel(
+                user: user,
+                followedDoctorIds: [],
+                favoriteArticleIds: [],
+                favoriteAdviceIds: []
+            )
+            savePatient(patient)
+            completion(.success(user))
+        }
+    }
+
+    // التحقق من صحة البيانات
     func validateSignUp() -> Bool {
         clearErrors()
         var isValid = true
@@ -59,22 +112,32 @@ class SignUpViewModel: ObservableObject {
         }
 
         if model.userType == .doctor {
-            if let specialization = model.specialization, specialization.isEmpty {
+            if model.specialization?.isEmpty ?? true {
                 specializationErrorMessage = "يرجى إدخال التخصص."
                 isValid = false
             }
 
-            if let licenseNumber = model.licenseNumber, licenseNumber.isEmpty {
+            if model.licenseNumber?.isEmpty ?? true {
                 licenseNumberErrorMessage = "يرجى إدخال رقم الترخيص."
                 isValid = false
             }
         }
 
         if isValid {
-            successMessage = "تم إنشاء الحساب بنجاح! 🥳"
+            signUpSuccessMessage = "تم إنشاء الحساب بنجاح!"
         }
 
         return isValid
+    }
+
+    private func saveDoctor(_ doctor: DoctorModel) {
+        // إرسال بيانات الطبيب إلى الخادم أو تخزينها محليًا
+        print("تم حفظ الطبيب: \(doctor)")
+    }
+
+    private func savePatient(_ patient: PatientModel) {
+        // إرسال بيانات المريض إلى الخادم أو تخزينها محليًا
+        print("تم حفظ المريض: \(patient)")
     }
 
     private func clearErrors() {
@@ -86,3 +149,21 @@ class SignUpViewModel: ObservableObject {
         licenseNumberErrorMessage = ""
     }
 }
+
+// أخطاء محتملة أثناء التسجيل
+enum SignUpError: Error, LocalizedError {
+    case invalidData
+    case missingDoctorFields
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidData:
+            return "البيانات غير صحيحة."
+        case .missingDoctorFields:
+            return "يرجى إدخال التخصص ورقم الترخيص للطبيب."
+        }
+    }
+}
+
+
+

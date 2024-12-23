@@ -6,7 +6,8 @@
 //
 
 
-enum UserType {
+
+enum UserType: String, Codable {
     case doctor
     case patient
 }

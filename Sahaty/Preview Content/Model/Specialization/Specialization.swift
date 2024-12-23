@@ -8,8 +8,9 @@
 import Foundation
 
 
-struct Specialization: Identifiable {
-    let id = UUID()
+struct Specialization: Identifiable, Codable {
+    var id: UUID = UUID()
     let name: String
-    let doctors: [DoctorModel]
+    let doctorIds: [UUID] // قائمة IDs للأطباء المرتبطين
 }
+

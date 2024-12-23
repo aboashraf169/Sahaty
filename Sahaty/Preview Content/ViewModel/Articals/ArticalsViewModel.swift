@@ -30,22 +30,19 @@ class ArticalsViewModel: ObservableObject {
         Articals = [
             ArticalModel(
                 description: "اشرب 8 أكواب ماء يوميًا للحفاظ على ترطيب جسمك.",
-                name: "د. محمد أشرف",
-                userName: "@midoMj",
-                addTime: "ساعتين",
-                imagePost: "post",
-                personImage: "doctor"
+                authorId: DoctorModel(user: UserModel(fullName: "", email: "", userType: .doctor), specialization: "", licenseNumber: ""), // ربط بالمستخدم الافتراضي
+                publishDate: Date(),
+                imagePost: "post"
             ),
             ArticalModel(
                 description: "قم بممارسة الرياضة بانتظام لتحسين صحتك.",
-                name: "د. أحمد علي",
-                userName: "@ahmedAli",
-                addTime: "ساعة",
-                imagePost: nil,
-                personImage: "doctor"
+                authorId: DoctorModel(user: UserModel(fullName: "", email: "", userType: .doctor), specialization: "", licenseNumber: ""), // ربط بالمستخدم الافتراضي
+                publishDate: Date(),
+                imagePost: "post"
             )
         ]
     }
+
 
 
     // MARK: - Add or Edit Article
@@ -58,26 +55,24 @@ class ArticalsViewModel: ObservableObject {
             return
         }
 
-
         if let editingIndex = Articals.firstIndex(where: { $0.id == editingArticle?.id }) {
-            // تعديل المقالة
             Articals[editingIndex].description = trimmedText
             editingArticle = nil
-        } else {
-            // إضافة مقالة جديدة
+        } else if let currentUser = currentUser {
             let newArticle = ArticalModel(
                 description: trimmedText,
-                name: getCurrentUserName(),
-                userName: "@\(getCurrentUserName().replacingOccurrences(of: " ", with: ""))",
-                addTime: "الآن",
-                imagePost: selectedImage != nil ? "newImage" : nil, // رابط الصورة إذا وجدت
-                personImage: "doctor" // صورة المستخدم (افتراضية هنا)
+                authorId: DoctorModel(user: UserModel(fullName: "", email: "", userType: .doctor), specialization: "", licenseNumber: ""), // ربط بالمستخدم الافتراضي
+                publishDate: Date(),
+                imagePost: selectedImage != nil ? "uploadedImage" : nil // يجب حفظ الصورة إذا تم رفعها
             )
             Articals.append(newArticle)
+        } else {
+            showAlert(title: "خطأ", message: "لا يمكن إضافة المقالة بدون مستخدم.")
         }
 
         resetFields()
     }
+
     
 
     // MARK: - Start Editing Article
@@ -115,18 +110,6 @@ class ArticalsViewModel: ObservableObject {
                     self.showAlert(title: "خطأ", message: error.localizedDescription)
                 }
             }
-        }
-    }
-
-    // MARK: - Utility Methods
-    private func getCurrentUserName() -> String {
-        switch currentUser {
-        case .doctor(let doctor):
-            return doctor.fullName
-        case .patient(let patient):
-            return patient.fullName
-        default:
-            return "مستخدم مجهول"
         }
     }
 

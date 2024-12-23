@@ -30,7 +30,6 @@ struct CommentView: View {
                     .clipShape(Circle())
                     .overlay(Circle().stroke(Color.accentColor, lineWidth: 3))
             }
-            
 
             // المحتوى
             VStack(alignment: .leading, spacing: 5) {

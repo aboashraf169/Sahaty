@@ -31,6 +31,11 @@ struct AddAdviceSheetView: View {
             
             // زر النشر
             Button {
+                if adviceViewModel.newAdviceText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    // عرض رسالة خطأ إذا كان النص فارغًا
+                    print("النصيحة لا يمكن أن تكون فارغة")
+                    return
+                }
                 adviceViewModel.addAdvice()
                 presentationMode.wrappedValue.dismiss()
             } label: {
@@ -53,23 +58,6 @@ struct AddAdviceSheetView: View {
 
 
 #Preview {
-    // إنشاء نموذج طبيب تجريبي
-    let doctor = DoctorModel(
-        fullName: "د. محمد أشرف",
-        email: "doctor@example.com",
-        password: "123456",
-        specialization: "طب الأطفال",
-        licenseNumber: "12345",
-        profilePicture: nil,
-        biography: nil,
-        articlesCount: 10,
-        advicesCount: 20,
-        followersCount: 50,
-        articles: [],
-        advices: [],
-        comments: [],
-        likedArticles: []
-    )
-    AddAdviceSheetView(adviceViewModel:  AdviceViewModel(author: doctor))
+    AddAdviceSheetView(adviceViewModel: AdviceViewModel(author: DoctorModel(user: UserModel(fullName: "", email: "", userType: .doctor), specialization: "", licenseNumber: "")))
 
 }

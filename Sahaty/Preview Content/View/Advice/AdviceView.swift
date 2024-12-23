@@ -27,5 +27,5 @@ struct AdviceView: View {
     }
 }
 #Preview {
-    AdviceView(advice:  AdviceModel(content: "mido mj", authorName: "mido mj", publishDate: .now))
+    AdviceView(advice: AdviceModel(content: "", authorId: UUID(), publishDate: .now))
 }

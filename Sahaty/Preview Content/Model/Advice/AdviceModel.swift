@@ -7,9 +7,12 @@
 
 import Foundation
 
-struct AdviceModel: Identifiable {
-    let id = UUID()
+
+struct AdviceModel:  Identifiable, Codable, Equatable {
+    var id: UUID = UUID()
     var content: String
-    var authorName: String
+    var authorId: UUID // ربط النصيحة بالطبيب
     var publishDate: Date
+
 }
+

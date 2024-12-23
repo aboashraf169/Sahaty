@@ -18,37 +18,38 @@ struct ArticleView: View {
     var body: some View {
         VStack(spacing: 20) {
             HStack {
-                // إعدادات المنشور للأطباء فقط
                 
                 // صورة صاحب المنشور
-                if let image = articlesModel.personImage {
-                    Image(image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
-                } else {
-                    Image(systemName: "person.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(.top,3)
-                        .frame(width: 40, height: 40)
-                        .background(Color.accentColor)
-                        .clipShape(Circle())
-                        .foregroundColor(.white)
+                if let author = articlesViewModel.currentUser {
+                    switch author {
+                    case .doctor(let doctor):
+                        Image(doctor.user.profilePicture ?? "defaultProfile")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                    case .patient(let patient):
+                        Image(patient.user.profilePicture ?? "defaultProfile")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                    }
                 }
+
+                
 
                 // بيانات صاحب المنشور
                 VStack(alignment: .leading) {
-                    Text(articlesModel.name)
+                    Text(articlesModel.authorId.user.fullName)
                         .font(.headline)
                         .fontWeight(.regular)
                     
                     HStack {
-                        Text(articlesModel.userName)
+                        Text(articlesModel.authorId.user.email)
                             .font(.subheadline)
                             .fontWeight(.light)
-                        Text("منذ \(articlesModel.addTime)")
+                        Text("منذ \(articlesModel.publishDate)")
                             .font(.subheadline)
                             .fontWeight(.light)
             
@@ -126,7 +127,7 @@ struct ArticleView: View {
                 }
 
             // خيارات التفاعل
-            FotterArtical(comments:articlesModel.comments)
+            FotterArtical(comments:[])
 
         }
         .padding(.horizontal)
@@ -138,7 +139,6 @@ struct ArticleView: View {
 }
 
 #Preview {
-    
-    ArticleView(articlesModel: ArticalModel(description:  "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار.", name: "محمد اشرف", userName: "midoMj@", addTime: "ساعتين"), articlesViewModel: ArticalsViewModel(), userType: .doctor)
+
 }
 
