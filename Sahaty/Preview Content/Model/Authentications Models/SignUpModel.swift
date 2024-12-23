@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SignUpModel {
+struct SignUpModel: Codable, Equatable  {
     var fullName: String
     var email: String
     var password: String
@@ -16,4 +16,5 @@ struct SignUpModel {
     var specialization: String?
     var licenseNumber: String?
     var userType: UserType
+    
 }

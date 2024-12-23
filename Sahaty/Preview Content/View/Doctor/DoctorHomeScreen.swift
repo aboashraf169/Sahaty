@@ -77,28 +77,28 @@ struct DoctorHomeScreen: View {
                     .presentationDetents([.fraction(0.45)])
                     .presentationCornerRadius(30)
             }
-
             if adviceViewModel.advices.isEmpty {
                 noDataView(
                     imageName: "lightbulb.slash.fill",
                     title: "لا توجد نصائح حتى الآن!",
                     description: "ابدأ بإضافة نصيحة جديدة لتحفيز الآخرين.",
-                    action: { showAddAdviceView.toggle()
-                    }
+                    action: { showAddAdviceView.toggle() }
                 )
             } else {
-                List {
-
+                ScrollView {
+                    LazyVStack {
                         ForEach(adviceViewModel.advices) { advice in
                             AdviceView(advice: advice)
-                                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     swipeActions(for: advice)
                                 }
                         }
+                    }
                 }
                 .listStyle(.plain)
-                .frame(height: 130)
+                .frame(maxHeight: 200)
             }
+
         }
     }
     
@@ -123,6 +123,7 @@ struct DoctorHomeScreen: View {
             .tint(.red)
         }
     }
+    
 
     // MARK: - Articles Section
     private var articlesSection: some View {
@@ -213,22 +214,5 @@ struct DoctorHomeScreen: View {
 }
 
 #Preview {
-    let doctor = DoctorModel(
-        fullName: "د. محمد أشرف",
-        email: "doctor@example.com",
-        password: "123456",
-        specialization: "طب الأطفال",
-        licenseNumber: "12345",
-        profilePicture: "post",
-        biography: nil,
-        articlesCount: 10,
-        advicesCount: 20,
-        followersCount: 50,
-        articles: [],
-        advices: [],
-        comments: [],
-        likedArticles: []
-    )
-
-    DoctorHomeScreen(doctor: doctor)
+    DoctorRowView(doctor: DoctorModel(user: UserModel(fullName: "", email: "", userType: .doctor), specialization: "", licenseNumber: ""))
 }

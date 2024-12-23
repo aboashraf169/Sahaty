@@ -16,18 +16,7 @@ struct PatientTabBarView: View {
         
         TabView(selection: $appState.selectedTabPatients){
 
-            PatientHomeScreen(patient: PatientModel(
-                id: UUID(),
-                fullName: "محمد علي",
-                email: "patient@example.com",
-                password: "password123",
-                profilePicture: nil,
-                followedDoctors: [],
-                favoriteArticles: [],
-                favoriteAdvices: [],
-                likedArticles: [],
-                articleComments: []
-            ))
+            PatientHomeScreen(patient: PatientModel(user: UserModel(fullName: "", email: "", userType: .patient)))
                     .tabItem{
                         HStack{
                             Text("الرئيسية")

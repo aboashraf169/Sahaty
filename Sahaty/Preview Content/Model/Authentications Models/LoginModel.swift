@@ -8,8 +8,9 @@
 
 import Foundation
 
-struct LoginModel {
+struct LoginModel: Identifiable, Codable, Equatable  {
     var email: String
     var password: String
     var userType: UserType
 }
+

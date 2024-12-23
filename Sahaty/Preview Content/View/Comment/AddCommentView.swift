@@ -77,22 +77,7 @@ struct AddCommentView: View {
 
 
 #Preview {
-    let currentUser = DoctorModel(
-        id: UUID(),
-        fullName: "محمد أشرف",
-        email: "mohamed@example.com",
-        password: "password123",
-        specialization: "Cardiology", // التخصص
-        licenseNumber: "123456789", // رقم الترخيص
-        profilePicture: nil, // صورة اختيارية
-        biography: "استشاري أمراض القلب", // السيرة الذاتية
-        articlesCount: 10, // عدد المقالات
-        advicesCount: 15, // عدد النصائح
-        followersCount: 200, // عدد المتابعين
-        articles: [], // قائمة المقالات
-        advices: [], // قائمة النصائح
-        comments: [], // قائمة التعليقات
-        likedArticles: [] // قائمة المقالات المعجب بها
-    )
-    AddCommentView(currentUser: .doctor(currentUser))
+   
+    AddCommentView(currentUser: .doctor(DoctorModel(user: UserModel(fullName: "", email: "", userType: .doctor), specialization: "", licenseNumber: "")))
+    
 }

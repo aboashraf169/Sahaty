@@ -42,3 +42,4 @@ class CommentViewModel: ObservableObject {
         newCommentText = comment.text
     }
 }
+

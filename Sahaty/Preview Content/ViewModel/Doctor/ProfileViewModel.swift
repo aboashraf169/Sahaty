@@ -19,68 +19,60 @@ class ProfileViewModel: ObservableObject {
         fetchDoctorArticles()
         fetchDoctorAdvice()
     }
-    
     private func fetchDoctorArticles() {
-        // بيانات المقالات الافتراضية الخاصة بالطبيب
         articles = [
             ArticalModel(
-                description: "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار.",
-                name: doctor.fullName,
-                userName: "@\(doctor.fullName.replacingOccurrences(of: " ", with: "").lowercased())",
-                addTime: "منذ ساعتين",
-                imagePost: "post",
-                personImage: doctor.profilePicture,
-                comments: []
+                description: "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن.",
+                authorId: doctor,
+                publishDate: Date(),
+                imagePost: "post"
             ),
             ArticalModel(
                 description: "التغذية السليمة تعزز من صحة الجسم وتقي من الأمراض المزمنة.",
-                name: doctor.fullName,
-                userName: "@\(doctor.fullName.replacingOccurrences(of: " ", with: "").lowercased())",
-                addTime: "منذ 3 ساعات",
-                imagePost: nil,
-                personImage: doctor.profilePicture,
-                comments: []
+                authorId: doctor,
+                publishDate: Date(),
+                imagePost: nil
             )
         ]
     }
+
+    
+    
     private func fetchDoctorAdvice() {
-        // بيانات المقالات الافتراضية الخاصة بالطبيب
-      advices = [
+        // بيانات النصائح الافتراضية الخاصة بالطبيب
+        advices = [
             AdviceModel(
                 content: "تناول وجبة إفطار صحية كل يوم لتحصل على بداية يوم مليئة بالطاقة.",
-                authorName: "د. علي سالم",
+                authorId: doctor.user.id,
                 publishDate: Date()
             ),
             AdviceModel(
                 content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "تناول وجبة إفطار صحية كل يوم لتحصل على بداية يوم مليئة بالطاقة.",
-                authorName: "د. علي سالم",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
+                authorId: doctor.user.id,
                 publishDate: Date()
             ),
             AdviceModel(
                 content: "تناول وجبة إفطار صحية كل يوم لتحصل على بداية يوم مليئة بالطاقة.",
-                authorName: "د. علي سالم",
+                authorId: doctor.user.id,
                 publishDate: Date()
             ),
             AdviceModel(
                 content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
+                authorId: doctor.user.id,
+                publishDate: Date()
+            ),
+            AdviceModel(
+                content: "تناول وجبة إفطار صحية كل يوم لتحصل على بداية يوم مليئة بالطاقة.",
+                authorId: doctor.user.id,
+                publishDate: Date()
+            ),
+            AdviceModel(
+                content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
+                authorId: doctor.user.id,
                 publishDate: Date()
             )
         ]
     }
+
 }
+

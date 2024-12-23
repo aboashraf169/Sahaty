@@ -6,7 +6,6 @@ struct PatientHomeScreen: View {
     @State private var searchText = ""
 
         init(patient: PatientModel) {
-            let adviceViewModel = AdviceViewModel(currentUser: .patient(patient))
             _adviceViewModel = StateObject(wrappedValue: adviceViewModel)
             _articlesViewModel = StateObject(wrappedValue: ArticalsViewModel(currentUser: .patient(patient)))
         }
@@ -51,7 +50,11 @@ struct PatientHomeScreen: View {
                         } else {
                             VStack(spacing: 10) { // يمكنك إضافة تباعد بين المقالات هنا
                                 ForEach(articlesViewModel.Articals) { article in
-                                    ArticleView(articlesModel: ArticalModel(description: article.description, name: article.name, userName: article.userName, addTime: article.addTime, imagePost: article.imagePost, personImage: article.imagePost), articlesViewModel: articlesViewModel,userType: .patient)
+                                    ArticleView(
+                                              articlesModel: article,
+                                              articlesViewModel: articlesViewModel,
+                                              userType: .patient
+                                          )
                                 }
                             }
                         }
@@ -69,22 +72,22 @@ struct PatientHomeScreen: View {
                 Button {
                     print("عرض تفاصيل النصيحة: \(advice.content)")
                 } label: {
-                    
-                    Rectangle()
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.accentColor)
                         .frame(maxWidth: .infinity)
                         .frame(height: 80)
-                        .foregroundStyle(Color.accentColor)
                         .overlay(
                             HStack {
-                                Image("idea")
-
-                                ViewThatFits {
-                                    Text("\"\(advice.content)\"")
-                                        .font(.callout)
-                                        .foregroundColor(.white)
-                                }
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
+                                Image(systemName: "lightbulb")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.white)
+                                
+                                Text("\"\(advice.content)\"")
+                                    .font(.callout)
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
                             }
                             .padding()
                         )
@@ -99,6 +102,7 @@ struct PatientHomeScreen: View {
             }
         }
     }
+
 
     
     // MARK: - Categories Section
@@ -188,17 +192,5 @@ struct Categoryy: View {
 
 // MARK: - Preview
 #Preview {
-    let patient = PatientModel(
-        id: UUID(),
-        fullName: "محمد علي",
-        email: "patient@example.com",
-        password: "password123",
-        profilePicture: "post",
-        followedDoctors: [],
-        favoriteArticles: [],
-        favoriteAdvices: [],
-        likedArticles: [],
-        articleComments: []
-    )
-    PatientHomeScreen(patient: patient)
+    PatientHomeScreen(patient: PatientModel(user: UserModel(fullName: "", email: "", userType: .patient)))
 }

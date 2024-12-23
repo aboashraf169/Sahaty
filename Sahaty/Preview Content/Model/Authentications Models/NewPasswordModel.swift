@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct NewPasswordModel {
+struct NewPasswordModel:  Identifiable, Codable, Equatable  {
     var password: String
     var confirmPassword: String?
 }

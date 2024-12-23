@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct OtpVerificationModel {
+struct OtpVerificationModel :  Identifiable, Codable, Equatable {
     var email: String
     var otpCode: String
 }

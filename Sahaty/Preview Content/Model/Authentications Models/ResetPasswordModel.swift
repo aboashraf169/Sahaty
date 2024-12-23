@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ResetPasswordModel {
+struct ResetPasswordModel : Codable, Equatable {
     var email: String
     var otpCode: String?
     var newPassword: String?

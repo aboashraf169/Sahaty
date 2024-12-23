@@ -154,18 +154,4 @@ struct AddArticleSheetView: View {
 }
 
 #Preview {
-    AddArticleSheetView(articalsViewModel: ArticalsViewModel(currentUser: .doctor(DoctorModel(
-        fullName: "د. محمد علي",
-        email: "test@example.com",
-        password: "123456",
-        specialization: "أمراض القلب",
-        licenseNumber: "12345",
-        articlesCount: 10,
-        advicesCount: 5,
-        followersCount: 50,
-        articles: [],
-        advices: [],
-        comments: [],
-        likedArticles: []
-    ))))
 }
