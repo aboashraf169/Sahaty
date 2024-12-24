@@ -86,6 +86,8 @@ struct DoctorHomeScreen: View {
                     action: { showAddAdviceView.toggle()
                     }
                 )
+                .frame(height: 130)
+
             } else {
                 List {
 
@@ -184,7 +186,7 @@ struct DoctorHomeScreen: View {
             Image(systemName: imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 80, height: 80)
+                .frame(width: 40, height: 40)
                 .foregroundColor(.gray.opacity(0.7))
 
             Text(title)
@@ -203,12 +205,12 @@ struct DoctorHomeScreen: View {
             Button(action: action) {
                 Image(systemName: "plus.circle.fill")
                     .resizable()
-                    .frame(width: 50, height: 50)
+                    .frame(width: 35, height: 35)
                     .foregroundColor(Color.accentColor)
             }
             .padding(.bottom, 20)
         }
-        .padding(.top)
+//        .padding(.top)
     }
 }
 
@@ -216,7 +218,6 @@ struct DoctorHomeScreen: View {
     let doctor = DoctorModel(
         fullName: "د. محمد أشرف",
         email: "doctor@example.com",
-        password: "123456",
         specialization: "طب الأطفال",
         licenseNumber: "12345",
         profilePicture: "post",

@@ -17,30 +17,30 @@ class SpecializationViewModel: ObservableObject {
             Specialization(
                 name: "طب الأطفال",
                 doctors: [
-                    DoctorModel(fullName: "محمد", email: "abo.ashraf@gmail.com", password: "123456789", specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "احمد", email: "mido.ashraf@gmail.com", password: "123456789", specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "عيسى", email: "abo.ashraf@gmail.com", password: "123456789", specialization: "طب الأطفال", licenseNumber: "55664321",profilePicture: "doctor", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "ماجد", email: "mido.ashraf@gmail.com", password: "123456789", specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: [])
+                    DoctorModel(fullName: "محمد", email: "abo.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "احمد", email: "mido.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "عيسى", email: "abo.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321",profilePicture: "doctor", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "ماجد", email: "mido.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: [])
     
                 ]
             ),
             Specialization(
                 name: "طب القلب",
                 doctors: [
-                    DoctorModel(fullName: "عبد الله", email: "abo.ashraf@gmail.com", password: "123456789", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "حسن", email: "mido.ashraf@gmail.com", password: "123456789", specialization:  "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "حاتم", email: "abo.ashraf@gmail.com", password: "123456789", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "مهدي", email: "mido.ashraf@gmail.com", password: "123456789", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: [])
+                    DoctorModel(fullName: "عبد الله", email: "abo.ashraf@gmail.com",specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "حسن", email: "mido.ashraf@gmail.com", specialization:  "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "حاتم", email: "abo.ashraf@gmail.com", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "مهدي", email: "mido.ashraf@gmail.com",specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: [])
     
                 ]
             ),
             Specialization(
                 name: "طب العيون",
                 doctors: [
-                    DoctorModel(fullName: "رشدي", email: "abo.ashraf@gmail.com", password: "123456789", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "خليل", email: "mido.ashraf@gmail.com", password: "123456789", specialization:  "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "خالد", email: "abo.ashraf@gmail.com", password: "123456789", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
-                    DoctorModel(fullName: "منصور", email: "mido.ashraf@gmail.com", password: "123456789", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: [])
+                    DoctorModel(fullName: "رشدي", email: "abo.ashraf@gmail.com", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "خليل", email: "mido.ashraf@gmail.com",specialization:  "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "خالد", email: "abo.ashraf@gmail.com", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: []),
+                    DoctorModel(fullName: "منصور", email: "mido.ashraf@gmail.com",specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35, articles: [], advices: [], comments: [], likedArticles: [])
     
                 ]
             )

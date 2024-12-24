@@ -14,7 +14,6 @@ struct DoctorTabBarView: View {
     @State var doctor = DoctorModel(
         fullName: "د. محمد أشرف",
         email: "doctor@example.com",
-        password: "123456",
         specialization: "طب الأطفال",
         licenseNumber: "12345",
         profilePicture: nil,
@@ -79,9 +78,8 @@ struct DoctorTabBarView: View {
             .badge(10)
     
     
-            Text("الاعدادات")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            DoctorSettingView(viewModel: ProfileViewModel(doctor: doctor))
+                .padding()
             .tabItem{
                 HStack{
                     Text("الاعدادات")
@@ -99,9 +97,9 @@ struct DoctorTabBarView: View {
 }
 
 #Preview{
-    let appState = AppState() // إنشاء كائن البيئة
+    let appState = AppState()
     DoctorTabBarView()
-        .environmentObject(appState) // تمرير AppState للمعاينة
+        .environmentObject(appState)
 }
 
 

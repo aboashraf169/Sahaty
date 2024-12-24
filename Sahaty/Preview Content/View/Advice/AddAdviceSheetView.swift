@@ -57,7 +57,6 @@ struct AddAdviceSheetView: View {
     let doctor = DoctorModel(
         fullName: "د. محمد أشرف",
         email: "doctor@example.com",
-        password: "123456",
         specialization: "طب الأطفال",
         licenseNumber: "12345",
         profilePicture: nil,

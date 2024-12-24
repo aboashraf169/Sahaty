@@ -10,24 +10,25 @@ import SwiftUI
 struct PatientTabBarView: View {
     
     @StateObject var appState = AppState()
-
+    
+    @State var Patient : PatientModel =
+    PatientModel(
+        id: UUID(),
+        fullName: "محمد علي",
+        email: "patient@example.com",
+        profilePicture: "post",
+        followedDoctors: [],
+        favoriteArticles: [],
+        favoriteAdvices: [],
+        likedArticles: [],
+        articleComments: []
+    )
 
     var body: some View {
         
         TabView(selection: $appState.selectedTabPatients){
 
-            PatientHomeScreen(patient: PatientModel(
-                id: UUID(),
-                fullName: "محمد علي",
-                email: "patient@example.com",
-                password: "password123",
-                profilePicture: nil,
-                followedDoctors: [],
-                favoriteArticles: [],
-                favoriteAdvices: [],
-                likedArticles: [],
-                articleComments: []
-            ))
+            PatientHomeScreen(patient: Patient)
                     .tabItem{
                         HStack{
                             Text("الرئيسية")
@@ -77,9 +78,8 @@ struct PatientTabBarView: View {
            
             
             
-            Text("الاعدادات")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            PatientSettingView(viewModel: Patient)
+                .padding()
             .tabItem{
                 HStack{
                     Text("الاعدادات")

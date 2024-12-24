@@ -11,7 +11,6 @@ struct PatientModel: Identifiable {
     var id = UUID() // معرف فريد للمريض
     var fullName: String // الاسم الكامل
     var email: String // البريد الإلكتروني
-    var password: String // كلمة المرور
     var profilePicture: String? // رابط الصورة الشخصية (اختياري)
     var age: Int? // العمر (اختياري)
     var gender: String? // الجنس (اختياري)

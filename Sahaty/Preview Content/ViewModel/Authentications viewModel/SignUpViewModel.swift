@@ -9,8 +9,7 @@
 import Foundation
 
 class SignUpViewModel: ObservableObject {
-    // خاصية مساعدة للتعامل مع الحقول الاختيارية كسلسلة نصية عادية
-        @Published var confirmPasswordText: String = ""
+    
 
     @Published var model = SignUpModel(
         fullName: "",
@@ -23,7 +22,6 @@ class SignUpViewModel: ObservableObject {
     )
     
 
-
     // رسائل الأخطاء
     @Published var fullNameErrorMessage: String = ""
     @Published var emailErrorMessage: String = ""
@@ -32,6 +30,8 @@ class SignUpViewModel: ObservableObject {
     @Published var specializationErrorMessage: String = ""
     @Published var licenseNumberErrorMessage: String = ""
     @Published var successMessage: String = ""
+
+    @Published var confirmPasswordText: String = ""
 
     // التحقق من إنشاء الحساب
     func validateSignUp() -> Bool {

@@ -81,7 +81,6 @@ struct AddCommentView: View {
         id: UUID(),
         fullName: "محمد أشرف",
         email: "mohamed@example.com",
-        password: "password123",
         specialization: "Cardiology", // التخصص
         licenseNumber: "123456789", // رقم الترخيص
         profilePicture: nil, // صورة اختيارية

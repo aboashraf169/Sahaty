@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PatientHomeScreen: View {
+    @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
     @StateObject private var adviceViewModel: AdviceViewModel
     @StateObject private var articlesViewModel: ArticalsViewModel
     @State private var searchText = ""
@@ -21,6 +22,7 @@ struct PatientHomeScreen: View {
                     userType: .patient,
                     searchText: $searchText, // تمرير نص البحث كـ Binding
                     onProfileTap: {
+                        appState.selectedTabPatients = .settings
                         print("تم النقر على صورة المستخدم (الدكتور)")
                     },
                     onAddTap: {
@@ -192,7 +194,6 @@ struct Categoryy: View {
         id: UUID(),
         fullName: "محمد علي",
         email: "patient@example.com",
-        password: "password123",
         profilePicture: "post",
         followedDoctors: [],
         favoriteArticles: [],

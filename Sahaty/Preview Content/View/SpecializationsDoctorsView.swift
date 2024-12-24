@@ -1,6 +1,8 @@
 import SwiftUI
 
+
 struct SpecializationsDoctorsView: View {
+    
     @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
     @StateObject var viewModel = SpecializationViewModel() // تمرير ViewModel
     @State private var searchText: String = "" // نص البحث
@@ -9,45 +11,51 @@ struct SpecializationsDoctorsView: View {
         NavigationStack {
             VStack {
                 // شريط البحث
-                HStack {
-               
-//                    HeaderHomeSectionView(userType: .doctor)
-                    
-                    TextField("ابحث في الواجهة", text: $searchText)
-                        .padding(10)
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(10)
-                        .overlay(
-                            HStack {
-                                Spacer()
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.gray)
-                                    .padding(.trailing, 10)
-                            }
-                        )
-                }
-                .padding()
+                searchBar
 
                 // قائمة الأطباء حسب التخصص
-                List {
-                    ForEach(viewModel.filteredSpecializations(searchText: searchText)) { specialization in
-                        Section(header: Text(specialization.name)
-                                    .font(.headline)
-                                    .foregroundColor(.accentColor)) {
-                            ForEach(specialization.doctors) { doctor in
-                                DoctorRowView(doctor: doctor)
-                                    .environmentObject(appState)
-                            }
-                        }
-                    }
-                }
-                .listStyle(.plain)
+                doctorList
             }
             .navigationTitle("الأطباء")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
+
+    private var searchBar: some View {
+        HStack {
+            TextField("ابحث في الواجهة", text: $searchText)
+                .padding(10)
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(10)
+                .overlay(
+                    HStack {
+                        Spacer()
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                            .padding(.trailing, 10)
+                    }
+                )
+        }
+        .padding()
+    }
+
+    private var doctorList: some View {
+        List {
+            ForEach(viewModel.filteredSpecializations(searchText: searchText)) { specialization in
+                Section(header: Text(specialization.name)
+                            .font(.headline)
+                            .foregroundColor(.accentColor)) {
+                                ForEach(specialization.doctors) { doctor in
+                        DoctorRowView(doctor: doctor)
+                            .environmentObject(appState)
+                    }
+                }
+            }
+        }
+        .listStyle(.plain)
+    }
 }
+
 
 // MARK: - DoctorRowView
 struct DoctorRowView: View {
@@ -95,12 +103,15 @@ struct DoctorRowView: View {
                 HStack {
                     Image(systemName: "message.fill")
                     Text("محادثة")
-                   
                 }
-                .foregroundColor(.white)
+                
+                .foregroundColor(.accentColor)
                 .padding(10)
-                .background(Color.accentColor)
-                .cornerRadius(10)
+                .border(Color.accentColor,width: 3)
+                .cornerRadius(4)
+
+                
+//                .background(Color.accentColor)
             }
         }
         .padding(.vertical, 5)
@@ -110,8 +121,7 @@ struct DoctorRowView: View {
 
 
 // MARK: - Preview
-struct DoctorsListView_Previews: PreviewProvider {
-    static var previews: some View {
-        SpecializationsDoctorsView()
-    }
+#Preview{
+    SpecializationsDoctorsView()
+        .environmentObject(AppState())
 }

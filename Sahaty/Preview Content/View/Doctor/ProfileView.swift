@@ -286,8 +286,8 @@ struct ProfileHeaderView: View {
             }
             
             Text(viewModel.doctor.fullName)
-                .font(.title2)
-                .fontWeight(.bold)
+                .font(.headline)
+                .fontWeight(.medium)
             
             Text(viewModel.doctor.specialization)
                 .font(.subheadline)
@@ -409,7 +409,6 @@ struct BioSectionView: View {
         id: UUID(),
         fullName: "د. محمد اشرف",
         email: "ahmedalkhairy@example.com",
-        password: "123456",
         specialization: "أخصائي الغدد الصماء",
         licenseNumber: "12345",
         profilePicture: "post", // اسم الصورة في Assets

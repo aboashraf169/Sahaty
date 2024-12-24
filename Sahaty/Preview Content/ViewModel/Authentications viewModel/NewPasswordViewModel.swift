@@ -10,11 +10,13 @@ import Foundation
 
 class NewPasswordViewModel: ObservableObject {
     // MARK: - Model
-    @Published var model = NewPasswordModel(password: "", confirmPassword: nil)
+    @Published var model = NewPasswordModel(password: "")
 
     // MARK: - Error Messages
     @Published var passwordErrorMessage: String = ""
     @Published var confirmPasswordErrorMessage: String = ""
+    @Published var OldPasswordErrorMessage: String = ""
+
 
     // MARK: - Success Message
     @Published var successMessage: String = ""
@@ -38,6 +40,12 @@ class NewPasswordViewModel: ObservableObject {
             confirmPasswordErrorMessage = "كلمة المرور وتأكيدها غير متطابقين"
             isValid = false
         }
+        
+        // التحقق من تطابق كلمة المرور
+        if model.oldPassword != model.password {
+            OldPasswordErrorMessage = "كلمة المرور القديمة غير صحيحة"
+            isValid = false
+        }
 
         // إذا كان كل شيء صحيحًا
         if isValid {
@@ -51,5 +59,6 @@ class NewPasswordViewModel: ObservableObject {
     func clearErrors() {
         passwordErrorMessage = ""
         confirmPasswordErrorMessage = ""
+        OldPasswordErrorMessage = ""
     }
 }

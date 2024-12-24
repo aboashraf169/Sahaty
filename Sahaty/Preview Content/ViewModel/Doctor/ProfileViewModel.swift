@@ -7,7 +7,6 @@
 
 
 import Foundation
-import SwiftUI
 
 class ProfileViewModel: ObservableObject {
     @Published var doctor: DoctorModel
@@ -19,7 +18,6 @@ class ProfileViewModel: ObservableObject {
         fetchDoctorArticles()
         fetchDoctorAdvice()
     }
-    
     private func fetchDoctorArticles() {
         // بيانات المقالات الافتراضية الخاصة بالطبيب
         articles = [
@@ -43,6 +41,7 @@ class ProfileViewModel: ObservableObject {
             )
         ]
     }
+    
     private func fetchDoctorAdvice() {
         // بيانات المقالات الافتراضية الخاصة بالطبيب
       advices = [
@@ -83,4 +82,7 @@ class ProfileViewModel: ObservableObject {
             )
         ]
     }
+    
+    
+    
 }

@@ -157,7 +157,6 @@ struct AddArticleSheetView: View {
     AddArticleSheetView(articalsViewModel: ArticalsViewModel(currentUser: .doctor(DoctorModel(
         fullName: "د. محمد علي",
         email: "test@example.com",
-        password: "123456",
         specialization: "أمراض القلب",
         licenseNumber: "12345",
         articlesCount: 10,

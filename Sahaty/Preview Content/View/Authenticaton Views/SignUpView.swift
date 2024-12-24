@@ -1,59 +1,6 @@
 import SwiftUI
 
-// لانشاء text field مخصص
-// الهدف منه عند اضافة رمز اظهار كلمة المرور يتم اظهارها والعكس
-// قيد التنفيذ حتى وقت اخر
-struct PasswordField: View {
-    @Binding var password: String
-    @State private var isSecure: Bool = true
-    var placeholder: String
-    var label: String
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(label)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            
-            HStack {
-                // حالة الاخفاء لكلمة المرور
-                if isSecure {
-                    SecureField(placeholder, text: $password)
-                        .padding(.horizontal)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 45)
-                        .multilineTextAlignment(.leading)
-                } else {
-                    
-                // حالة الاظهار لكلمة المرور
-                    TextField(placeholder, text: $password)
-                        .padding(.horizontal)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 45)
-                        .multilineTextAlignment(.leading)
-                    
-                }
-// واقف حتى يتم الحل مشكلة الاتجاهات
-                
-//                Button(action: {
-//                    isSecure.toggle()
-//                }) {
-//                    Image(systemName: isSecure ? "eye.slash" : "eye")
-//                        .foregroundColor(.gray)
-//                }
 
-            }
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
-        }
-        .padding(.top,10)
-
-    }
-}
-
-import SwiftUI
-
-    
     struct SignUpView: View {
         @StateObject private var signUpViewModel = SignUpViewModel()
         @State private var showLoginView = false

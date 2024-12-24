@@ -11,4 +11,6 @@ import Foundation
 struct NewPasswordModel {
     var password: String
     var confirmPassword: String?
+    var oldPassword: String?
+
 }

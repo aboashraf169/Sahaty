@@ -101,29 +101,45 @@ struct ArticleView: View {
                 .font(.callout)
                 .fontWeight(.light)
 
-            // صورة المنشور
-            Rectangle()
-                .frame(maxWidth: .infinity)
-                .frame(height: 200)
-                .foregroundStyle(Color(.systemGray6)).opacity(0.4)
-                .cornerRadius(10)
-                .overlay {
-                    if let image = articlesModel.imagePost {
+            
+            if let image = articlesModel.imagePost {
+                Rectangle()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 200)
+                    .foregroundStyle(Color(.systemGray6)).opacity(0.4)
+                    .cornerRadius(10)
+                    .overlay {
                         Image(image)
                             .resizable()
                             .scaledToFit()
                             .cornerRadius(10)
-                    } else {
-                        VStack {
-                            Image(systemName: "photo.on.rectangle.angled")
-                                .resizable()
-                                .foregroundStyle(.accent)
-                                .frame(width: 100, height: 100)
-                            Text("No Image")
-                                .foregroundStyle(.accent)
-                        }
                     }
-                }
+            }
+            
+//            // صورة المنشور
+//            Rectangle()
+//                .frame(maxWidth: .infinity)
+//                .frame(height: 200)
+//                .foregroundStyle(Color(.systemGray6)).opacity(0.4)
+//                .cornerRadius(10)
+//                .overlay {
+//                    if let image = articlesModel.imagePost {
+//                        Image(image)
+//                            .resizable()
+//                            .scaledToFit()
+//                            .cornerRadius(10)
+//                    }
+//                    else {
+//                        VStack {
+//                            Image(systemName: "photo.on.rectangle.angled")
+//                                .resizable()
+//                                .foregroundStyle(.accent)
+//                                .frame(width: 100, height: 100)
+//                            Text("No Image")
+//                                .foregroundStyle(.accent)
+//                        }
+//                    }
+//                }
 
             // خيارات التفاعل
             FotterArtical(comments:articlesModel.comments)
@@ -139,6 +155,6 @@ struct ArticleView: View {
 
 #Preview {
     
-    ArticleView(articlesModel: ArticalModel(description:  "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار.", name: "محمد اشرف", userName: "midoMj@", addTime: "ساعتين"), articlesViewModel: ArticalsViewModel(), userType: .doctor)
+    ArticleView(articlesModel: ArticalModel(description:  "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار.", name: "محمد اشرف", userName: "midoMj@", addTime: "ساعتين",imagePost: "post"), articlesViewModel: ArticalsViewModel(), userType: .doctor)
 }
 

@@ -13,7 +13,6 @@ struct DoctorModel: Identifiable {
     var id = UUID() // معرف فريد للطبيب
     var fullName: String // الاسم الكامل
     var email: String // البريد الإلكتروني
-    var password: String // كلمة المرور
     var specialization: String // التخصص
     var licenseNumber: String // رقم الترخيص
     var profilePicture: String? // رابط الصورة الشخصية (اختياري)
