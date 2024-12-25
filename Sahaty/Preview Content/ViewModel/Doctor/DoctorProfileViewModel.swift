@@ -16,6 +16,7 @@ class DoctorProfileViewModel: ObservableObject {
 
     @Published var userProfile = DoctorModel(fullName: "محمد اشرف", email: "mido@gmail.com", specialization: "طب عيون", licenseNumber: "4656564934943", articlesCount: 0, advicesCount: 0, followersCount: 0, articles: [], advices: [], comments: [], likedArticles: [])
 
+    
     init(doctor: DoctorModel) {
         self.doctor = doctor
         fetchDoctorArticles()

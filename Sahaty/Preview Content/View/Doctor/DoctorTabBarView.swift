@@ -65,9 +65,7 @@ struct DoctorTabBarView: View {
                 .badge(3)
 
             
-            Text("الاشعارات")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            NotificationsView()
             .tabItem{
                 HStack{
                     Text("الاشعارات")

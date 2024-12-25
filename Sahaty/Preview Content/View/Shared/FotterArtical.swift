@@ -93,7 +93,7 @@ struct FotterArtical: View {
             .sheet(isPresented: $showCommentView) {
                 AddCommentView(currentUser: .doctor(DoctorModel(
                     id: UUID(),
-                    fullName: "د. محمد اشرف",
+                    fullName: "محمد اشرف",
                     email: "ahmed@example.com",
                     specialization: "Cardiology",
                     licenseNumber: "12345",

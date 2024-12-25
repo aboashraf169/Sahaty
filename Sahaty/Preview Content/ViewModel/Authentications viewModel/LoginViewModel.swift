@@ -17,7 +17,7 @@ class LoginViewModel: ObservableObject {
     @Published var successMessage: String = ""
 
     // بيانات افتراضية (للتجربة فقط)
-    private let defaultEmail = "mido@gmail.com"
+    private let defaultEmail = "Mido@gmail.com"
     private let defaultPassword = "123456"
 
     // التحقق من تسجيل الدخول

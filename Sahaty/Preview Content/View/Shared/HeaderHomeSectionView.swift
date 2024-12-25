@@ -20,6 +20,7 @@ struct HeaderHomeSectionView: View {
                     .frame(width: 40, height: 40)
                     .background(Color(.systemGray6))
                     .clipShape(Circle())
+                    .shadow(radius: 3)
             }
 
             // صندوق البحث

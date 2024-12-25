@@ -39,21 +39,8 @@ struct PatientTabBarView: View {
                     .tag(TabPatient.Doctors)
 
 
-            Text("المحادثات")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-            .tabItem{
-                HStack{
-                    Text("المحادثات")
-                    Image(systemName: "message")
-                }
-            }
-            .tag(TabPatient.chat)
-            .badge(3)
-
-            Text("الاشعارات")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            
+            NotificationsView()
             .tabItem{
                 HStack{
                     Text("الاشعارات")
