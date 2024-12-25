@@ -42,7 +42,7 @@ struct DoctorTabBarView: View {
                     .tag(TabDoctor.home)
             
             
-                 ProfileView(viewModel: ProfileViewModel(doctor: doctor))
+                 ProfileView(viewModel: DoctorProfileViewModel(doctor: doctor))
                  .tabItem{
                      HStack{
                          Text("الملف الشخصي")
@@ -78,7 +78,7 @@ struct DoctorTabBarView: View {
             .badge(10)
     
     
-            DoctorSettingView(viewModel: ProfileViewModel(doctor: doctor))
+            DoctorSettingView(viewModel: DoctorProfileViewModel(doctor: doctor))
                 .padding()
             .tabItem{
                 HStack{

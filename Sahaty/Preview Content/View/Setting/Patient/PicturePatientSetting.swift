@@ -26,19 +26,25 @@ struct PicturePatientSetting: View {
                         .scaledToFill()
                         .frame(width: 120, height: 120)
                         .clipShape(Circle())
+                        .shadow(radius: 5)
+
                 }
+                
                 else if let image = viewModel.profilePicture {
                     Image(image)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 120, height: 120)
                         .clipShape(Circle())
+                        .shadow(radius: 5)
+
                 } else {
                     Image(systemName: "person.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 100, height: 100)
                         .foregroundStyle(Color.accentColor)
+                        .shadow(radius: 5)
                 }
                 Button {
                     showImagePicker.toggle()

@@ -30,27 +30,69 @@ struct PatientSettingView: View {
         NavigationStack {
             VStack{
                 
-                PicturePatientSetting(viewModel: viewModel,selectedImage: $selectedImage, showImagePicker: $showImagePicker)
+                    VStack() {
+                    ZStack {
+                        Circle()
+                            .fill(Color.accentColor.opacity(0.1))
+                            .frame(width: 120, height: 120)
+                        
+                        if let selectedImage = selectedImage {
+                            Image(uiImage: selectedImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
+                        } else if let image = viewModel.profilePicture {
+                            Image(image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
+                                .shadow(radius: 5)
+                        } else {
+                            Image(systemName: "person.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .foregroundStyle(Color.accentColor)
+                                .shadow(radius: 5)
+                            
+                        }
+                        Button {
+                            showImagePicker.toggle()
+                        } label: {
+                            Image(systemName: "camera.fill")
+                                .foregroundStyle(Color.white)
+                                .padding(8)
+                                .background(Color.accentColor)
+                                .clipShape(Circle())
+                        }
+                        .offset(x: -40, y: 40)
+                        
+             
+                    }
+                    
+                    Text(viewModel.fullName)
+                        .font(.headline)
+                        .fontWeight(.medium)
+                    
+                    Text(viewModel.email)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
                     .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
                     .onChange(of: selectedImageItem) { _, newValue in
                         loadImage(newValue)
                     }
-                Text("محمد أشرف")
-                    .font(.headline)
-                    .fontWeight(.medium)
-                
-                Text("Mido@mj")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                
-                
-                NavigationLink("تعديل الملف الشخصي", destination: EditPationtDataProfileView(viewModel: viewModel))
-//                    .padding(.horizontal)
-//                    .foregroundStyle(.white)
-//                    .padding(10)
-//                    .background(Color.accentColor)
-//                    .cornerRadius(15)
-//                    .padding(.vertical)
+
+                NavigationLink("تعديل الملف الشخصي", destination: EditPationtDataProfileView())
+                    .padding(.horizontal)
+                    .foregroundStyle(.white)
+                    .padding(10)
+                    .background(Color.accentColor)
+                    .cornerRadius(15)
+                    .padding(.vertical)
                 Divider()
                 
                 VStack(spacing:20){

@@ -2,7 +2,7 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @StateObject var viewModel: ProfileViewModel
+    @StateObject var viewModel: DoctorProfileViewModel
     @State private var isEditingBio = false
     @State private var editedBio: String = ""
     @State private var showImagePicker = false
@@ -84,7 +84,7 @@ struct ProfileView: View {
 
 // MARK: - AdviceSectionView
 struct AdviceSectionView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: DoctorProfileViewModel
     @Binding var showAllAdvices: Bool
 
     var body: some View {
@@ -143,7 +143,7 @@ struct AllArticlesView: View {
 
 // MARK: - ArticlesSectionView
 struct ArticlesSectionView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: DoctorProfileViewModel
     @Binding var showAllArticles: Bool
 
     var body: some View {
@@ -241,7 +241,7 @@ struct AllAdvicesView: View {
 
 // MARK: - ProfileHeaderView
 struct ProfileHeaderView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: DoctorProfileViewModel
     @Binding var selectedImage: UIImage?
     @Binding var showImagePicker: Bool
     
@@ -258,18 +258,22 @@ struct ProfileHeaderView: View {
                         .scaledToFill()
                         .frame(width: 120, height: 120)
                         .clipShape(Circle())
+                        .shadow(radius: 5)
                 } else if let image = viewModel.doctor.profilePicture {
                     Image(image)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 120, height: 120)
                         .clipShape(Circle())
+                        .shadow(radius: 5)
                 } else {
                     Image(systemName: "person.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 100, height: 100)
                         .foregroundStyle(Color.accentColor)
+                        .shadow(radius: 5)
+                    
                 }
                 Button {
                     showImagePicker.toggle()
@@ -298,7 +302,7 @@ struct ProfileHeaderView: View {
 
 // MARK: - DoctorStatisticsView
 struct DoctorStatisticsView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: DoctorProfileViewModel
     
     var body: some View {
         HStack(spacing: 20) {
@@ -422,7 +426,7 @@ struct BioSectionView: View {
         likedArticles: []
     )
 
-    let viewModel = ProfileViewModel(doctor: doctor)
+    let viewModel = DoctorProfileViewModel(doctor: doctor)
 
     ProfileView(viewModel: viewModel)
 }

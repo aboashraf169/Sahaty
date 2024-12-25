@@ -11,7 +11,7 @@ import PhotosUI
 
 struct DoctorSettingView: View {
     
-    var viewModel : ProfileViewModel
+    var viewModel : DoctorProfileViewModel
     
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
@@ -36,13 +36,14 @@ struct DoctorSettingView: View {
                         loadImage(newValue)
                     }
                 
-                NavigationLink("تعديل الملف الشخصي", destination: EditDoctorDataProfileView(viewModel: viewModel))
+                NavigationLink("تعديل الملف الشخصي", destination: EditDoctorDataProfileView())
                     .padding(.horizontal)
                     .foregroundStyle(.white)
                     .padding(10)
                     .background(Color.accentColor)
                     .cornerRadius(15)
                     .padding(.vertical)
+                               
                 Divider()
                 
                 VStack(spacing:20){
@@ -105,6 +106,6 @@ struct DoctorSettingView: View {
 
 
 #Preview {
-    DoctorSettingView(viewModel: ProfileViewModel(doctor: DoctorModel(fullName: "محمد أشرف", email: "mido@gmail.com", specialization: "طب عيون", licenseNumber: "", articlesCount: 0, advicesCount: 0, followersCount: 0,articles: [], advices: [], comments: [], likedArticles: [])))
+    DoctorSettingView(viewModel: DoctorProfileViewModel(doctor: DoctorModel(fullName: "محمد أشرف", email: "mido@gmail.com", specialization: "طب عيون", licenseNumber: "", articlesCount: 0, advicesCount: 0, followersCount: 0,articles: [], advices: [], comments: [], likedArticles: [])))
     
 }

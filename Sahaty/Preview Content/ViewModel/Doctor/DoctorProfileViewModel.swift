@@ -8,15 +8,27 @@
 
 import Foundation
 
-class ProfileViewModel: ObservableObject {
+class DoctorProfileViewModel: ObservableObject {
     @Published var doctor: DoctorModel
     @Published var articles: [ArticalModel] = []
-    @Published var advices: [AdviceModel] = [] 
+    @Published var advices: [AdviceModel] = []
+    @Published var isSaveEnabled: Bool = false
+
+    @Published var userProfile = DoctorModel(fullName: "محمد اشرف", email: "mido@gmail.com", specialization: "طب عيون", licenseNumber: "4656564934943", articlesCount: 0, advicesCount: 0, followersCount: 0, articles: [], advices: [], comments: [], likedArticles: [])
 
     init(doctor: DoctorModel) {
         self.doctor = doctor
         fetchDoctorArticles()
         fetchDoctorAdvice()
+        validateFields()
+
+    }
+    
+    func validateFields() {
+        isSaveEnabled = !userProfile.fullName.isEmpty &&
+                        !userProfile.email.isEmpty &&
+                        !userProfile.specialization.isEmpty &&
+        !userProfile.licenseNumber.isEmpty
     }
     private func fetchDoctorArticles() {
         // بيانات المقالات الافتراضية الخاصة بالطبيب
@@ -41,6 +53,11 @@ class ProfileViewModel: ObservableObject {
             )
         ]
     }
+    
+    func saveChanges() {
+        print("Profile saved: \(userProfile)")
+    }
+
     
     private func fetchDoctorAdvice() {
         // بيانات المقالات الافتراضية الخاصة بالطبيب
