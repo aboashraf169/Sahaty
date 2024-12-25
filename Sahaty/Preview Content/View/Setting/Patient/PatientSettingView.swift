@@ -13,7 +13,8 @@ import PhotosUI
 
 struct PatientSettingView: View {
     
-    var viewModel : PatientModel
+    var viewModel  = PatiantModel.defaultData
+    
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
@@ -160,16 +161,6 @@ struct PatientSettingView: View {
 
 
 #Preview {
-    PatientSettingView(viewModel: PatientModel(
-        id: UUID(),
-        fullName: "محمد علي",
-        email: "patient@example.com",
-        profilePicture: "post",
-        followedDoctors: [],
-        favoriteArticles: [],
-        favoriteAdvices: [],
-        likedArticles: [],
-        articleComments: []
-    ))
+    PatientSettingView()
     
 }

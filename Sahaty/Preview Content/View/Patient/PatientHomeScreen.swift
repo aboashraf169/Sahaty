@@ -6,7 +6,8 @@ struct PatientHomeScreen: View {
     @StateObject private var articlesViewModel: ArticalsViewModel
     @State private var searchText = ""
 
-        init(patient: PatientModel) {
+        init() {
+            let patient = PatiantModel.defaultData
             let adviceViewModel = AdviceViewModel(currentUser: .patient(patient))
             _adviceViewModel = StateObject(wrappedValue: adviceViewModel)
             _articlesViewModel = StateObject(wrappedValue: ArticalsViewModel(currentUser: .patient(patient)))
@@ -190,16 +191,5 @@ struct Categoryy: View {
 
 // MARK: - Preview
 #Preview {
-    let patient = PatientModel(
-        id: UUID(),
-        fullName: "محمد علي",
-        email: "patient@example.com",
-        profilePicture: "post",
-        followedDoctors: [],
-        favoriteArticles: [],
-        favoriteAdvices: [],
-        likedArticles: [],
-        articleComments: []
-    )
-    PatientHomeScreen(patient: patient)
+    PatientHomeScreen()
 }

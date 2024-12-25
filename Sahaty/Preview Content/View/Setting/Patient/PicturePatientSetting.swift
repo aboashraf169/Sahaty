@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PicturePatientSetting: View {
 //    var profilePicture: UIImage?
-    var viewModel : PatientModel
+    var viewModel = PatiantModel.defaultData
     @Binding var selectedImage: UIImage?
     @Binding var showImagePicker: Bool
     

@@ -16,7 +16,7 @@ struct EditPationtDataProfileView: View {
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
     
-    @StateObject private var viewModel = PatientProfileViewModel(patient:  PatientModel(fullName: "محمود اسماعيل", email: "hamada@gmail.com", followedDoctors: [], favoriteArticles: [], favoriteAdvices: [], likedArticles: [], articleComments: []))
+    @State private var viewModel = PatiantModel.defaultData
     var body: some View {
         VStack(spacing: 20) {
             // Profile Picture
@@ -33,7 +33,7 @@ struct EditPationtDataProfileView: View {
                             .frame(width: 120, height: 120)
                             .clipShape(Circle())
                             .shadow(radius: 5)
-                    } else if let image = viewModel.patient.profilePicture {
+                    } else if let image = viewModel.profilePicture {
                         Image(image)
                             .resizable()
                             .scaledToFill()
@@ -63,11 +63,11 @@ struct EditPationtDataProfileView: View {
          
                 }
                 
-                Text(viewModel.patient.fullName)
+                Text(viewModel.fullName)
                     .font(.headline)
                     .fontWeight(.medium)
                 
-                Text(viewModel.patient.email)
+                Text(viewModel.email)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -79,9 +79,9 @@ struct EditPationtDataProfileView: View {
             Divider()
         ScrollView{
                             
-                EditField(title: "الاسم", text : $viewModel.patient.fullName)
+                EditField(title: "الاسم", text : $viewModel.fullName)
         
-                EditField(title: "البريد الإلكتروني", text: $viewModel.patient.email)
+                EditField(title: "البريد الإلكتروني", text: $viewModel.email)
             
             
                 
@@ -89,7 +89,7 @@ struct EditPationtDataProfileView: View {
             
             // Save Button
             Button(action: {
-                viewModel.saveChanges()
+                viewModel.fullName = viewModel.fullName
             }) {
                 Text("حفظ التغييرات")
                     .font(.headline)

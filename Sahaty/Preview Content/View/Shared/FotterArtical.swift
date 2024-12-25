@@ -149,26 +149,6 @@ struct FotterArtical: View {
             publishDate: Date(),
             likeCount: 10,
             CommentCount: 5
-        ),
-        CommentModel(
-            text: "شكرًا على المعلومات المفيدة!",
-            author: .patient(PatientModel(
-                id: UUID(),
-                fullName: "محمد علي",
-                email: "mohamed@example.com",
-                profilePicture: "patient",
-                age: 30,
-                gender: "ذكر",
-                medicalHistory: "لا يوجد تاريخ طبي سابق",
-                followedDoctors: [],
-                favoriteArticles: [],
-                favoriteAdvices: [],
-                likedArticles: [],
-                articleComments: []
-            )),
-            publishDate: Date(),
-            likeCount: 3,
-            CommentCount: 1
         )
     ])
 }

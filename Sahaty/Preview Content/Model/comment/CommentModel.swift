@@ -21,7 +21,7 @@ struct  CommentModel: Identifiable {
 
 enum CommentAuthor : Equatable {
     case doctor(DoctorModel) // إذا كان المعلق طبيبًا
-    case patient(PatientModel) // إذا كان المعلق مريضًا
+    case patient(PatiantModel) // إذا كان المعلق مريضًا
     
     static func == (lhs: CommentAuthor, rhs: CommentAuthor) -> Bool {
         switch (lhs, rhs) {

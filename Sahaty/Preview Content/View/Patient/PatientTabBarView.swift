@@ -11,24 +11,13 @@ struct PatientTabBarView: View {
     
     @StateObject var appState = AppState()
     
-    @State var Patient : PatientModel =
-    PatientModel(
-        id: UUID(),
-        fullName: "محمد علي",
-        email: "patient@example.com",
-        profilePicture: "post",
-        followedDoctors: [],
-        favoriteArticles: [],
-        favoriteAdvices: [],
-        likedArticles: [],
-        articleComments: []
-    )
+    @State var Patient : PatiantModel =  PatiantModel.defaultData
 
     var body: some View {
         
         TabView(selection: $appState.selectedTabPatients){
 
-            PatientHomeScreen(patient: Patient)
+            PatientHomeScreen()
                     .tabItem{
                         HStack{
                             Text("الرئيسية")
