@@ -21,8 +21,9 @@ struct DoctorSettingView: View {
     @State private var showSavedView = false
     @State private var showRestPasswordView = false
     @State private var showLogoutAleart = false
-        
     
+    @AppStorage("isDarkModeDoctor") private var isDarkModeDoctor = false // حفظ الاختيار
+
 
     var body: some View {
         // Header Section
@@ -73,6 +74,24 @@ struct DoctorSettingView: View {
                               Button("موافق", role: .destructive) {}
                               Button("إلغاء", role: .cancel) {}
                                 }
+                    
+                    Toggle(isOn: $isDarkModeDoctor) {
+                                HStack {
+                                    Image(systemName: isDarkModeDoctor ? "moon.fill" : "sun.max.fill")
+                                        .foregroundColor(.blue)
+                                        .frame(width: 50, height: 50)
+                                        .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
+
+                                    Text("الوضع الليلي")
+                                        .font(.body)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.vertical, 8)
+
+                           }
+                    .toggleStyle(SwitchToggleStyle(tint: .accent)) // تخصيص لون التبديل
+                    .frame(maxWidth: .infinity)
+                    .padding(0)
                 }
             
 
@@ -81,6 +100,8 @@ struct DoctorSettingView: View {
             .padding()
             .navigationBarTitle("الملف الشخصي")
             .navigationBarTitleDisplayMode(.inline)
+            .preferredColorScheme(isDarkModeDoctor ? .dark : .light) // تطبيق المظهر
+
         }
        
         

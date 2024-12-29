@@ -4,6 +4,7 @@ struct PatientHomeScreen: View {
     @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
     @StateObject private var adviceViewModel: AdviceViewModel
     @StateObject private var articlesViewModel: ArticalsViewModel
+    
     @State private var searchText = ""
 
         init() {
@@ -34,6 +35,7 @@ struct PatientHomeScreen: View {
 //                        
                     }
                 )
+
                 ScrollView {
                     // MARK: - Daily Advice Section
                     titleCategory(title: "نصائح اليوم")
@@ -62,6 +64,7 @@ struct PatientHomeScreen: View {
                     
                 }
             }
+
         }
     }
     

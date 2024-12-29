@@ -44,7 +44,7 @@ class SignUpViewModel: ObservableObject {
         }
 
         if model.email.isEmpty || !model.email.contains("@") {
-            emailErrorMessage = "يرجى إدخال بريد إلكتروني صحيح."
+            emailErrorMessage = "يرجى إدخال بريد إلكتروني الصحيح."
             isValid = false
         }
 

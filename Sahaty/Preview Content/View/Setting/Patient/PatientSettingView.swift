@@ -14,7 +14,8 @@ import PhotosUI
 struct PatientSettingView: View {
     
     var viewModel  = PatiantModel.defaultData
-    
+    @AppStorage("isDarkModePatient") private var isDarkModePatient = false // حفظ الاختيار
+
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
@@ -23,7 +24,7 @@ struct PatientSettingView: View {
     @State private var showSavedView = false
     @State private var showRestPasswordView = false
     @State private var showLogoutAleart = false
-        
+
     
 
     var body: some View {
@@ -87,6 +88,8 @@ struct PatientSettingView: View {
                         loadImage(newValue)
                     }
 
+
+                
                 NavigationLink("تعديل الملف الشخصي", destination: EditPationtDataProfileView())
                     .padding(.horizontal)
                     .foregroundStyle(.white)
@@ -94,9 +97,11 @@ struct PatientSettingView: View {
                     .background(Color.accentColor)
                     .cornerRadius(15)
                     .padding(.vertical)
+                
                 Divider()
                 
                 VStack(spacing:20){
+                           
                     MenuOption(title: "ادارة الاشعارات", icon: "bell", action: {showNotificationView.toggle()})
                         .sheet(isPresented: $showNotificationView) {
                             
@@ -128,6 +133,25 @@ struct PatientSettingView: View {
                               Button("موافق", role: .destructive) {}
                               Button("إلغاء", role: .cancel) {}
                                 }
+                    
+                    Toggle(isOn: $isDarkModePatient) {
+                                HStack {
+                                    Image(systemName: isDarkModePatient ? "moon.fill" : "sun.max.fill")
+                                        .foregroundColor(.blue)
+                                        .frame(width: 50, height: 50)
+                                        .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
+
+                                    Text("الوضع الليلي")
+                                        .font(.body)
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.vertical, 8)
+
+                           }
+                    .toggleStyle(SwitchToggleStyle(tint: .accent)) // تخصيص لون التبديل
+                    .frame(maxWidth: .infinity)
+                    .padding(0)
+                    
                 }
             
 
@@ -136,6 +160,8 @@ struct PatientSettingView: View {
             .padding()
             .navigationBarTitle("الملف الشخصي")
             .navigationBarTitleDisplayMode(.inline)
+            .preferredColorScheme(isDarkModePatient ? .dark : .light) // تطبيق المظهر
+
         }
        
         

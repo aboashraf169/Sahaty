@@ -32,6 +32,7 @@ struct PasswordField: View {
                         .padding(.horizontal)
                         .frame(maxWidth: .infinity)
                         .frame(height: 45)
+                        .foregroundStyle(.secondary)
                 } else {
                     
                 // حالة الاظهار لكلمة المرور
@@ -39,6 +40,8 @@ struct PasswordField: View {
                         .padding(.horizontal)
                         .frame(maxWidth: .infinity)
                         .frame(height: 45)
+                        .foregroundStyle(.secondary)
+
 
                 }
                 

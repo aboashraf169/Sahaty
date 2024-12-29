@@ -51,7 +51,7 @@ struct DoctorTabBarView: View {
                  }
                  .tag(TabDoctor.profile)
 
-            
+        
                 Text("المحادثات")
                         .font(.largeTitle)
                         .fontWeight(.bold)

@@ -79,7 +79,7 @@ struct AddCommentView: View {
 #Preview {
     let currentUser = DoctorModel(
         id: UUID(),
-        fullName: "محمد أشرف",
+        fullName: "الحارٍٍث نبيل",
         email: "mohamed@example.com",
         specialization: "Cardiology", // التخصص
         licenseNumber: "123456789", // رقم الترخيص
