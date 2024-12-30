@@ -8,73 +8,62 @@
 import SwiftUI
 
 struct PatientTabBarView: View {
-    
     @StateObject var appState = AppState()
-    
-    @State var Patient : PatiantModel =  PatiantModel.defaultData
+    @State var Patient: PatiantModel = PatiantModel.defaultData
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
-        
-        TabView(selection: $appState.selectedTabPatients){
-
+        TabView(selection: $appState.selectedTabPatients) {
+            // MARK: - Home Tab
             PatientHomeScreen()
-                    .tabItem{
-                        HStack{
-                            Text("الرئيسية")
-                            Image(systemName: "house.fill")
-                        }
+                .tabItem {
+                    HStack {
+                        Text("home".localized()) // الرئيسية
+                        Image(systemName: "house.fill")
                     }
-                    .tag(TabPatient.home)
-
-   
-            
-            
-            SpecializationsDoctorsView()
-                    .tabItem{
-                        HStack{
-                            Text("الاطباء")
-                            Image(systemName: "person.2")
-                        }
-                    }
-                    .tag(TabPatient.Doctors)
-
-
-            
-            NotificationsView()
-            .tabItem{
-                HStack{
-                    Text("الاشعارات")
-                    Image(systemName: "heart.fill")
                 }
-            }
-            .tag(TabPatient.Notificatons)
-            .badge(5)
-    
-            
-           
-            
-            
+                .tag(TabPatient.home)
+
+            // MARK: - Doctors Tab
+            SpecializationsDoctorsView()
+                .tabItem {
+                    HStack {
+                        Text("doctors".localized()) // الاطباء
+                        Image(systemName: "person.2")
+                    }
+                }
+                .tag(TabPatient.Doctors)
+
+            // MARK: - Notifications Tab
+            NotificationsView()
+                .tabItem {
+                    HStack {
+                        Text("notifications".localized()) // الاشعارات
+                        Image(systemName: "heart.fill")
+                    }
+                }
+                .tag(TabPatient.Notificatons)
+                .badge(5) // عدد الإشعارات
+
+            // MARK: - Settings Tab
             PatientSettingView(viewModel: Patient)
                 .padding()
-            .tabItem{
-                HStack{
-                    Text("الاعدادات")
-                    Image(systemName: "gear")
+                .tabItem {
+                    HStack {
+                        Text("settings".localized()) // الاعدادات
+                        Image(systemName: "gear")
+                    }
                 }
-            }
-            .tag(TabPatient.settings)
-
-            
-            
-   
-            }
+                .tag(TabPatient.settings)
+        }
+        .direction(appLanguage) // ضبط اتجاه النصوص
         .environmentObject(appState) // مشاركة حالة التطبيق مع جميع الشاشات
-
-        
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة المختارة
     }
 }
 
-#Preview{
+// MARK: - Preview
+#Preview {
     PatientTabBarView()
 }
 

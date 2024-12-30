@@ -4,6 +4,7 @@ struct ForgotPasswordView: View {
     @StateObject private var resetPasswordViewModel = ResetPasswordViewModel()
     @State private var isSuccessAlertPresented = false
     @State private var showOtpVerificationScreen = false
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var userType: UserType // استلام نوع المستخدم (مريض أو طبيب)
 
@@ -12,12 +13,12 @@ struct ForgotPasswordView: View {
             VStack {
                 // MARK: - Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("نسيت كلمة المرور")
+                    Text("forgot_password_title".localized()) // نسيت كلمة المرور
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color.accentColor)
 
-                    Text("سوف نرسل رمز لإعادة تعيين كلمة المرور")
+                    Text("forgot_password_description".localized()) // سوف نرسل رمز لإعادة تعيين كلمة المرور
                         .font(.body)
                         .foregroundColor(Color.secondary)
                 }
@@ -27,13 +28,13 @@ struct ForgotPasswordView: View {
 
                 // MARK: - Email Field
                 VStack(alignment: .trailing, spacing: 5) {
-                    Text("البريد الإلكتروني")
+                    Text("email".localized()) // البريد الإلكتروني
                         .font(.callout)
                         .foregroundColor(.secondary)
                         .padding(.leading, 20)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    TextField("أدخل عنوان بريدك الإلكتروني..", text: $resetPasswordViewModel.model.email)
+                    TextField("enter_email".localized(), text: $resetPasswordViewModel.model.email) // أدخل عنوان بريدك الإلكتروني
                         .padding()
                         .frame(height: 50)
                         .background(Color(.systemGray6))
@@ -60,7 +61,7 @@ struct ForgotPasswordView: View {
                         isSuccessAlertPresented = true
                     }
                 }) {
-                    Text("إرسال")
+                    Text("send".localized()) // إرسال
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding()
@@ -74,7 +75,7 @@ struct ForgotPasswordView: View {
                 Spacer()
             }
             .alert(resetPasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
-                Button("موافق", role: .cancel) {
+                Button("ok".localized(), role: .cancel) { // موافق
                     showOtpVerificationScreen = true
                 }
             }
@@ -82,6 +83,9 @@ struct ForgotPasswordView: View {
                 OtpVerificationView()
             }
         }
+        .direction(appLanguage) // تطبيق الاتجاه
+        .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
+
     }
 }
 

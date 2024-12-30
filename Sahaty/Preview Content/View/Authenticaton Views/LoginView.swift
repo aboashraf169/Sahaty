@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LoginView: View {
     
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
     @StateObject private var loginViewModel = LoginViewModel()
     @State private var navigateToDoctorView = false
     @State private var navigateToPatientView = false
@@ -13,14 +14,38 @@ struct LoginView: View {
         let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white]
         UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .selected)
     }
+    
+    func toggleLanguage() {
+        appLanguage = (appLanguage == "ar") ? "en" : "ar"
+        UserDefaults.standard.set(appLanguage, forKey: "appLanguage") // تحديث اللغة في UserDefaults
+    }
 
     // MARK: - View
     var body: some View {
         NavigationStack {
+            
             VStack {
                 // MARK: - Header
+                HStack {
+                    Spacer()
+
+                    Button {
+                        toggleLanguage()
+
+                    } label: {
+                        Image(systemName: "globe")
+                            .font(.title)
+                            .foregroundStyle(.accent)
+                        Text("".localized())
+
+                    }
+
+                }
+                .padding(.horizontal)
+                .padding(.vertical,10)
+               
                 VStack(alignment: .trailing, spacing: 8) {
-                    Text("قم بتسجيل الدخول الآن")
+                    Text("login_now".localized())
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color.accentColor)
@@ -30,8 +55,8 @@ struct LoginView: View {
 
                 // اختيار نوع المستخدم
                 Picker("", selection: $loginViewModel.model.userType) {
-                    Text("مريض").tag(UserType.patient)
-                    Text("طبيب").tag(UserType.doctor)
+                    Text("patient".localized()).tag(UserType.patient)
+                    Text("doctor".localized()).tag(UserType.doctor)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(20)
@@ -39,11 +64,11 @@ struct LoginView: View {
                 // MARK: - Center
                 VStack(alignment: .leading, spacing: 5) {
                     // البريد الإلكتروني
-                    Text("البريد الإلكتروني")
+                    Text("email".localized())
                         .font(.callout)
                         .foregroundColor(.secondary).opacity(0.7)
                     
-                    TextField("أدخل عنوان بريدك الإلكتروني..", text: $loginViewModel.model.email)
+                    TextField("enter_email".localized(), text: $loginViewModel.model.email)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
@@ -64,11 +89,11 @@ struct LoginView: View {
 
                 VStack(alignment: .leading, spacing: 5) {
                     // كلمة المرور
-                    Text("كلمة المرور")
+                    Text("password".localized())
                         .font(.callout)
                         .foregroundColor(.secondary).opacity(0.7)
                     
-                    SecureField("أدخل كلمة المرور", text: $loginViewModel.model.password)
+                    SecureField("enter_password".localized(), text: $loginViewModel.model.password)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
@@ -89,7 +114,7 @@ struct LoginView: View {
 
                 // رابط "نسيت كلمة المرور؟"
                 HStack {
-                    NavigationLink("هل نسيت كلمة المرور؟", destination: ForgotPasswordView(userType: loginViewModel.model.userType))
+                    NavigationLink("forgot_password".localized(), destination: ForgotPasswordView(userType: loginViewModel.model.userType))
                         .font(.callout)
                         .foregroundColor(.secondary.opacity(0.7))
                     Spacer()
@@ -107,7 +132,7 @@ struct LoginView: View {
                         }
                     }
                 }) {
-                    Text("تسجيل الدخول")
+                    Text("login".localized())
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -130,7 +155,7 @@ struct LoginView: View {
                         Rectangle()
                             .frame(height: 1)
                             .foregroundColor(.secondary.opacity(0.4))
-                        Text("التسجيل من خلال")
+                        Text("login_with".localized())
                             .font(.system(size: 15))
                             .foregroundColor(.secondary).opacity(0.7)
                         Rectangle()
@@ -196,11 +221,14 @@ struct LoginView: View {
                 }
 
                 // الانتقال لشاشة إنشاء حساب
-                NavigationLink("إنشاء حساب جديد؟", destination: SignUpView())
+                NavigationLink("sign_up".localized(), destination: SignUpView())
                     .font(.callout)
                     .foregroundColor(.secondary)
                     .padding(.top, 20)
             }
+            .direction(appLanguage) // تطبيق الاتجاه
+            .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
+
         }
     }
 }

@@ -9,46 +9,77 @@ import SwiftUI
 
 struct NotificationsView: View {
     @StateObject private var viewModel = NotificationViewModel()
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
-                List(viewModel.notifications) { notification in
-                    HStack(alignment: .top, spacing: 10) {
-                        // أيقونة الإشعار
-                        Image(systemName: "bell.badge.circle")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.accent)
-                            .frame(width: 30, height: 30)
+                if viewModel.notifications.isEmpty {
+                    noNotificationsView
+                } else {
+                    List(viewModel.notifications) { notification in
+                        HStack(alignment: .top, spacing: 10) {
+                            // أيقونة الإشعار
+                            Image(systemName: "bell.badge.circle")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(.accent)
+                                .frame(width: 30, height: 30)
 
-                        // تفاصيل الإشعار
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(notification.senderName)
+                            // تفاصيل الإشعار
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(notification.senderName)
                                     .font(.subheadline)
-                            Text(notification.senderEmail)
+
+                                Text(notification.senderEmail)
                                     .font(.subheadline)
                                     .foregroundColor(.gray)
-                            
-                            Text(notification.message)
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                                .lineLimit(nil)
-                                .padding(.top,10)
+
+                                Text(notification.message)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                                    .lineLimit(nil)
+                                    .padding(.top, 10)
+                            }
                         }
+                        .padding(8)
                     }
-                    .padding(8)
+                    .listStyle(PlainListStyle())
                 }
-                .listStyle(PlainListStyle())
             }
-            .navigationTitle("الإشعارات")
+            .navigationTitle("notifications".localized()) // الإشعارات
             .navigationBarTitleDisplayMode(.inline)
+            .direction(appLanguage) // ضبط اتجاه النصوص
+            .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
         }
+    }
+
+    // MARK: - No Notifications View
+    private var noNotificationsView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "tray")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 80, height: 80)
+                .foregroundColor(.gray.opacity(0.7))
+            
+            Text("no_notifications".localized()) // لا توجد إشعارات
+                .font(.title2)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 30)
+
+            Text("no_notifications_message".localized()) // ستظهر الإشعارات هنا عند توفرها.
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+        }
+        .padding(.top)
     }
 }
 
-struct NotificationsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NotificationsView()
-    }
+#Preview {
+    NotificationsView()
 }

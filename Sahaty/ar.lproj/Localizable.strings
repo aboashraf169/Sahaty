@@ -1,0 +1,127 @@
+/* 
+  Localizable.strings
+  Sahaty
+
+  Created by mido mj on 12/29/24.
+  
+*/
+
+// MARK: - LOGIN
+
+"login_now" = "تسجيل الدخول الآن";
+"email" = "البريد الإلكتروني";
+"enter_email" = "أدخل عنوان بريدك الإلكتروني...";
+"password" = "كلمة المرور";
+"enter_password" = "أدخل كلمة المرور";
+"forgot_password" = "هل نسيت كلمة المرور؟";
+"login" = "تسجيل الدخول";
+"sign_up" = "إنشاء حساب جديد؟";
+"login_with" = "التسجيل من خلال";
+"patient" = "مريض";
+"doctor" = "طبيب";
+
+
+// MARK: - FORGET PASSWORD VIEW
+"forgot_password_title" = "نسيت كلمة المرور";
+"forgot_password_description" = "سوف نرسل رمز لإعادة تعيين كلمة المرور";
+"email" = "البريد الإلكتروني";
+"enter_email" = "أدخل عنوان بريدك الإلكتروني..";
+"send" = "إرسال";
+"ok" = "موافق";
+
+// MARK: - NEW PASSWORD VIEW
+"enter_new_password" = "قم بادخال كلمة المرور الجديدة";
+"password" = "كلمة المرور";
+"enter_password" = "أدخل كلمة المرور";
+"confirm_password" = "تأكيد كلمة المرور";
+"login" = "تسجيل الدخول";
+"ok" = "موافق";
+
+// MARK: - OTP PASSWORD VIEW
+"otp_sent_message" = "قمنا بإرسال رسالة SMS قصيرة تحتوي على رمز التفعيل";
+"verify" = "تحقق";
+"resend_otp_in" = "إعادة إرسال الرمز في";
+"resend_otp" = "إعادة إرسال الرمز";
+"ok" = "موافق";
+
+// MARK: - SignUp VIEW
+"signup_subtitle" = "بادر بالتسجيل";
+"signup_title" = "تسجيل جديد";
+"user_type" = "نوع المستخدم";
+"patient" = "مريض";
+"doctor" = "طبيب";
+"name" = "الاسم";
+"enter_full_name" = "أدخل الاسم كاملاً";
+"email" = "البريد الإلكتروني";
+"enter_email" = "أدخل عنوان بريدك الإلكتروني..";
+"password" = "كلمة المرور";
+"enter_password" = "أدخل كلمة المرور";
+"confirm_password" = "تأكيد كلمة المرور";
+"confirm_password_label" = "تأكيد كلمة المرور";
+"specialization" = "التخصص";
+"enter_specialization" = "أدخل التخصص";
+"license_number" = "رقم التخصص الوظيفي";
+"enter_license_number" = "أدخل رقم التخصص الوظيفي";
+"signup_button" = "إنشاء الحساب";
+"ok" = "موافق";
+
+
+// MARK: - ADD ADVICE VIEW
+"create_daily_advice" = "إنشاء النصيحة اليومية";
+"edit_advice" = "تعديل النصيحة";
+"topic" = "الموضوع";
+"publish" = "نشر";
+
+
+// MARK: - ADD ARTCALE VIEW
+"create_new_article" = "إنشاء مقالة جديدة";
+"edit_article" = "تعديل المقالة";
+"fill_fields_for_article" = "املأ الحقول أدناه لإضافة أو تعديل المقالة";
+"topic" = "الموضوع";
+"upload_image" = "رفع الصورة";
+"choose_image" = "اختر صورة";
+"no_image_selected" = "لا يوجد صورة محددة";
+"publish" = "نشر";
+"save_changes" = "حفظ التعديلات";
+"error" = "خطأ";
+"text_empty_error" = "النص لا يمكن أن يكون فارغًا.";
+"ok" = "حسنًا";
+
+
+// MARK: - ARTCALE VIEW
+"since" = "منذ";
+"delete_article" = "حذف المقالة";
+"delete_article_confirmation" = "هل أنت متأكد من أنك تريد حذف المقالة؟";
+"confirm" = "موافقة";
+"cancel" = "إلغاء";
+
+
+// MARK: - ADD COMMENT VIEW
+"add_comment_placeholder" = "أضف تعليقًا...";
+"comments" = "التعليقات";
+"edit" = "تعديل";
+"delete" = "حذف";
+
+// MARK: - PatientHomeScreen
+"daily_advices" = "نصائح اليوم";
+"categories" = "التخصصات";
+"new_articles" = "المقالات الجديدة";
+"no_posts" = "لا توجد منشورات حاليًا";
+"follow_articles" = "ابدأ بمتابعة المقالات الجديدة المفيدة.";
+"no_advices" = "لا توجد نصائح حتى الآن!";
+"start_following_advices" = "ابدأ بمتابعة النصائح اليومية لتحسين صحتك.";
+"mental_health" = "الصحة النفسية";
+"chronic_diseases" = "الأمراض المزمنة";
+"healthy_nutrition" = "التغذية الصحية";
+
+
+// MARK: - PatientTabBarView
+"home" = "الرئيسية";
+"doctors" = "الاطباء";
+"notifications" = "الاشعارات";
+"settings" = "الاعدادات";
+
+
+"notifications" = "الإشعارات";
+"no_notifications" = "لا توجد إشعارات";
+"no_notifications_message" = "ستظهر الإشعارات هنا عند توفرها.";

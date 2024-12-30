@@ -4,6 +4,7 @@ struct NewPasswordView: View {
     @StateObject private var newPasswordViewModel = NewPasswordViewModel()
     @State private var showLoginView = false
     @State private var isSuccessAlertPresented = false
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     // MARK: - View
     var body: some View {
@@ -11,7 +12,7 @@ struct NewPasswordView: View {
             VStack {
                 // MARK: - Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("قم بادخال كلمة المرور الجديدة")
+                    Text("enter_new_password".localized()) // قم بادخال كلمة المرور الجديدة
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color.accentColor)
@@ -23,8 +24,8 @@ struct NewPasswordView: View {
                 // MARK: - Password Field
                 PasswordField(
                     password: $newPasswordViewModel.model.password,
-                    placeholder: "أدخل كلمة المرور",
-                    label: "كلمة المرور"
+                    placeholder: "enter_password".localized(), // أدخل كلمة المرور
+                    label: "password".localized() // كلمة المرور
                 )
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
@@ -44,8 +45,8 @@ struct NewPasswordView: View {
                         get: { newPasswordViewModel.model.confirmPassword ?? "" },
                         set: { newPasswordViewModel.model.confirmPassword = $0.isEmpty ? nil : $0 }
                     ),
-                    placeholder: "تأكيد كلمة المرور",
-                    label: "تأكيد كلمة المرور"
+                    placeholder: "confirm_password".localized(), // تأكيد كلمة المرور
+                    label: "confirm_password".localized() // تأكيد كلمة المرور
                 )
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
@@ -65,7 +66,7 @@ struct NewPasswordView: View {
                         isSuccessAlertPresented = true
                     }
                 }) {
-                    Text("تسجيل الدخول")
+                    Text("login".localized()) // تسجيل الدخول
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -78,7 +79,7 @@ struct NewPasswordView: View {
 
                 // Success Alert
                 .alert(newPasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
-                    Button("موافق", role: .cancel) {
+                    Button("ok".localized(), role: .cancel) { // موافق
                         showLoginView = true
                     }
                 }
@@ -89,6 +90,8 @@ struct NewPasswordView: View {
                 Spacer()
             }
         }
+        .direction(appLanguage) // اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
     }
 }
 

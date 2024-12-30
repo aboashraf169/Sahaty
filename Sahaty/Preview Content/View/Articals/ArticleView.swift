@@ -14,6 +14,7 @@ struct ArticleView: View {
     var userType: UserType // نوع المستخدم (Doctor أو Patient)
     @State private var showEditSheet = false // التحكم بعرض شاشة التعديل
     @State private var showDeleteAlert = false // التحكم بعرض التنبيه
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         VStack(spacing: 20) {
@@ -48,7 +49,7 @@ struct ArticleView: View {
                         Text(articlesModel.userName)
                             .font(.subheadline)
                             .fontWeight(.light)
-                        Text("منذ \(articlesModel.addTime)")
+                        Text("\("since".localized()) \(articlesModel.addTime)")
                             .font(.subheadline)
                             .fontWeight(.light)
             
@@ -66,20 +67,16 @@ struct ArticleView: View {
                     }
                 .fontWeight(.ultraLight)
                 .foregroundStyle(.primary)
-                .alert("حذف المقالة", isPresented: $showDeleteAlert) {
-                  
-                        Button("موافقة", role: .destructive) {
-                            articlesViewModel.deleteArticle(id: articlesModel.id)
-                        }
-                        Button("إلغاء", role: .cancel) {}
-
-                    
-                
-                    
-                   
-                } message: {
-                    Text("هل أنت متأكد من أنك تريد حذف المقالة؟")
-                }
+                .alert("delete_article".localized(), isPresented: $showDeleteAlert) {
+                         
+                               Button("confirm".localized(), role: .destructive) {
+                                   articlesViewModel.deleteArticle(id: articlesModel.id)
+                               }
+                               Button("cancel".localized(), role: .cancel) {}
+                           
+                       } message: {
+                           Text("delete_article_confirmation".localized())
+                       }
                    
                     // زر التعديل
                         Button {
@@ -115,32 +112,7 @@ struct ArticleView: View {
                             .cornerRadius(10)
                     }
             }
-            
-//            // صورة المنشور
-//            Rectangle()
-//                .frame(maxWidth: .infinity)
-//                .frame(height: 200)
-//                .foregroundStyle(Color(.systemGray6)).opacity(0.4)
-//                .cornerRadius(10)
-//                .overlay {
-//                    if let image = articlesModel.imagePost {
-//                        Image(image)
-//                            .resizable()
-//                            .scaledToFit()
-//                            .cornerRadius(10)
-//                    }
-//                    else {
-//                        VStack {
-//                            Image(systemName: "photo.on.rectangle.angled")
-//                                .resizable()
-//                                .foregroundStyle(.accent)
-//                                .frame(width: 100, height: 100)
-//                            Text("No Image")
-//                                .foregroundStyle(.accent)
-//                        }
-//                    }
-//                }
-
+        
             // خيارات التفاعل
             FotterArtical(comments:articlesModel.comments)
 
@@ -150,6 +122,8 @@ struct ArticleView: View {
         .sheet(isPresented: $showEditSheet) {
             AddArticleSheetView(articalsViewModel: articlesViewModel)
         }
+        .direction(appLanguage) // لضبط اتجاه النصوص بناءً على اللغة
+               .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
     }
 }
 

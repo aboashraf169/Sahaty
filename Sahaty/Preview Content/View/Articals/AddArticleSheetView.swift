@@ -13,17 +13,18 @@ import PhotosUI
 struct AddArticleSheetView: View {
     @ObservedObject var articalsViewModel: ArticalsViewModel
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         VStack {
             // MARK: - Header Section
             VStack(spacing: 10) {
-                Text(articalsViewModel.editingArticle == nil ? "إنشاء مقالة جديدة" : "تعديل المقالة")
+                Text(articalsViewModel.editingArticle == nil ? "create_new_article".localized() : "edit_article".localized())
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
 
-                Text("املأ الحقول أدناه لإضافة أو تعديل المقالة")
+                Text("fill_fields_for_article".localized())
                     .font(.callout)
                     .foregroundColor(.secondary)
             }
@@ -33,7 +34,7 @@ struct AddArticleSheetView: View {
             VStack(alignment: .trailing, spacing: 10) {
                 HStack {
                     Image(systemName: "text.book.closed")
-                    Text("الموضوع")
+                    Text("topic".localized())
                     Spacer()
                 }
 
@@ -55,7 +56,7 @@ struct AddArticleSheetView: View {
                     Image(systemName: "icloud.and.arrow.up")
                         .font(.title2)
                         .tint(.secondary)
-                    Text("رفع الصورة")
+                    Text("upload_image".localized())
                         .tint(.black)
                     Spacer()
                   
@@ -66,11 +67,10 @@ struct AddArticleSheetView: View {
                         articalsViewModel.showImagePicker.toggle()
                     }) {
                         HStack {
-                            Text("اختر صورة")
-                                .font(.headline)
+                            Text("choose_image".localized())
+                                  .font(.headline)
                             Image(systemName: "icloud.and.arrow.up")
-                                .font(.title3)
-                           
+                                  .font(.title3)
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -99,11 +99,11 @@ struct AddArticleSheetView: View {
                         .overlay {
                             VStack {
                                 Image(systemName: "photo.on.rectangle")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.secondary)
-                                Text("لا يوجد صورة محددة")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                     .font(.largeTitle)
+                                     .foregroundColor(.secondary)
+                                Text("no_image_selected".localized())
+                                     .font(.subheadline)
+                                     .foregroundColor(.secondary)
                             }
                         }
                 }
@@ -118,15 +118,15 @@ struct AddArticleSheetView: View {
             // MARK: - Publish Button
             Button(action: {
                 guard !articalsViewModel.articleText.isEmpty else {
-                    articalsViewModel.alertTitle = "خطأ"
-                    articalsViewModel.alertMessage = "النص لا يمكن أن يكون فارغًا."
+                    articalsViewModel.alertTitle = "error".localized()
+                    articalsViewModel.alertMessage = "text_empty_error".localized()
                     articalsViewModel.showAlert = true
                     return
                 }
                 articalsViewModel.saveArticle()
                 dismiss()
             }) {
-                Text(articalsViewModel.editingArticle == nil ? "نشر" : "حفظ التعديلات")
+                Text(articalsViewModel.editingArticle == nil ? "publish".localized() : "save_changes".localized())
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -146,10 +146,12 @@ struct AddArticleSheetView: View {
             Alert(
                 title: Text(articalsViewModel.alertTitle),
                 message: Text(articalsViewModel.alertMessage),
-                dismissButton: .default(Text("حسنًا"))
+                dismissButton: .default(Text("ok".localized()))
             )
         }
         .padding(.top)
+        .direction(appLanguage) // لضبط اتجاه النصوص بناءً على اللغة
+        .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
     }
 }
 

@@ -2,21 +2,20 @@ import SwiftUI
 
 struct AddAdviceSheetView: View {
     @Environment(\.presentationMode) var presentationMode
-    
     @ObservedObject var adviceViewModel: AdviceViewModel // تمرير ViewModel للطبيب
-    
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+
     var body: some View {
         VStack {
             // العنوان الرئيسي
-            Text(adviceViewModel.editingAdvice == nil ? "إنشاء النصيحة اليومية" : "تعديل النصيحة")
+            Text(adviceViewModel.editingAdvice == nil ? "create_daily_advice".localized() : "edit_advice".localized())
                 .font(.title)
                 .padding(.vertical)
             
             // القسم العلوي
             HStack {
                 Image(systemName: "text.book.closed")
-                Text("الموضوع")
-                
+                      Text("topic".localized())
                 Spacer()
 
             }
@@ -34,7 +33,7 @@ struct AddAdviceSheetView: View {
                 adviceViewModel.addAdvice()
                 presentationMode.wrappedValue.dismiss()
             } label: {
-                Text("نشر")
+                Text("publish".localized())
                     .font(.headline)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -48,6 +47,8 @@ struct AddAdviceSheetView: View {
 //            Spacer()
         }
         .padding()
+        .direction(appLanguage) // اتجاه النصوص بناءً على اللغة
+        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
     }
 }
 

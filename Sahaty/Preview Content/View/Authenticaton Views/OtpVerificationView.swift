@@ -8,6 +8,7 @@ struct OtpVerificationView: View {
     @State private var timer: Timer?
     @State private var isSuccessAlertPresented = false
     @State private var showNewPasswordView = false // عرض شاشة كلمة جديد
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     // MARK: - View
     var body: some View {
@@ -15,7 +16,7 @@ struct OtpVerificationView: View {
             VStack(spacing: 20) {
                 // MARK: - Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("قمنا بإرسال رسالة SMS قصيرة تحتوي على رمز التفعيل")
+                    Text("otp_sent_message".localized()) // قمنا بإرسال رسالة SMS قصيرة تحتوي على رمز التفعيل
                         .font(.headline)
                         .foregroundColor(Color.accentColor)
                         .multilineTextAlignment(.leading)
@@ -61,7 +62,7 @@ struct OtpVerificationView: View {
                         isSuccessAlertPresented = true
                     }
                 }) {
-                    Text("تحقق")
+                    Text("verify".localized()) // تحقق
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding()
@@ -74,7 +75,7 @@ struct OtpVerificationView: View {
                 // MARK: - Resend Timer
                 if !canResend {
                     HStack(spacing: 5) {
-                        Text("إعادة إرسال الرمز في")
+                        Text("resend_otp_in".localized()) // إعادة إرسال الرمز في
                             .font(.caption)
                             .foregroundColor(.gray)
                         
@@ -84,7 +85,7 @@ struct OtpVerificationView: View {
                     }
                 } else {
                     Button(action: resendOtp) {
-                        Text("إعادة إرسال الرمز")
+                        Text("resend_otp".localized()) // إعادة إرسال الرمز
                             .font(.caption)
                             .foregroundColor(Color.purple)
                     }
@@ -96,7 +97,7 @@ struct OtpVerificationView: View {
 
             // Success Alert
             .alert(otpViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
-                Button("موافق", role: .cancel) {
+                Button("ok".localized(), role: .cancel) { // موافق
                     showNewPasswordView = true
                 }
             }
@@ -106,6 +107,8 @@ struct OtpVerificationView: View {
                 NewPasswordView()
             }
         }
+         .direction(appLanguage) // اتجاه النصوص
+         .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
     }
 
     // MARK: - Timer Management

@@ -1,0 +1,133 @@
+/* 
+  Localizable.strings
+  Sahaty
+
+  Created by mido mj on 12/29/24.
+  
+*/
+
+// MARK: - LOGIN
+"login_now" = "Login Now";
+"email" = "Email";
+"enter_email" = "Enter your email address...";
+"password" = "Password";
+"enter_password" = "Enter your password";
+"forgot_password" = "Forgot your password?";
+"login" = "Login";
+"sign_up" = "Create new Account?";
+"login_with" = "Login with";
+"patient" = "Patient";
+"doctor" = "Doctor";
+
+// MARK: - FORGET PASSWORD VIEW
+"forgot_password_title" = "Forgot Password";
+"forgot_password_description" = "We will send a code to reset your password";
+"email" = "Email";
+"enter_email" = "Enter your email address..";
+"send" = "Send";
+"ok" = "OK";
+
+
+// MARK: - NEW PASSWORD VIEW
+"enter_new_password" = "Enter your new password";
+"password" = "Password";
+"enter_password" = "Enter your password";
+"confirm_password" = "Confirm Password";
+"login" = "Login";
+"ok" = "OK";
+
+
+// MARK: - OTP PASSWORD VIEW
+"otp_sent_message" = "We have sent a short SMS message with the activation code";
+"verify" = "Verify";
+"resend_otp_in" = "Resend code in";
+"resend_otp" = "Resend Code";
+"ok" = "OK";
+
+
+// MARK: - SignUp VIEW
+"signup_subtitle" = "Start Registration";
+"signup_title" = "New Registration";
+"user_type" = "User Type";
+"patient" = "Patient";
+"doctor" = "Doctor";
+"name" = "Name";
+"enter_full_name" = "Enter full name";
+"email" = "Email";
+"enter_email" = "Enter your email address...";
+"password" = "Password";
+"enter_password" = "Enter password";
+"confirm_password" = "Confirm Password";
+"confirm_password_label" = "Confirm Password";
+"specialization" = "Specialization";
+"enter_specialization" = "Enter specialization";
+"license_number" = "License Number";
+"enter_license_number" = "Enter license number";
+"signup_button" = "Create Account";
+"ok" = "OK";
+
+
+
+
+// MARK: - ADVICE VIEW
+"create_daily_advice" = "Create Daily Advice";
+"edit_advice" = "Edit Advice";
+"topic" = "Topic";
+"publish" = "Publish";
+
+
+
+// MARK: - ADD ARTCALE VIEW
+"create_new_article" = "Create New Article";
+"edit_article" = "Edit Article";
+"fill_fields_for_article" = "Fill in the fields below to add or edit the article";
+"topic" = "Topic";
+"upload_image" = "Upload Image";
+"choose_image" = "Choose Image";
+"no_image_selected" = "No image selected";
+"publish" = "Publish";
+"save_changes" = "Save Changes";
+"error" = "Error";
+"text_empty_error" = "The text cannot be empty.";
+"ok" = "OK";
+
+
+// MARK: - ARTCALE VIEW
+"since" = "Since";
+"delete_article" = "Delete Article";
+"delete_article_confirmation" = "Are you sure you want to delete the article?";
+"confirm" = "Confirm";
+"cancel" = "Cancel";
+
+
+// MARK: - ADD COMMENT VIEW
+"add_comment_placeholder" = "Add a comment...";
+"comments" = "Comments";
+"edit" = "Edit";
+"delete" = "Delete";
+
+
+// MARK: - PatientHomeScreen
+"daily_advices" = "Daily Advices";
+"categories" = "Categories";
+"new_articles" = "New Articles";
+"no_posts" = "No posts available right now";
+"follow_articles" = "Start following new and useful articles.";
+"no_advices" = "No advices available yet!";
+"start_following_advices" = "Start following daily advices to improve your health.";
+"mental_health" = "Mental Health";
+"chronic_diseases" = "Chronic Diseases";
+"healthy_nutrition" = "Healthy Nutrition";
+
+
+// MARK: - PatientTabBarView
+"home" = "Home";
+"doctors" = "Doctors";
+"notifications" = "Notifications";
+"settings" = "Settings";
+
+
+
+"notifications" = "Notifications";
+"no_notifications" = "No Notifications";
+"no_notifications_message" = "Notifications will appear here when available.";

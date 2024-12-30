@@ -4,7 +4,8 @@ struct PatientHomeScreen: View {
     @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
     @StateObject private var adviceViewModel: AdviceViewModel
     @StateObject private var articlesViewModel: ArticalsViewModel
-    
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+
     @State private var searchText = ""
 
         init() {
@@ -38,20 +39,19 @@ struct PatientHomeScreen: View {
 
                 ScrollView {
                     // MARK: - Daily Advice Section
-                    titleCategory(title: "نصائح اليوم")
-                    dailyAdviceSection
-                    
+                        titleCategory(title: "daily_advices".localized())
+                        dailyAdviceSection
+                                    
                     // MARK: - Categories Section
-                    titleCategory(title: "التخصصات")
-                    categoriesSection
-                    
+                        titleCategory(title: "categories".localized())
+                        categoriesSection
                     // MARK: - Articles Section
-                        titleCategory(title: "المقالات الجديدة")
+                    titleCategory(title: "new_articles".localized())
                         if articlesViewModel.Articals.isEmpty {
                             noDataView(
                                 imageName: "tray",
-                                title: "لا توجد منشورات حاليًا",
-                                description: "ابدأ بمتابعة المقالات الجديدة المفيدة."
+                                title: "no_posts".localized(),
+                                description: "follow_articles".localized()
                             )
                         } else {
                             VStack(spacing: 10) { // يمكنك إضافة تباعد بين المقالات هنا
@@ -66,6 +66,8 @@ struct PatientHomeScreen: View {
             }
 
         }
+        .direction(appLanguage) // اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
     }
     
     // MARK: - Daily Advice Section
@@ -99,9 +101,9 @@ struct PatientHomeScreen: View {
             } else {
                 noDataView(
                     imageName: "lightbulb.slash.fill",
-                    title: "لا توجد نصائح حتى الآن!",
-                    description: "ابدأ بمتابعة النصائح اليومية لتحسين صحتك."
-                )
+                    title: "no_advices".localized(),
+                    description: "start_following_advices".localized()
+                          )
             }
         }
     }
@@ -111,9 +113,9 @@ struct PatientHomeScreen: View {
     private var categoriesSection: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                Categoryy(title: "الصحة النفسية", imageName: "face.smiling")
-                Categoryy(title: "الأمراض المزمنة", imageName: "arrow.clockwise.heart")
-                Categoryy(title: "التغذية الصحية", imageName: "fork.knife.circle")
+                Categoryy(title: "mental_health".localized(), imageName: "face.smiling")
+                Categoryy(title: "chronic_diseases".localized(), imageName: "arrow.clockwise.heart")
+                Categoryy(title: "healthy_nutrition".localized(), imageName: "fork.knife.circle")
             }
             .padding(.horizontal)
         }

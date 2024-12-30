@@ -3,6 +3,7 @@ import SwiftUI
 struct AddCommentView: View {
     @StateObject private var viewModel = CommentViewModel()
     var currentUser: CommentAuthor // المستخدم الحالي (طبيب أو مريض)
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         NavigationStack {
@@ -19,7 +20,7 @@ struct AddCommentView: View {
                 
                 // إضافة أو تعديل تعليق
                 HStack {
-                    TextField("أضف تعليقًا...", text: $viewModel.newCommentText)
+                    TextField("add_comment_placeholder".localized(), text: $viewModel.newCommentText) // أضف تعليقًا...
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
                         .padding(.horizontal)
@@ -48,8 +49,10 @@ struct AddCommentView: View {
                 .padding(.vertical, 10)
                 .padding(.horizontal)
             }
-            .navigationTitle("التعليقات")
+            .navigationTitle("comments".localized()) // التعليقات
             .navigationBarTitleDisplayMode(.inline)
+            .direction(appLanguage) // اتجاه النصوص
+            .environment(\.locale, .init(identifier: appLanguage))
         }
     }
 
@@ -59,7 +62,7 @@ struct AddCommentView: View {
             Button {
                 viewModel.startEditing(comment: comment)
             } label: {
-                Label("تعديل", systemImage: "pencil")
+                Label("edit".localized(), systemImage: "pencil") // تعديل
             }
             .tint(.accent)
 
@@ -67,7 +70,7 @@ struct AddCommentView: View {
             Button() {
                 viewModel.deleteComment(id: comment.id)
             } label: {
-                Label("حذف", systemImage: "trash")
+                Label("delete".localized(), systemImage: "trash") // حذف
             }
             .tint(.red)
         }
