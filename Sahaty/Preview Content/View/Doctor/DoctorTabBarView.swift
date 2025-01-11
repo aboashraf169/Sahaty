@@ -10,6 +10,7 @@ import SwiftUI
 // واجهة قيد الانشاء
 struct DoctorTabBarView: View {
     @StateObject var appState = AppState()
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     @State var doctor = DoctorModel(
         fullName: "د. محمد أشرف",
@@ -35,7 +36,7 @@ struct DoctorTabBarView: View {
             DoctorHomeScreen(doctor: doctor)
                     .tabItem{
                         HStack{
-                            Text("الرئيسية")
+                            Text(("Home").localized())
                             Image(systemName: "house.fill")
                         }
                     }
@@ -45,19 +46,19 @@ struct DoctorTabBarView: View {
                  ProfileView(viewModel: DoctorProfileViewModel(doctor: doctor))
                  .tabItem{
                      HStack{
-                         Text("الملف الشخصي")
+                         Text("Profile".localized())
                          Image(systemName: "person.fill")
                      }
                  }
                  .tag(TabDoctor.profile)
 
         
-                Text("المحادثات")
+            Text("Chats".localized())
                         .font(.largeTitle)
                         .fontWeight(.bold)
                 .tabItem{
                     HStack{
-                        Text("المحادثات")
+                        Text("Chats".localized())
                         Image(systemName: "message")
                     }
                 }
@@ -68,7 +69,7 @@ struct DoctorTabBarView: View {
             NotificationsView()
             .tabItem{
                 HStack{
-                    Text("الاشعارات")
+                    Text("Notifications".localized())
                     Image(systemName: "heart.fill")
                 }
             }
@@ -80,7 +81,7 @@ struct DoctorTabBarView: View {
                 .padding()
             .tabItem{
                 HStack{
-                    Text("الاعدادات")
+                    Text("Settings".localized())
                     Image(systemName: "gear")
                 }
             }
@@ -88,6 +89,8 @@ struct DoctorTabBarView: View {
   
             }
         .environmentObject(appState) // مشاركة حالة التطبيق مع جميع الشاشات
+        .direction(appLanguage) // اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
 
         
     }

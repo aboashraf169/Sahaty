@@ -11,12 +11,13 @@ struct changePasswordView: View {
     var userType: UserType // نوع المستخدم
     @StateObject private var newPasswordViewModel = NewPasswordViewModel()
     @State private var isSuccessAlertPresented = false
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         
         VStack{
             HStack {
-                Text("تغيير كلمة المرور")
+                Text("change_password".localized())
                 .font(.title)
                 Spacer()
             }
@@ -30,15 +31,15 @@ struct changePasswordView: View {
                         get: { newPasswordViewModel.model.oldPassword ?? ""},
                         set: { newPasswordViewModel.model.oldPassword = $0.isEmpty ? nil : $0}
                     ),
-                    placeholder: "أدخل كلمة القديمة",
-                    label: "كلمة المرور القديمة"
+                    placeholder: "enter_old_password".localized(),
+                    label: "old_password".localized()
                 )
                 
                 
                 
                 // Error Message for Old Password
-                if !newPasswordViewModel.OldPasswordErrorMessage.isEmpty {
-                    Text(newPasswordViewModel.OldPasswordErrorMessage)
+                if !newPasswordViewModel.oldPasswordErrorMessage.isEmpty {
+                    Text(newPasswordViewModel.oldPasswordErrorMessage)
                         .font(.caption)
                         .foregroundColor(.red)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -53,8 +54,8 @@ struct changePasswordView: View {
             VStack{
                 PasswordField(
                     password: $newPasswordViewModel.model.password,
-                    placeholder: "أدخل كلمة المرور",
-                    label: "كلمة المرور"
+                    placeholder: "enter_password".localized(),
+                    label: "password".localized()
                 )
 
             // Error Message for Password
@@ -78,8 +79,8 @@ struct changePasswordView: View {
                         get: { newPasswordViewModel.model.confirmPassword ?? "" },
                         set: { newPasswordViewModel.model.confirmPassword = $0.isEmpty ? nil : $0 }
                     ),
-                    placeholder: "تأكيد كلمة المرور",
-                    label: "تأكيد كلمة المرور"
+                    placeholder: "confirm_password".localized(),
+                    label: "confirm_password_label".localized()
                 )
             
             // Error Message for Confirm Password
@@ -100,7 +101,7 @@ struct changePasswordView: View {
                     isSuccessAlertPresented = true
                 }
             }) {
-                Text("تأكيد")
+                Text("confirm".localized())
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -112,7 +113,7 @@ struct changePasswordView: View {
             
             // Success Alert
             .alert(newPasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
-                Button("موافق", role: .cancel) {
+                Button("ok", role: .cancel) {
                 }
             }
             
@@ -120,6 +121,9 @@ struct changePasswordView: View {
             
         }
         .padding()
+        .direction(appLanguage) // ضبط اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط البيئة
+    
   
             
         

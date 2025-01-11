@@ -15,8 +15,7 @@ class NewPasswordViewModel: ObservableObject {
     // MARK: - Error Messages
     @Published var passwordErrorMessage: String = ""
     @Published var confirmPasswordErrorMessage: String = ""
-    @Published var OldPasswordErrorMessage: String = ""
-
+    @Published var oldPasswordErrorMessage: String = ""
 
     // MARK: - Success Message
     @Published var successMessage: String = ""
@@ -28,28 +27,28 @@ class NewPasswordViewModel: ObservableObject {
 
         // التحقق من كلمة المرور
         if model.password.isEmpty {
-            passwordErrorMessage = "يرجى إدخال كلمة المرور"
+            passwordErrorMessage = "enter_password".localized()
             isValid = false
         } else if model.password.count < 6 {
-            passwordErrorMessage = "يجب أن تكون كلمة المرور 6 أحرف على الأقل"
+            passwordErrorMessage = "password_min_length".localized()
             isValid = false
         }
 
         // التحقق من تأكيد كلمة المرور
         if model.confirmPassword != model.password {
-            confirmPasswordErrorMessage = "كلمة المرور وتأكيدها غير متطابقين"
+            confirmPasswordErrorMessage = "passwords_not_matching".localized()
             isValid = false
         }
         
-        // التحقق من تطابق كلمة المرور
+        // التحقق من كلمة المرور القديمة
         if model.oldPassword != model.password {
-            OldPasswordErrorMessage = "كلمة المرور القديمة غير صحيحة"
+            oldPasswordErrorMessage = "incorrect_old_password".localized()
             isValid = false
         }
 
         // إذا كان كل شيء صحيحًا
         if isValid {
-            successMessage = "تم تعديل كلمة السر بنجاح!"
+            successMessage = "password_change_success".localized()
         }
 
         return isValid
@@ -59,6 +58,9 @@ class NewPasswordViewModel: ObservableObject {
     func clearErrors() {
         passwordErrorMessage = ""
         confirmPasswordErrorMessage = ""
-        OldPasswordErrorMessage = ""
+        oldPasswordErrorMessage = ""
     }
 }
+
+
+

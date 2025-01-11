@@ -6,6 +6,7 @@ struct HeaderHomeSectionView: View {
     var onProfileTap: () -> Void // الإجراء عند النقر على صورة المستخدم
     var onAddTap: (() -> Void)? = nil // الإجراء عند النقر على زر الإضافة (للدكتور فقط)
     var onSearch: (String) -> Void // الإجراء عند تحديث نص البحث
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         HStack {
@@ -16,15 +17,16 @@ struct HeaderHomeSectionView: View {
                 Image(systemName: "person.fill")
                     .resizable()
                     .scaledToFit()
+                    .shadow(radius: 2)
                     .padding(.top, 5)
                     .frame(width: 40, height: 40)
                     .background(Color(.systemGray6))
                     .clipShape(Circle())
-                    .shadow(radius: 3)
+        
             }
 
             // صندوق البحث
-            TextField("ابحث في الواجهة", text: $searchText, onEditingChanged: { _ in
+            TextField("search_placeholder".localized(), text: $searchText, onEditingChanged: { _ in
                 // عند بدء أو إنهاء التعديل
             }, onCommit: {
                 // عند الضغط على زر الإدخال
@@ -63,6 +65,8 @@ struct HeaderHomeSectionView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 20)
+        .direction(appLanguage) // ضبط الاتجاه
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
     }
 }
 
@@ -82,5 +86,3 @@ struct HeaderHomeSectionView: View {
         }
     )
 }
-
-

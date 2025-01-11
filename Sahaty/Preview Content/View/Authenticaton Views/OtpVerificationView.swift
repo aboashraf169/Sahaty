@@ -45,6 +45,8 @@ struct OtpVerificationView: View {
                     }
                 }
                 .padding(.horizontal, 20)
+                .environment(\.layoutDirection, .leftToRight) // تثبيت الاتجاه من اليسار إلى اليمين
+
 
                 // Error Message
                 if !otpViewModel.otpErrorMessage.isEmpty {

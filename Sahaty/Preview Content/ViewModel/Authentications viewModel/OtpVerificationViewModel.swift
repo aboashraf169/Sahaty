@@ -1,11 +1,3 @@
-//
-//  OtpVerificationViewModel.swift
-//  Sahaty
-//
-//  Created by mido mj on 12/16/24.
-//
-
-
 import Foundation
 
 class OtpVerificationViewModel: ObservableObject {
@@ -24,15 +16,15 @@ class OtpVerificationViewModel: ObservableObject {
         var isValid = true
 
         if model.otpCode.isEmpty || model.otpCode.count != 4 {
-            otpErrorMessage = "يرجى إدخال رمز التحقق المكون من 4 أرقام"
+            otpErrorMessage = "enter_valid_otp".localized()
             isValid = false
         } else if model.otpCode != "1234" { // رمز افتراضي للتحقق
-            otpErrorMessage = "رمز التحقق غير صحيح"
+            otpErrorMessage = "incorrect_otp".localized()
             isValid = false
         }
 
         if isValid {
-            successMessage = "تم التحقق بنجاح!"
+            successMessage = "otp_verification_success".localized()
         }
 
         return isValid
@@ -45,6 +37,6 @@ class OtpVerificationViewModel: ObservableObject {
 
     // MARK: - Resend OTP
     func resendOtp() {
-        print("تم إعادة إرسال رمز OTP إلى البريد الإلكتروني: \(model.email)")
+        print("otp_resend_message".localized() + ": \(model.email)")
     }
 }

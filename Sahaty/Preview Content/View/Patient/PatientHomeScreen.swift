@@ -20,7 +20,6 @@ struct PatientHomeScreen: View {
         NavigationStack {
             VStack {
                 // MARK: - Header Section
-//                HeaderHomeSectionView(userType: .doctor)
                 HeaderHomeSectionView(
                     userType: .patient,
                     searchText: $searchText, // تمرير نص البحث كـ Binding
@@ -48,11 +47,24 @@ struct PatientHomeScreen: View {
                     // MARK: - Articles Section
                     titleCategory(title: "new_articles".localized())
                         if articlesViewModel.Articals.isEmpty {
-                            noDataView(
-                                imageName: "tray",
-                                title: "no_posts".localized(),
-                                description: "follow_articles".localized()
-                            )
+                                VStack(spacing: 20) {
+                                    
+                                    Image("noArtical")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 150)
+                                        .foregroundColor(.gray.opacity(0.7))
+                                    //                     title: "no_articles",
+                                    //                    description: "add_new_article",
+                                    Text("no_articles".localized())
+                                        .font(.title2)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.primary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 30)
+                                    
+                                }
                         } else {
                             VStack(spacing: 10) { // يمكنك إضافة تباعد بين المقالات هنا
                                 ForEach(articlesViewModel.Articals) { article in
@@ -99,11 +111,13 @@ struct PatientHomeScreen: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                noDataView(
-                    imageName: "lightbulb.slash.fill",
-                    title: "no_advices".localized(),
-                    description: "start_following_advices".localized()
-                          )
+                HStack {
+                    Text("no_advices".localized())
+                        .fontWeight(.medium)
+                        .foregroundStyle(.gray)
+                    Spacer()
+                }
+                .padding(.horizontal,20)
             }
         }
     }
@@ -120,35 +134,6 @@ struct PatientHomeScreen: View {
             .padding(.horizontal)
         }
     }
-    
-
-
-    
-    // MARK: - No Data View
-    private func noDataView(imageName: String, title: String, description: String) -> some View {
-        VStack(spacing: 20) {
-            Image(systemName: imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 80, height: 80)
-                .foregroundColor(.gray.opacity(0.7))
-            
-            Text(title)
-                .font(.title2)
-                .fontWeight(.semibold)
-                .foregroundColor(.primary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 30)
-            
-            Text(description)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-        }
-        .padding(.top)
-    }
-    
     // MARK: - Title Category
     private func titleCategory(title: String) -> some View {
         HStack {

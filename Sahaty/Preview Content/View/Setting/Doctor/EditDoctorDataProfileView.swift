@@ -16,6 +16,7 @@ struct EditDoctorDataProfileView: View {
     @State private var showImagePicker = false
     
     @StateObject private var viewModel = DoctorProfileViewModel(doctor: DoctorModel(fullName: "محمد اشرف", email: "mido@gmail.com", specialization: "طب عيون", licenseNumber: "323434832432", articlesCount: 0, advicesCount: 0, followersCount: 0, articles: [], advices: [], comments: [], likedArticles: []))
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
             VStack(spacing: 20) {
@@ -79,27 +80,26 @@ struct EditDoctorDataProfileView: View {
                 Divider()
             ScrollView{
                                 
-                    EditField(title: "الاسم", text: $viewModel.userProfile.fullName)
-                
-                    EditField(title: "نبذة شخصية"
-                                ,
+                EditField(title: "name".localized(), text: $viewModel.userProfile.fullName)
+
+                EditField(title: "personal_bio".localized(),
                                 text: Binding(
                                 get: { viewModel.userProfile.biography ?? "" },
                                 set: { viewModel.userProfile.biography = $0 }))
                 
-                    EditField(title: "البريد الإلكتروني", text: $viewModel.userProfile.email)
-                
-                    EditField(title: "التخصص الطبي", text: $viewModel.userProfile.specialization)
-                
-                    EditField(title: "رقم التخصص الوظيفي", text: $viewModel.userProfile.licenseNumber)
-                    
+                EditField(title: "email".localized(), text: $viewModel.userProfile.email)
+
+                EditField(title: "medical_specialization".localized(), text: $viewModel.userProfile.specialization)
+
+                EditField(title: "license_number".localized(), text: $viewModel.userProfile.licenseNumber)
+
                 }
                 
                 // Save Button
                 Button(action: {
                     viewModel.saveChanges()
                 }) {
-                    Text("حفظ التغييرات")
+                    Text("save_changes".localized())
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -110,6 +110,8 @@ struct EditDoctorDataProfileView: View {
                 .padding()
 
             }
+             .direction(appLanguage) // ضبط الاتجاه
+             .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
         
     }
     
@@ -139,7 +141,7 @@ struct EditField: View {
             Text(title)
                 .font(.callout)
                 .foregroundStyle(.secondary)
-            TextField("لا يوجد نص متوفر", text: $text)
+            TextField("placeholder_text".localized(), text: $text)
                 .font(.callout)
                 .padding()
                 .background(Color(.systemGray6))

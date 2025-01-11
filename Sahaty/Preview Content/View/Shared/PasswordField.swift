@@ -18,7 +18,8 @@ struct PasswordField: View {
     @State private var isSecure: Bool = true
     var placeholder: String
     var label: String
-    
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+
     var body: some View {
         VStack(alignment: .leading) {
             
@@ -57,7 +58,7 @@ struct PasswordField: View {
             .background(Color(.systemGray6))
             .cornerRadius(10)
         }
-//        .padding(.top,10)
-
+        .direction(appLanguage) // ضبط الاتجاه
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
     }
 }

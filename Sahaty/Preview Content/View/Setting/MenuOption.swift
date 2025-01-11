@@ -12,9 +12,8 @@ struct MenuOption : View {
     let title: String
     let icon: String
     let action: () -> Void
-    
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
     var body: some View {
-        
         Button(action: action) {
                 HStack {
                     
@@ -29,11 +28,14 @@ struct MenuOption : View {
 
                     Spacer()
 
-                    Image(systemName: "chevron.left")
+                    Image(systemName: appLanguage == "ar" ? "chevron.left" : "chevron.right") // السهم حسب اللغة
                         .foregroundColor(.gray)
                 }
                 .padding(.vertical, 8)
         }
+        .direction(appLanguage) // ضبط اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط البيئة
+    
         
     }
 

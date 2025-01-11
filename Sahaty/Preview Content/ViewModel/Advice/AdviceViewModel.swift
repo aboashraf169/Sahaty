@@ -1,9 +1,3 @@
-//
-//  AdviceViewModel.swift
-//  Sahaty
-//
-//  Created by mido mj on 12/14/24.
-//
 import Foundation
 import SwiftUI
 import Combine
@@ -18,31 +12,34 @@ class AdviceViewModel: ObservableObject {
     @Published var searchText: String = "" // النص المدخل في البحث
     private var cancellables = Set<AnyCancellable>()
     
+    
+    deinit {
+        cancellables.forEach { $0.cancel() }
+    }
+
     // الطبيب المسؤول عن النصائح
     var currentUser: CommentAuthor? // المستخدم الحالي (Doctor أو Patient)
     var author: DoctorModel? // المؤلف (إذا كان Doctor)
+
     // MARK: - Initialization
     init(author: DoctorModel? = nil, currentUser: CommentAuthor? = nil) {
-        // قم بتعيين القيم الافتراضية
         self.author = author
         if let doctor = author {
             self.currentUser = .doctor(doctor)
         } else {
             self.currentUser = currentUser
         }
-//        if case .patient = currentUser {
         addDefaultAdvicesForPatient() // إضافة بيانات افتراضية إذا كان المستخدم مريضًا
         filteredAdvices = advices
 
         // ربط النص المدخل مع التصفية
-            $searchText
-                .debounce(for: 0.3, scheduler: DispatchQueue.main) // تأخير التحديث لتقليل عمليات التصفية
-                .removeDuplicates()
-                .sink { [weak self] searchText in
-                    self?.filterAdvices(with: searchText)
-                }
-                .store(in: &cancellables)
-//            }
+        $searchText
+            .debounce(for: 0.3, scheduler: DispatchQueue.main) // تأخير التحديث لتقليل عمليات التصفية
+            .removeDuplicates()
+            .sink { [weak self] searchText in
+                self?.filterAdvices(with: searchText)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Add filter Advices
@@ -55,43 +52,17 @@ class AdviceViewModel: ObservableObject {
         }
     }
 
-
     // MARK: - Add Default Advices
     private func addDefaultAdvicesForPatient() {
         advices = [
             AdviceModel(
-                content: "تناول وجبة إفطار صحية كل يوم لتحصل على بداية يوم مليئة بالطاقة.",
-                authorName: "د. علي سالم",
+                content: "default_advice_1".localized(),
+                authorName: "default_author_1".localized(),
                 publishDate: Date()
             ),
             AdviceModel(
-                content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "تناول وجبة إفطار صحية كل يوم لتحصل على بداية يوم مليئة بالطاقة.",
-                authorName: "د. علي سالم",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "تناول وجبة إفطار صحية كل يوم لتحصل على بداية يوم مليئة بالطاقة.",
-                authorName: "د. علي سالم",
-                publishDate: Date()
-            ),
-            AdviceModel(
-                content: "مارس التمارين الرياضية بانتظام لتحسين لياقتك البدنية.",
-                authorName: "د. مريم عبد الله",
+                content: "default_advice_2".localized(),
+                authorName: "default_author_2".localized(),
                 publishDate: Date()
             )
         ]
@@ -104,7 +75,7 @@ class AdviceViewModel: ObservableObject {
         
         // التحقق من أن النصيحة ليست فارغة
         guard !trimmedAdvice.isEmpty else {
-            errorMessage = "النصيحة لا يمكن أن تكون فارغة."
+            errorMessage = "empty_advice_error".localized()
             return
         }
         
@@ -131,7 +102,6 @@ class AdviceViewModel: ObservableObject {
         newAdviceText = ""
     }
 
-    
     // MARK: - Delete Advice
     func deleteAdvice(at indexSet: IndexSet) {
         advices.remove(atOffsets: indexSet)

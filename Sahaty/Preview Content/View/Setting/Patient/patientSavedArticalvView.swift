@@ -10,8 +10,9 @@ import SwiftUI
 struct patientSavedArticalvView: View {
     
     var articles: [ArticalModel]
-    
     @State var DefultArticle : [ArticalModel] = []
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+
     
     init() {
         let defaultArticles = [
@@ -41,9 +42,13 @@ struct patientSavedArticalvView: View {
                     }
                 }
             }
-            .navigationTitle("جميع المقالات المحفوظة")
+            .navigationTitle("saved_articles".localized())
             .navigationBarTitleDisplayMode(.inline)
         }
+        .direction(appLanguage) // ضبط الاتجاه
+        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+
+
     }
 }
 

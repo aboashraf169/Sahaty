@@ -12,7 +12,8 @@ struct PicturePatientSetting: View {
     var viewModel = PatiantModel.defaultData
     @Binding var selectedImage: UIImage?
     @Binding var showImagePicker: Bool
-    
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+
     var body: some View {
         VStack() {
             ZStack {
@@ -61,5 +62,8 @@ struct PicturePatientSetting: View {
             }
 
         }
+        .direction(appLanguage) // ضبط اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط البيئة
+    
     }
 }

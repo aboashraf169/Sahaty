@@ -39,39 +39,39 @@ class SignUpViewModel: ObservableObject {
         var isValid = true
 
         if model.fullName.isEmpty || model.fullName.count <= 2 {
-            fullNameErrorMessage = "يرجى إدخال الاسم الرباعي."
+            fullNameErrorMessage = "enter_full_name".localized()
             isValid = false
         }
 
         if model.email.isEmpty || !model.email.contains("@") {
-            emailErrorMessage = "يرجى إدخال بريد إلكتروني الصحيح."
+            emailErrorMessage = "enter_valid_email".localized()
             isValid = false
         }
 
         if model.password.isEmpty || model.password.count < 6 {
-            passwordErrorMessage = "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل."
+            passwordErrorMessage = "password_min_length".localized()
             isValid = false
         }
 
         if model.confirmPassword != model.password {
-            confirmPasswordErrorMessage = "كلمة المرور وتأكيدها غير متطابقين."
+            confirmPasswordErrorMessage = "passwords_not_matching".localized()
             isValid = false
         }
 
         if model.userType == .doctor {
             if let specialization = model.specialization, specialization.isEmpty {
-                specializationErrorMessage = "يرجى إدخال التخصص."
+                specializationErrorMessage = "enter_specialization".localized()
                 isValid = false
             }
 
             if let licenseNumber = model.licenseNumber, licenseNumber.isEmpty {
-                licenseNumberErrorMessage = "يرجى إدخال رقم الترخيص."
+                licenseNumberErrorMessage = "enter_license_number".localized()
                 isValid = false
             }
         }
 
         if isValid {
-            successMessage = "تم إنشاء الحساب بنجاح! 🥳"
+            successMessage = "signup_success".localized()
         }
 
         return isValid

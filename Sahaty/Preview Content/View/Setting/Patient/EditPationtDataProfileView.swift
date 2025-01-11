@@ -3,7 +3,7 @@
 //  Sahaty
 //
 //  Created by mido mj on 12/25/24.
-//
+
 
 
 
@@ -17,6 +17,8 @@ struct EditPationtDataProfileView: View {
     @State private var showImagePicker = false
     
     @State private var viewModel = PatiantModel.defaultData
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+
     var body: some View {
         VStack(spacing: 20) {
             // Profile Picture
@@ -78,20 +80,15 @@ struct EditPationtDataProfileView: View {
             
             Divider()
         ScrollView{
-                            
-                EditField(title: "الاسم", text : $viewModel.fullName)
-        
-                EditField(title: "البريد الإلكتروني", text: $viewModel.email)
-            
-            
-                
+            EditField(title: "name".localized(), text: $viewModel.fullName)
+            EditField(title: "email".localized(), text: $viewModel.email)
             }
             
             // Save Button
             Button(action: {
                 viewModel.fullName = viewModel.fullName
             }) {
-                Text("حفظ التغييرات")
+                Text("save_changes".localized())
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -102,6 +99,8 @@ struct EditPationtDataProfileView: View {
             .padding()
 
         }
+        .direction(appLanguage) // ضبط الاتجاه
+        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
 
 
      
@@ -133,7 +132,7 @@ struct EditPationtDataProfileView: View {
                 Text(title)
                     .font(.callout)
                     .foregroundStyle(.secondary)
-                TextField("لا يوجد نص متوفر", text: $text)
+                TextField("placeholder_text".localized(), text: $text)
                     .font(.callout)
                     .padding()
                     .background(Color(.systemGray6))

@@ -12,6 +12,7 @@ struct ProfileView: View {
     @State private var showAllArticles = false
     @State private var showAddAdviceView: Bool = false
     @State private var showAddArticleView: Bool = false
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         NavigationStack {
@@ -63,6 +64,8 @@ struct ProfileView: View {
             .sheet(isPresented: $showAllArticles) {
                 AllArticlesView(articles: viewModel.articles)
             }
+            .direction(appLanguage) // ضبط الاتجاه
+            .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
         }
     }
     
@@ -90,13 +93,13 @@ struct AdviceSectionView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("النصائح")
+                Text("Advices".localized())
                     .font(.headline)
                 Spacer()
                 Button(action: {
                     showAllAdvices.toggle()
                 }) {
-                    Text("عرض الكل")
+                    Text("Show All")
                         .font(.subheadline)
                         .foregroundColor(.accentColor)
                 }
@@ -135,7 +138,7 @@ struct AllArticlesView: View {
                     }
                 }
             }
-            .navigationTitle("جميع المقالات")
+            .navigationTitle("all_artical".localized())
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -149,13 +152,13 @@ struct ArticlesSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("المقالات")
+                Text("Articles".localized())
                     .font(.headline)
                 Spacer()
                 Button(action: {
                     showAllArticles.toggle()
                 }) {
-                    Text("عرض الكل")
+                    Text("Show All".localized())
                         .font(.subheadline)
                         .foregroundColor(.accentColor)
                 }
@@ -204,7 +207,7 @@ struct AllAdvicesView: View {
                             adviceViewModel.startEditing(advice: advice) // بدء التعديل
                             showAddAdviceSheet.toggle() // عرض شاشة التعديل
                         } label: {
-                            Label("تعديل", systemImage: "pencil")
+                            Label("Edit".localized(), systemImage: "pencil")
                         }
                         .tint(.accentColor)
 
@@ -214,16 +217,16 @@ struct AllAdvicesView: View {
                                 adviceViewModel.deleteAdvice(at: IndexSet(integer: indexToDelete))
                             }
                         } label: {
-                            Label("حذف", systemImage: "trash")
+                            Label("Delete".localized(), systemImage: "trash")
                         }
                     }
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("جميع النصائح")
+            .navigationTitle("all_advice".localized())
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
-                leading: Button("إضافة") {
+                leading: Button("Add".localized()) {
                     adviceViewModel.clearEditing() // إلغاء أي تعديل سابق
                     showAddAdviceSheet.toggle() // عرض شاشة الإضافة
                 })
@@ -306,9 +309,9 @@ struct DoctorStatisticsView: View {
     
     var body: some View {
         HStack(spacing: 20) {
-            StatisticView(title: "المتابعون", value: "\(viewModel.doctor.followersCount)")
-            StatisticView(title: "المقالات", value: "\(viewModel.doctor.articlesCount)")
-            StatisticView(title: "النصائح", value: "\(viewModel.doctor.advicesCount)")
+            StatisticView(title: "Followers".localized(), value: "\(viewModel.doctor.followersCount)")
+            StatisticView(title: "Articles".localized(), value: "\(viewModel.doctor.articlesCount)")
+            StatisticView(title: "Advices".localized(), value: "\(viewModel.doctor.advicesCount)")
         }
 //        .padding(.vertical)
     }
@@ -345,7 +348,7 @@ struct BioSectionView: View {
             
             HStack {
                 
-                Text("السيرة الذاتية")
+                Text("Bio".localized())
                     .font(.headline)
                 Spacer()
                 if !isEditingBio {
@@ -376,14 +379,14 @@ struct BioSectionView: View {
                     )
                 
                 HStack {
-                    Button("حفظ") {
+                    Button("Save".localized()) {
                         
                     onSave()
 
                     }
                     .foregroundColor(.red)
 
-                    Button("إلغاء") {
+                    Button("Cancel".localized()) {
                         isEditingBio = false
                     }
                     .padding(.horizontal, 10)
@@ -393,14 +396,12 @@ struct BioSectionView: View {
                     .cornerRadius(10)
                 }
             } else {
-                Text(biography ?? "لا توجد سيرة ذاتية متاحة.")
+                Text(biography ?? "noBio".localized())
                     .font(.body)
                     .foregroundColor(.secondary)
-//                    .multilineTextAlignment(.leading)
             }
 
         }
-//        .multilineTextAlignment(.trailing)
         .padding(.horizontal)
         .padding(.top,10)
     }

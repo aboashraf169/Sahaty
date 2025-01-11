@@ -1,20 +1,11 @@
-//
-//  SettingView.swift
-//  Sahaty
-//
-//  Created by mido mj on 12/24/24.
-//
-
 import SwiftUI
 import PhotosUI
 
-
-// MARK: - ProfileHeaderView
-
 struct PatientSettingView: View {
     
-    var viewModel  = PatiantModel.defaultData
+    var viewModel = PatiantModel.defaultData
     @AppStorage("isDarkModePatient") private var isDarkModePatient = false // حفظ الاختيار
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
@@ -23,16 +14,13 @@ struct PatientSettingView: View {
     @State private var showNotificationToggle = false
     @State private var showSavedView = false
     @State private var showRestPasswordView = false
-    @State private var showLogoutAleart = false
-
-    
+    @State private var showLogoutAlert = false
 
     var body: some View {
-        // Header Section
         NavigationStack {
-            VStack{
-                
-                    VStack() {
+            VStack {
+                // Profile Header
+                VStack {
                     ZStack {
                         Circle()
                             .fill(Color.accentColor.opacity(0.1))
@@ -59,7 +47,6 @@ struct PatientSettingView: View {
                                 .frame(width: 100, height: 100)
                                 .foregroundStyle(Color.accentColor)
                                 .shadow(radius: 5)
-                            
                         }
                         Button {
                             showImagePicker.toggle()
@@ -71,8 +58,6 @@ struct PatientSettingView: View {
                                 .clipShape(Circle())
                         }
                         .offset(x: -40, y: 40)
-                        
-             
                     }
                     
                     Text(viewModel.fullName)
@@ -83,14 +68,13 @@ struct PatientSettingView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
-                    .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
-                    .onChange(of: selectedImageItem) { _, newValue in
-                        loadImage(newValue)
-                    }
+                .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
+                .onChange(of: selectedImageItem) { _, newValue in
+                    loadImage(newValue)
+                }
 
-
-                
-                NavigationLink("تعديل الملف الشخصي", destination: EditPationtDataProfileView())
+                // Navigation Links
+                NavigationLink("edit_profile".localized(), destination: EditPationtDataProfileView())
                     .padding(.horizontal)
                     .foregroundStyle(.white)
                     .padding(10)
@@ -100,13 +84,12 @@ struct PatientSettingView: View {
                 
                 Divider()
                 
-                VStack(spacing:20){
-                           
-                    MenuOption(title: "ادارة الاشعارات", icon: "bell", action: {showNotificationView.toggle()})
+                // Settings Options
+                VStack(spacing: 20) {
+                    MenuOption(title: "manage_notifications".localized(), icon: "bell", action: { showNotificationView.toggle() })
                         .sheet(isPresented: $showNotificationView) {
-                            
-                            Toggle(isOn: $showNotificationToggle){
-                                Text("تفعيل الاشعارات")
+                            Toggle(isOn: $showNotificationToggle) {
+                                Text("enable_notifications".localized())
                                     .font(.headline)
                                     .foregroundStyle(.accent)
                             }
@@ -114,60 +97,54 @@ struct PatientSettingView: View {
                             .padding()
                             .presentationDetents([.fraction(0.1)])
                             .presentationCornerRadius(30)
-                   
                         }
-                    MenuOption(title: "العناصر المحفوظة", icon: "bookmark", action: {showSavedView.toggle()})
+                    
+                    MenuOption(title: "saved_items".localized(), icon: "bookmark", action: { showSavedView.toggle() })
                         .sheet(isPresented: $showSavedView) {
                             patientSavedArticalvView()
-            
                         }
-                    MenuOption(title: "تغير كلمة المرور", icon: "key", action: {showRestPasswordView.toggle()})
+                    
+                    MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
                         .sheet(isPresented: $showRestPasswordView) {
                             changePasswordView(userType: .patient)
                                 .presentationDetents([.fraction(0.65)])
                                 .presentationCornerRadius(30)
                         }
                     
-                    MenuOption(title: "تسجيل الخروج", icon: "arrowshape.turn.up.left", action: {showLogoutAleart.toggle()})
-                        .alert("هل انت متاكد من انك تريد مغادرة الحساب؟", isPresented: $showLogoutAleart){
-                              Button("موافق", role: .destructive) {}
-                              Button("إلغاء", role: .cancel) {}
-                                }
+                    MenuOption(title: "logout".localized(), icon: "arrowshape.turn.up.left", action: { showLogoutAlert.toggle() })
+                        .alert("confirm_logout".localized(), isPresented: $showLogoutAlert) {
+                            Button("confirm".localized(), role: .destructive) {}
+                            Button("cancel".localized(), role: .cancel) {}
+                        }
                     
                     Toggle(isOn: $isDarkModePatient) {
-                                HStack {
-                                    Image(systemName: isDarkModePatient ? "moon.fill" : "sun.max.fill")
-                                        .foregroundColor(.blue)
-                                        .frame(width: 50, height: 50)
-                                        .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
-
-                                    Text("الوضع الليلي")
-                                        .font(.body)
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(.vertical, 8)
-
-                           }
-                    .toggleStyle(SwitchToggleStyle(tint: .accent)) // تخصيص لون التبديل
+                        HStack {
+                            Image(systemName: isDarkModePatient ? "moon.fill" : "sun.max.fill")
+                                .foregroundColor(.blue)
+                                .frame(width: 50, height: 50)
+                                .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
+                            
+                            Text("dark_mode".localized())
+                                .font(.body)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    .toggleStyle(SwitchToggleStyle(tint: .accent))
                     .frame(maxWidth: .infinity)
                     .padding(0)
-                    
                 }
-            
-
                 Spacer()
             }
             .padding()
-            .navigationBarTitle("الملف الشخصي")
+            .navigationBarTitle("profile".localized())
             .navigationBarTitleDisplayMode(.inline)
-            .preferredColorScheme(isDarkModePatient ? .dark : .light) // تطبيق المظهر
-
+            .preferredColorScheme(isDarkModePatient ? .dark : .light)
+            .direction(appLanguage) // ضبط اتجاه النصوص
+            .environment(\.locale, .init(identifier: appLanguage)) // ضبط البيئة
         }
-       
-        
     }
-    
-    
+
     private func loadImage(_ item: PhotosPickerItem?) {
         if let item = item {
             item.loadTransferable(type: ImageTransferable.self) { result in
@@ -184,9 +161,6 @@ struct PatientSettingView: View {
     }
 }
 
-
-
 #Preview {
     PatientSettingView()
-    
 }

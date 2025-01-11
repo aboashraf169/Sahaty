@@ -1,11 +1,11 @@
 import SwiftUI
 
-
 struct SpecializationsDoctorsView: View {
     
     @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
     @StateObject var viewModel = SpecializationViewModel() // تمرير ViewModel
     @State private var searchText: String = "" // نص البحث
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         NavigationStack {
@@ -16,14 +16,16 @@ struct SpecializationsDoctorsView: View {
                 // قائمة الأطباء حسب التخصص
                 doctorList
             }
-            .navigationTitle("الأطباء")
+            .navigationTitle("doctors".localized())
             .navigationBarTitleDisplayMode(.inline)
+            .direction(appLanguage) // ضبط الاتجاه
+            .environment(\.locale, .init(identifier: appLanguage)) // ضبط البيئة
         }
     }
 
     private var searchBar: some View {
         HStack {
-            TextField("ابحث في الواجهة", text: $searchText)
+            TextField("search_placeholder".localized(), text: $searchText)
                 .padding(10)
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(10)
@@ -42,10 +44,10 @@ struct SpecializationsDoctorsView: View {
     private var doctorList: some View {
         List {
             ForEach(viewModel.filteredSpecializations(searchText: searchText)) { specialization in
-                Section(header: Text(specialization.name)
+                Section(header: Text(specialization.name.localized())
                             .font(.headline)
                             .foregroundColor(.accentColor)) {
-                                ForEach(specialization.doctors) { doctor in
+                    ForEach(specialization.doctors) { doctor in
                         DoctorRowView(doctor: doctor)
                             .environmentObject(appState)
                     }
@@ -55,7 +57,6 @@ struct SpecializationsDoctorsView: View {
         .listStyle(.plain)
     }
 }
-
 
 // MARK: - DoctorRowView
 struct DoctorRowView: View {
@@ -83,7 +84,7 @@ struct DoctorRowView: View {
 
             // معلومات الطبيب
             VStack(alignment: .leading) {
-                Text("د.\(doctor.fullName)")
+                Text("doctor_title".localized() + doctor.fullName)
                     .font(.subheadline)
                     .bold()
                     .foregroundStyle(.secondary)
@@ -102,26 +103,20 @@ struct DoctorRowView: View {
             }) {
                 HStack {
                     Image(systemName: "message.fill")
-                    Text("محادثة")
+                    Text("chat".localized())
                 }
-                
                 .foregroundColor(.accentColor)
                 .padding(10)
-                .border(Color.accentColor,width: 3)
+                .border(Color.accentColor, width: 3)
                 .cornerRadius(4)
-
-                
-//                .background(Color.accentColor)
             }
         }
         .padding(.vertical, 5)
     }
 }
 
-
-
 // MARK: - Preview
-#Preview{
+#Preview {
     SpecializationsDoctorsView()
         .environmentObject(AppState())
 }

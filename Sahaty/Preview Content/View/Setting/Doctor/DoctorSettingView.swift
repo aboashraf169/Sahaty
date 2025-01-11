@@ -23,6 +23,7 @@ struct DoctorSettingView: View {
     @State private var showLogoutAleart = false
     
     @AppStorage("isDarkModeDoctor") private var isDarkModeDoctor = false // حفظ الاختيار
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
 
     var body: some View {
@@ -37,7 +38,7 @@ struct DoctorSettingView: View {
                         loadImage(newValue)
                     }
                 
-                NavigationLink("تعديل الملف الشخصي", destination: EditDoctorDataProfileView())
+                NavigationLink("edit_profile".localized(), destination: EditDoctorDataProfileView())
                     .padding(.horizontal)
                     .foregroundStyle(.white)
                     .padding(10)
@@ -48,11 +49,11 @@ struct DoctorSettingView: View {
                 Divider()
                 
                 VStack(spacing:20){
-                    MenuOption(title: "ادارة الاشعارات", icon: "bell", action: {showNotificationView.toggle()})
+                    MenuOption(title: "manage_notifications".localized(), icon: "bell", action: { showNotificationView.toggle() })
                         .sheet(isPresented: $showNotificationView) {
                             
                             Toggle(isOn: $showNotificationToggle){
-                                Text("تفعيل الاشعارات")
+                                Text("enable_notifications".localized())
                                     .font(.headline)
                                     .foregroundStyle(.accent)
                             }
@@ -62,19 +63,18 @@ struct DoctorSettingView: View {
                             .presentationCornerRadius(30)
                    
                         }
-                    MenuOption(title: "تغير كلمة المرور", icon: "key", action: {showRestPasswordView.toggle()})
+                    MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
                         .sheet(isPresented: $showRestPasswordView) {
                             changePasswordView(userType: .doctor)
                                 .presentationDetents([.fraction(0.65)])
                                 .presentationCornerRadius(30)
                         }
                     
-                    MenuOption(title: "تسجيل الخروج", icon: "arrowshape.turn.up.left", action: {showLogoutAleart.toggle()})
-                        .alert("هل انت متاكد من انك تريد مغادرة الحساب؟", isPresented: $showLogoutAleart){
-                              Button("موافق", role: .destructive) {}
-                              Button("إلغاء", role: .cancel) {}
-                                }
-                    
+                    MenuOption(title: "logout".localized(), icon:    "arrowshape.turn.up.left", action: { showLogoutAleart.toggle() })
+                        .alert("confirm_logout".localized(), isPresented: $showLogoutAleart) {
+                            Button("confirm".localized(), role: .destructive) {}
+                            Button("cancel".localized(), role: .cancel) {}
+                        }
                     Toggle(isOn: $isDarkModeDoctor) {
                                 HStack {
                                     Image(systemName: isDarkModeDoctor ? "moon.fill" : "sun.max.fill")
@@ -82,7 +82,7 @@ struct DoctorSettingView: View {
                                         .frame(width: 50, height: 50)
                                         .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
 
-                                    Text("الوضع الليلي")
+                                    Text("dark_mode".localized())
                                         .font(.body)
                                         .foregroundColor(.gray)
                                 }
@@ -98,11 +98,12 @@ struct DoctorSettingView: View {
                 Spacer()
             }
             .padding()
-            .navigationBarTitle("الملف الشخصي")
+            .navigationBarTitle("profile".localized())
             .navigationBarTitleDisplayMode(.inline)
             .preferredColorScheme(isDarkModeDoctor ? .dark : .light) // تطبيق المظهر
-
         }
+        .direction(appLanguage) // ضبط اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
        
         
     }

@@ -1,9 +1,7 @@
 import Foundation
-import SwiftUI
 import PhotosUI
-import Foundation
 import SwiftUI
-import PhotosUI
+import Combine
 
 class ArticalsViewModel: ObservableObject {
     // MARK: - Properties
@@ -29,24 +27,23 @@ class ArticalsViewModel: ObservableObject {
     private func addDefaultData() {
         Articals = [
             ArticalModel(
-                description: "اشرب 8 أكواب ماء يوميًا للحفاظ على ترطيب جسمك.",
-                name: "د. محمد أشرف",
+                description: "default_article_1".localized(),
+                name: "default_author_1".localized(),
                 userName: "@midoMj",
-                addTime: "ساعتين",
+                addTime: "2_hours_ago".localized(),
                 imagePost: "post",
                 personImage: "doctor"
             ),
             ArticalModel(
-                description: "قم بممارسة الرياضة بانتظام لتحسين صحتك.",
-                name: "د. أحمد علي",
+                description: "default_article_2".localized(),
+                name: "default_author_2".localized(),
                 userName: "@ahmedAli",
-                addTime: "ساعة",
+                addTime: "1_hour_ago".localized(),
                 imagePost: nil,
                 personImage: "doctor"
             )
         ]
     }
-
 
     // MARK: - Add or Edit Article
     func saveArticle() {
@@ -54,10 +51,9 @@ class ArticalsViewModel: ObservableObject {
 
         let trimmedText = articleText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else {
-            showAlert(title: "خطأ", message: "المقالة لا يمكن أن تكون فارغة.")
+            showAlert(title: "error_title".localized(), message: "empty_article_error".localized())
             return
         }
-
 
         if let editingIndex = Articals.firstIndex(where: { $0.id == editingArticle?.id }) {
             // تعديل المقالة
@@ -69,7 +65,7 @@ class ArticalsViewModel: ObservableObject {
                 description: trimmedText,
                 name: getCurrentUserName(),
                 userName: "@\(getCurrentUserName().replacingOccurrences(of: " ", with: ""))",
-                addTime: "الآن",
+                addTime: "now".localized(),
                 imagePost: selectedImage != nil ? "newImage" : nil, // رابط الصورة إذا وجدت
                 personImage: "doctor" // صورة المستخدم (افتراضية هنا)
             )
@@ -78,21 +74,19 @@ class ArticalsViewModel: ObservableObject {
 
         resetFields()
     }
-    
 
     // MARK: - Start Editing Article
     func startEditing(article: ArticalModel) {
         editingArticle = article
         articleText = article.description // تعبئة النص الحالي في الحقل
     }
-    
-    
+
     // MARK: - Delete Article
     func deleteArticle(id: UUID) {
         if let index = Articals.firstIndex(where: { $0.id == id }) {
             Articals.remove(at: index)
         } else {
-            showAlert(title: "خطأ", message: "تعذر العثور على المقالة.")
+            showAlert(title: "error_title".localized(), message: "article_not_found_error".localized())
         }
     }
 
@@ -112,7 +106,7 @@ class ArticalsViewModel: ObservableObject {
                 case .success(let transferableImage):
                     self.selectedImage = transferableImage?.image
                 case .failure(let error):
-                    self.showAlert(title: "خطأ", message: error.localizedDescription)
+                    self.showAlert(title: "error_title".localized(), message: error.localizedDescription)
                 }
             }
         }
@@ -126,7 +120,7 @@ class ArticalsViewModel: ObservableObject {
         case .patient(let patient):
             return patient.fullName
         default:
-            return "مستخدم مجهول"
+            return "unknown_user".localized()
         }
     }
 
@@ -141,7 +135,6 @@ class ArticalsViewModel: ObservableObject {
         alertMessage = ""
     }
 }
-
 
 /// A wrapper for UIImage that conforms to Transferable.
 struct ImageTransferable: Transferable {
@@ -161,3 +154,15 @@ struct ImageTransferable: Transferable {
 enum ImageTransferableError: Error {
     case importFailed
 }
+
+
+
+
+
+
+
+
+
+
+
+

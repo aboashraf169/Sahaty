@@ -26,23 +26,23 @@ class LoginViewModel: ObservableObject {
         var isValid = true
 
         if model.email.isEmpty || !model.email.contains("@") {
-            emailErrorMessage = "يرجى إدخال بريد إلكتروني صحيح."
+            emailErrorMessage = "enter_valid_email".localized()
             isValid = false
         } else if model.email != defaultEmail {
-            emailErrorMessage = "البريد الإلكتروني غير صحيح."
+            emailErrorMessage = "incorrect_email".localized()
             isValid = false
         }
 
         if model.password.isEmpty || model.password.count < 6 {
-            passwordErrorMessage = "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل."
+            passwordErrorMessage = "password_min_length".localized()
             isValid = false
         } else if model.password != defaultPassword {
-            passwordErrorMessage = "كلمة المرور غير صحيحة."
+            passwordErrorMessage = "incorrect_password".localized()
             isValid = false
         }
 
         if isValid {
-            successMessage = "تم تسجيل الدخول بنجاح! 🥳"
+            successMessage = "login_success".localized()
         }
 
         return isValid
@@ -53,3 +53,4 @@ class LoginViewModel: ObservableObject {
         passwordErrorMessage = ""
     }
 }
+

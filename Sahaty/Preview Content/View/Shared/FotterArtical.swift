@@ -1,10 +1,3 @@
-//
-//  FotterPost.swift
-//  Sahaty
-//
-//  Created by mido mj on 12/17/24.
-//
-
 import SwiftUI
 
 struct FotterArtical: View {
@@ -14,8 +7,8 @@ struct FotterArtical: View {
     @State private var showShereSheet = false
 
     @State var comments: [CommentModel] // قائمة التعليقات القابلة للتعديل
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
-    
     var commentCount: Int {
         comments.count
     }
@@ -27,11 +20,8 @@ struct FotterArtical: View {
                 // زر الإعجاب
                 Button {
                     if commentCount != 0 {
-                        if stateLike{
-                        }else {
-                        }
+                        stateLike.toggle()
                     }
-                    
                 } label: {
                     HStack {
                         Image(systemName: stateLike ? "heart.fill" : "heart")
@@ -114,13 +104,16 @@ struct FotterArtical: View {
             Divider()
                 .padding(.top, 5)
         }
+        .direction(appLanguage) // ضبط الاتجاه
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
     }
+
     private func getActionSheet() -> ActionSheet {
         ActionSheet(
-            title: Text("ماذا تريد أن تفعل؟"),
+            title: Text("share_action_sheet_title".localized()), // ترجمة النص
             buttons: [
-                .default(Text("مشاركة")) {},
-                .cancel(Text("إلغاء"))
+                .default(Text("share".localized())) {}, // ترجمة النص
+                .cancel(Text("cancel".localized())) // ترجمة النص
             ]
         )
     }

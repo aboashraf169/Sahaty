@@ -1,11 +1,3 @@
-//
-//  ResetPasswordViewModel.swift
-//  Sahaty
-//
-//  Created by mido mj on 12/16/24.
-//
-
-
 import Foundation
 
 class ResetPasswordViewModel: ObservableObject {
@@ -28,15 +20,15 @@ class ResetPasswordViewModel: ObservableObject {
         var isValid = true
 
         if model.email.isEmpty || !model.email.contains("@") {
-            emailErrorMessage = "يرجى إدخال بريد إلكتروني صحيح."
+            emailErrorMessage = "enter_valid_email".localized()
             isValid = false
         } else if model.email != defaultEmail {
-            emailErrorMessage = "البريد الإلكتروني غير موجود."
+            emailErrorMessage = "email_not_found".localized()
             isValid = false
         }
 
         if isValid {
-            successMessage = "تم إرسال رمز OTP بنجاح."
+            successMessage = "otp_sent_success".localized()
         }
 
         return isValid
@@ -48,12 +40,12 @@ class ResetPasswordViewModel: ObservableObject {
         var isValid = true
 
         if let otpCode = model.otpCode, otpCode.isEmpty || otpCode != defaultOtp {
-            otpErrorMessage = "رمز OTP غير صحيح."
+            otpErrorMessage = "incorrect_otp".localized()
             isValid = false
         }
 
         if isValid {
-            successMessage = "تم التحقق بنجاح! 🎉"
+            successMessage = "otp_verification_success".localized()
         }
 
         return isValid
@@ -65,17 +57,17 @@ class ResetPasswordViewModel: ObservableObject {
         var isValid = true
 
         if let newPassword = model.newPassword, newPassword.isEmpty || newPassword.count < 6 {
-            passwordErrorMessage = "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل."
+            passwordErrorMessage = "password_min_length".localized()
             isValid = false
         }
 
         if model.confirmPassword != model.newPassword {
-            confirmPasswordErrorMessage = "كلمة المرور وتأكيدها غير متطابقين."
+            confirmPasswordErrorMessage = "passwords_not_matching".localized()
             isValid = false
         }
 
         if isValid {
-            successMessage = "تم إعادة تعيين كلمة المرور بنجاح! 🥳"
+            successMessage = "password_reset_success".localized()
         }
 
         return isValid
