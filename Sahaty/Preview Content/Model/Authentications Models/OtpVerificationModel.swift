@@ -8,7 +8,17 @@
 
 import Foundation
 
-struct OtpVerificationModel {
-    var email: String
-    var otpCode: String
+struct OtpVerificationModel: Codable {
+    let email: String
+    let otpCode: String
+}
+
+// MARK: - API Request Body
+extension OtpVerificationModel {
+    func toDictionary() -> [String: Any] {
+        return [
+            "email": email,
+            "otp_code": otpCode
+        ]
+    }
 }

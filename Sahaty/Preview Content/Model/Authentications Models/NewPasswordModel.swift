@@ -8,9 +8,24 @@
 
 import Foundation
 
-struct NewPasswordModel {
-    var password: String
-    var confirmPassword: String?
-    var oldPassword: String?
+struct NewPasswordModel: Codable {
+    let password: String
+    let confirmPassword: String?
+    let oldPassword: String?
+}
 
+// MARK: - API Request Body
+extension NewPasswordModel {
+    func toDictionary() -> [String: Any] {
+        var dict: [String: Any] = ["password": password]
+        
+        if let confirmPassword = confirmPassword {
+            dict["password_confirmation"] = confirmPassword
+        }
+        if let oldPassword = oldPassword {
+            dict["old_password"] = oldPassword
+        }
+        
+        return dict
+    }
 }
