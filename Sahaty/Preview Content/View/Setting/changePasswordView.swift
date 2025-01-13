@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct changePasswordView: View {
-    var userType: UserType // نوع المستخدم
-    @StateObject private var newPasswordViewModel = NewPasswordViewModel()
+    var usersType: UsersType // نوع المستخدم
+    @StateObject private var newPasswordViewModel = NewPasswordViewModel(token: "")
     @State private var isSuccessAlertPresented = false
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
@@ -26,26 +26,16 @@ struct changePasswordView: View {
             // MARK: - Old Password Field
     
             VStack{
-                PasswordField(
-                    password: Binding(
-                        get: { newPasswordViewModel.model.oldPassword ?? ""},
-                        set: { newPasswordViewModel.model.oldPassword = $0.isEmpty ? nil : $0}
-                    ),
-                    placeholder: "enter_old_password".localized(),
-                    label: "old_password".localized()
-                )
-                
-                
-                
-                // Error Message for Old Password
-                if !newPasswordViewModel.oldPasswordErrorMessage.isEmpty {
-                    Text(newPasswordViewModel.oldPasswordErrorMessage)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-
-                }
+//                PasswordField(
+//                    password: Binding(
+//                        get: { newPasswordViewModel.model.oldPassword ?? ""},
+//                        set: { newPasswordViewModel.model.oldPassword = $0.isEmpty ? nil : $0}
+//                    ),
+//                    placeholder: "enter_old_password".localized(),
+//                    label: "old_password".localized()
+//                )
+//                
+        
                 
             }
 
@@ -75,14 +65,10 @@ struct changePasswordView: View {
             // MARK: - Confirm Password Field
             VStack{
                 PasswordField(
-                    password: Binding(
-                        get: { newPasswordViewModel.model.confirmPassword ?? "" },
-                        set: { newPasswordViewModel.model.confirmPassword = $0.isEmpty ? nil : $0 }
-                    ),
+                    password: $newPasswordViewModel.model.confirmPassword,
                     placeholder: "confirm_password".localized(),
                     label: "confirm_password_label".localized()
                 )
-            
             // Error Message for Confirm Password
             if !newPasswordViewModel.confirmPasswordErrorMessage.isEmpty {
                 Text(newPasswordViewModel.confirmPasswordErrorMessage)
@@ -131,5 +117,5 @@ struct changePasswordView: View {
 }
 
 #Preview {
-    changePasswordView(userType: .doctor)
+    changePasswordView(usersType: .doctor)
 }

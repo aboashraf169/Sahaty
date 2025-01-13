@@ -4,21 +4,22 @@ struct ForgotPasswordView: View {
     @StateObject private var resetPasswordViewModel = ResetPasswordViewModel()
     @State private var isSuccessAlertPresented = false
     @State private var showOtpVerificationScreen = false
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    @State private var isErrorAlertPresented = false
+    @AppStorage("appLanguage") private var appLanguage = "ar"
 
-    var userType: UserType // استلام نوع المستخدم (مريض أو طبيب)
+    var userType: UsersType
 
     var body: some View {
         NavigationStack {
             VStack {
                 // MARK: - Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("forgot_password_title".localized()) // نسيت كلمة المرور
+                    Text("forgot_password_title".localized())
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(Color.accentColor)
 
-                    Text("forgot_password_description".localized()) // سوف نرسل رمز لإعادة تعيين كلمة المرور
+                    Text("forgot_password_description".localized())
                         .font(.body)
                         .foregroundColor(Color.secondary)
                 }
@@ -27,14 +28,12 @@ struct ForgotPasswordView: View {
                 .padding(.top, 140)
 
                 // MARK: - Email Field
-                VStack(alignment: .trailing, spacing: 5) {
-                    Text("email".localized()) // البريد الإلكتروني
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("email".localized())
                         .font(.callout)
                         .foregroundColor(.secondary)
-                        .padding(.leading, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                    TextField("enter_email".localized(), text: $resetPasswordViewModel.model.email) // أدخل عنوان بريدك الإلكتروني
+                    TextField("enter_email".localized(), text: $resetPasswordViewModel.model.email)
                         .padding()
                         .frame(height: 50)
                         .background(Color(.systemGray6))
@@ -42,26 +41,28 @@ struct ForgotPasswordView: View {
                         .autocapitalization(.none)
                         .keyboardType(.emailAddress)
                         .multilineTextAlignment(.leading)
-                        .padding(.horizontal, 20)
-                }
-                .padding(.top, 20)
 
-                // Error Message
-                if !resetPasswordViewModel.emailErrorMessage.isEmpty {
-                    Text(resetPasswordViewModel.emailErrorMessage)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if !resetPasswordViewModel.emailErrorMessage.isEmpty {
+                        Text(resetPasswordViewModel.emailErrorMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(.top, 5)
+                    }
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
 
                 // MARK: - Send Button
                 Button(action: {
-                    if resetPasswordViewModel.validateEmail() {
-                        isSuccessAlertPresented = true
+                    resetPasswordViewModel.validateAndSendEmail { success in
+                        if success {
+                            isSuccessAlertPresented = true
+                        } else {
+                            isErrorAlertPresented = true
+                        }
                     }
                 }) {
-                    Text("send".localized()) // إرسال
+                    Text("send".localized())
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding()
@@ -74,21 +75,33 @@ struct ForgotPasswordView: View {
 
                 Spacer()
             }
-            .alert(resetPasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
-                Button("ok".localized(), role: .cancel) { // موافق
+            .direction(appLanguage)
+            .environment(\.locale, .init(identifier: appLanguage))
+            .overlay {
+                if resetPasswordViewModel.isLoading {
+                    ProgressView("loading".localized())
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.3))
+                        .ignoresSafeArea()
+                }
+            }
+            .alert(resetPasswordViewModel.successMessage.localized(), isPresented: $isSuccessAlertPresented) {
+                Button("ok".localized(), role: .cancel) {
                     showOtpVerificationScreen = true
                 }
             }
+            .alert("error".localized(), isPresented: $isErrorAlertPresented) {
+                Button("ok".localized(), role: .cancel) {}
+            } message: {
+                Text(resetPasswordViewModel.apiErrorMessage.localized())
+            }
             .navigationDestination(isPresented: $showOtpVerificationScreen) {
-                OtpVerificationView()
+                OtpVerificationView(email: resetPasswordViewModel.model.email)
             }
         }
-        .direction(appLanguage) // تطبيق الاتجاه
-        .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
-
     }
 }
-
 // MARK: - Preview
 #Preview {
     ForgotPasswordView(userType: .patient)

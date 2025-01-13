@@ -36,9 +36,9 @@ class APIManager {
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
         // Add Bearer Token if available
         if let token = bearerToken {
+            print("Bearer Token being sent: \(token)")
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
@@ -47,6 +47,11 @@ class APIManager {
             request.httpBody = try? JSONSerialization.data(withJSONObject: parameters)
         }
         
+        
+        print("Request URL: \(request.url?.absoluteString ?? "")")
+        print("Request Headers: \(request.allHTTPHeaderFields ?? [:])")
+        print("Request Body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "")")
+
         // Send the request
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -78,6 +83,8 @@ enum APIError: Error, LocalizedError {
     case invalidURL
     case noData
     case decodingError
+    case serverError(message: String) // حالة لمعالجة الأخطاء القادمة من الخادم
+    case unknownError // خطأ غير معروف
 
     var errorDescription: String? {
         switch self {
@@ -87,6 +94,13 @@ enum APIError: Error, LocalizedError {
             return "No data received from the server."
         case .decodingError:
             return "Failed to decode the response."
+        case .serverError(let message):
+            return message // عرض رسالة الخادم المخصصة
+        case .unknownError:
+            return "An unknown error occurred."
         }
     }
 }
+
+
+

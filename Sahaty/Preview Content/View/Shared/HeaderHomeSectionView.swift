@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct HeaderHomeSectionView: View {
-    var userType: UserType // نوع المستخدم
+    var usersType: UsersType // نوع المستخدم
     @Binding var searchText: String // نص البحث
     var onProfileTap: () -> Void // الإجراء عند النقر على صورة المستخدم
     var onAddTap: (() -> Void)? = nil // الإجراء عند النقر على زر الإضافة (للدكتور فقط)
@@ -47,7 +47,7 @@ struct HeaderHomeSectionView: View {
                 )
 
             // زر إضافة المقال (للدكتور فقط)
-            if userType == .doctor, let onAddTap = onAddTap {
+            if usersType == .doctor, let onAddTap = onAddTap {
                 Button {
                     onAddTap()
                 } label: {
@@ -73,7 +73,7 @@ struct HeaderHomeSectionView: View {
 // MARK: - Preview
 #Preview {
     HeaderHomeSectionView(
-        userType: .doctor,
+        usersType: .doctor,
         searchText: .constant(""),
         onProfileTap: {
             print("Profile tapped")

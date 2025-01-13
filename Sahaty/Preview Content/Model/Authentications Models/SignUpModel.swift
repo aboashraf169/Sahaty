@@ -9,36 +9,27 @@
 import Foundation
 
 // MARK: - SignUpModel
-struct SignUpModel: Codable {
-    let fullName: String
-    let email: String
-    let password: String
-    let confirmPassword: String
-    let specialization: String?
-    let licenseNumber: String?
-    let UsersType: UsersType
+struct SignUpModel: Codable {  
+    var fullName: String
+    var email: String
+    var password: String
+    var specialization: String?
+    var licenseNumber: String?
+    var usersType: UsersType
+    
 }
 
 
 // MARK: - API Request Body
 extension SignUpModel {
     func toDictionary() -> [String: Any] {
-        var dict: [String: Any] = [
+        return [
             "name": fullName,
             "email": email,
             "password": password,
-            "password_confirmation": confirmPassword,
-            "is_doctor": UsersType == .doctor ? 1 : 0
+            "is_doctor": usersType == .doctor ? 1 : 0
         ]
-        
-        // Add optional fields if they exist
-        if let specialization = specialization {
-            dict["specialization"] = specialization
-        }
-        if let licenseNumber = licenseNumber {
-            dict["license_number"] = licenseNumber
-        }
-        
-        return dict
+         
     }
 }
+

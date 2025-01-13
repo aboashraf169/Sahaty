@@ -26,7 +26,7 @@ struct DoctorHomeScreen: View {
             VStack {
                 // MARK: - Header Section
                 HeaderHomeSectionView(
-                    userType: .doctor,
+                    usersType: .doctor,
                     searchText: .constant(""), // تمرير نص البحث كـ Binding
                     onProfileTap: {
                         appState.selectedTabDoctors = .profile
@@ -168,7 +168,7 @@ struct DoctorHomeScreen: View {
                             ArticleView(
                                 articlesModel: article,
                                 articlesViewModel: articlesViewModel,
-                                userType: .doctor
+                                usersType: .doctor
                             )
                         }
                     }

@@ -3,8 +3,8 @@ import SwiftUI
 struct SignUpView: View {
     @StateObject private var signUpViewModel = SignUpViewModel()
     @State private var showLoginView = false
-    @State private var isSuccessAlertPresented = false
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    @State private var isErrorAlertPresented = false
+    @AppStorage("appLanguage") private var appLanguage = "ar"
 
     init() {
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor.accent
@@ -23,11 +23,10 @@ struct SignUpView: View {
                 userTypePicker()
                 
                 ScrollView {
-                    // MARK: - Center
                     VStack {
                         sharedFields()
                         
-                        if signUpViewModel.model.userType == .doctor {
+                        if signUpViewModel.model.usersType == .doctor {
                             doctorFields()
                         }
                     }
@@ -37,27 +36,45 @@ struct SignUpView: View {
                 footerView()
             }
             .padding(.vertical, 20)
-            .alert(signUpViewModel.successMessage.localized(), isPresented: $isSuccessAlertPresented) {
-                Button("ok".localized(), role: .cancel) {
+            .overlay {
+                if signUpViewModel.isLoading {
+                    ProgressView("loading".localized())
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.3))
+                        .ignoresSafeArea()
+                }
+            }
+            .alert(signUpViewModel.successMessage.localized(), isPresented: Binding(
+                get: { !signUpViewModel.successMessage.isEmpty },
+                set: { _ in }
+            )) {
+                Button("ok".localized()) {
                     showLoginView = true
                 }
             }
+            .alert("error".localized(), isPresented: $isErrorAlertPresented) {
+                Button("ok".localized(), role: .cancel) {}
+            } message: {
+                Text(signUpViewModel.errorMessage.localized())
+            }
+            
             .navigationDestination(isPresented: $showLoginView) {
                 LoginView()
             }
-            .direction(appLanguage) // اتجاه النصوص
-            .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+            .direction(appLanguage)
+            .environment(\.locale, .init(identifier: appLanguage))
         }
     }
     
     // MARK: - Header
     private func headerView() -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("signup_subtitle".localized()) // بادر بالتسجيل
+            Text("signup_subtitle".localized())
                 .font(.headline)
                 .foregroundColor(.gray)
             
-            Text("signup_title".localized()) // تسجيل جديد
+            Text("signup_title".localized())
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundColor(Color.accentColor)
@@ -68,9 +85,9 @@ struct SignUpView: View {
     
     // MARK: - User Type Picker
     private func userTypePicker() -> some View {
-        Picker("user_type".localized(), selection: $signUpViewModel.model.userType) {
-            Text("patient".localized()).tag(UserType.patient)
-            Text("doctor".localized()).tag(UserType.doctor)
+        Picker("user_type".localized(), selection: $signUpViewModel.model.usersType) {
+            Text("patient".localized()).tag(UsersType.patient)
+            Text("doctor".localized()).tag(UsersType.doctor)
         }
         .pickerStyle(SegmentedPickerStyle())
         .padding(.horizontal, 20)
@@ -79,36 +96,20 @@ struct SignUpView: View {
     // MARK: - Shared Fields
     private func sharedFields() -> some View {
         Group {
-            // الاسم
             fieldView(label: "name".localized(), placeholder: "enter_full_name".localized(), text: $signUpViewModel.model.fullName)
                 .padding(.top, 20)
             
             errorMessageView(signUpViewModel.fullNameErrorMessage)
             
-            // البريد الإلكتروني
             fieldView(label: "email".localized(), placeholder: "enter_email".localized(), text: $signUpViewModel.model.email)
                 .padding(.top, 10)
             
             errorMessageView(signUpViewModel.emailErrorMessage)
             
-            // كلمة المرور
             PasswordField(password: $signUpViewModel.model.password, placeholder: "enter_password".localized(), label: "password".localized())
             
             errorMessageView(signUpViewModel.passwordErrorMessage)
-            
-            // تأكيد كلمة المرور
-            PasswordField(
-                password: Binding(
-                    get: { signUpViewModel.model.confirmPassword },
-                    set: { signUpViewModel.model.confirmPassword = $0.isEmpty ? "" : $0 }
-                ),
-                placeholder: "confirm_password".localized(),
-                label: "confirm_password_label".localized()
-            )
-            .padding(.top, 10)
-            
-            errorMessageView(signUpViewModel.passwordErrorMessage)
-        }
+            }
         .padding(.horizontal, 20)
     }
     
@@ -145,11 +146,15 @@ struct SignUpView: View {
     private func footerView() -> some View {
         VStack {
             Button(action: {
-                if signUpViewModel.validateSignUp() {
-                    isSuccessAlertPresented = true
+                signUpViewModel.validateAndSignUp { success in
+                    if success {
+                        showLoginView = true
+                    } else {
+                        isErrorAlertPresented = true
+                    }
                 }
             }) {
-                Text("signup_button".localized()) // إنشاء الحساب
+                Text("signup_button".localized())
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding()

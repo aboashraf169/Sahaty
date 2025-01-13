@@ -11,7 +11,7 @@ import SwiftUI
 struct ArticleView: View {
     var articlesModel: ArticalModel
     @StateObject var articlesViewModel: ArticalsViewModel
-    var userType: UserType // نوع المستخدم (Doctor أو Patient)
+    var usersType: UsersType // نوع المستخدم (Doctor أو Patient)
     @State private var showEditSheet = false // التحكم بعرض شاشة التعديل
     @State private var showDeleteAlert = false // التحكم بعرض التنبيه
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
@@ -58,7 +58,7 @@ struct ArticleView: View {
                 }
                 .padding(.horizontal, 5)
                 Spacer()
-                if userType == .doctor {
+                if usersType == .doctor {
                     // زر الحذف
                     Button(role: .destructive) {
                         showDeleteAlert.toggle() // عرض التنبيه عند الحذف
@@ -129,6 +129,6 @@ struct ArticleView: View {
 
 #Preview {
     
-    ArticleView(articlesModel: ArticalModel(description:  "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار.", name: "محمد اشرف", userName: "midoMj@", addTime: "ساعتين",imagePost: "post"), articlesViewModel: ArticalsViewModel(), userType: .doctor)
+    ArticleView(articlesModel: ArticalModel(description:  "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار.", name: "محمد اشرف", userName: "midoMj@", addTime: "ساعتين",imagePost: "post"), articlesViewModel: ArticalsViewModel(), usersType: .doctor)
 }
 

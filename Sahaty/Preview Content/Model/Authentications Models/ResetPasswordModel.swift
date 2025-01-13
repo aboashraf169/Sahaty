@@ -8,9 +8,19 @@
 
 import Foundation
 
-struct ResetPasswordModel {
+struct ResetPasswordModel: Codable {
     var email: String
-    var otpCode: String?
-    var newPassword: String?
-    var confirmPassword: String?
+    var newPassword: String
+    var confirmPassword: String
+}
+
+
+// MARK: - API Request Body
+extension ResetPasswordModel {
+    func toDictionary() -> [String: Any] {
+        return [
+            "new_password": newPassword,
+            "password_confirmation": confirmPassword
+        ]
+    }
 }

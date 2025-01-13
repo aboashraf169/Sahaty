@@ -79,7 +79,7 @@
 
 
 // MARK: - OTP PASSWORD VIEW
-"otp_sent_message" = "We have sent a short SMS message with the activation code";
+"otp_sent_message" = "We have sent a email message with the activation code";
 "verify" = "Verify";
 "resend_otp_in" = "Resend code in";
 "resend_otp" = "Resend Code";
@@ -325,3 +325,10 @@
 "3_hours_ago" = "3 hours ago";
 "advice_1" = "Have a healthy breakfast every day for an energetic start to the day.";
 "advice_2" = "Exercise regularly to improve your physical fitness.";
+
+
+"valid_email" = "Please enter a valid registered email.";
+"send_email" = "we sent email to your mail OTP code";
+
+"invalid_otp" = "invalid OTP";
+"submit"  = "save";

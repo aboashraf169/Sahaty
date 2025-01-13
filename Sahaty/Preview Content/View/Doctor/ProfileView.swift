@@ -133,7 +133,7 @@ struct AllArticlesView: View {
                         ArticleView(
                             articlesModel: article,
                             articlesViewModel: ArticalsViewModel(),
-                            userType: .doctor
+                            usersType: .doctor
                         )
                     }
                 }
@@ -172,7 +172,7 @@ struct ArticlesSectionView: View {
                         ArticleView(
                             articlesModel: article,
                             articlesViewModel: ArticalsViewModel(currentUser: .doctor(viewModel.doctor)),
-                            userType: .doctor
+                            usersType: .doctor
                         )
                     }
                 }

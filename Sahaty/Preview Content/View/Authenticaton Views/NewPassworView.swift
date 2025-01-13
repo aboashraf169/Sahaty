@@ -1,101 +1,137 @@
 import SwiftUI
 
 struct NewPasswordView: View {
-    @StateObject private var newPasswordViewModel = NewPasswordViewModel()
+    
+    @StateObject private var newPasswordViewModel : NewPasswordViewModel
+    
     @State private var showLoginView = false
-    @State private var isSuccessAlertPresented = false
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
-
-    // MARK: - View
+    @State private var isErrorAlertPresented = false
+    @AppStorage("appLanguage") private var appLanguage = "ar"
+    
+    // Initializer لاستقبال التوكن
+    init(token: String) {
+        _newPasswordViewModel = StateObject(wrappedValue: NewPasswordViewModel(token: token))
+    }
     var body: some View {
         NavigationStack {
             VStack {
-                // MARK: - Header
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("enter_new_password".localized()) // قم بادخال كلمة المرور الجديدة
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(Color.accentColor)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                .padding(.top, 100)
+                headerView()
 
-                // MARK: - Password Field
-                PasswordField(
-                    password: $newPasswordViewModel.model.password,
-                    placeholder: "enter_password".localized(), // أدخل كلمة المرور
-                    label: "password".localized() // كلمة المرور
-                )
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
+                passwordField()
 
-                // Error Message for Password
                 if !newPasswordViewModel.passwordErrorMessage.isEmpty {
-                    Text(newPasswordViewModel.passwordErrorMessage)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    errorMessageView(message: newPasswordViewModel.passwordErrorMessage)
                 }
 
-                // MARK: - Confirm Password Field
-                PasswordField(
-                    password: Binding(
-                        get: { newPasswordViewModel.model.confirmPassword ?? "" },
-                        set: { newPasswordViewModel.model.confirmPassword = $0.isEmpty ? nil : $0 }
-                    ),
-                    placeholder: "confirm_password".localized(), // تأكيد كلمة المرور
-                    label: "confirm_password".localized() // تأكيد كلمة المرور
-                )
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
+                confirmPasswordField()
 
-                // Error Message for Confirm Password
                 if !newPasswordViewModel.confirmPasswordErrorMessage.isEmpty {
-                    Text(newPasswordViewModel.confirmPasswordErrorMessage)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    errorMessageView(message: newPasswordViewModel.confirmPasswordErrorMessage)
                 }
 
-                // MARK: - Submit Button
-                Button(action: {
-                    if newPasswordViewModel.validateNewPassword() {
-                        isSuccessAlertPresented = true
-                    }
-                }) {
-                    Text("login".localized()) // تسجيل الدخول
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .cornerRadius(10)
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 40)
-
-                // Success Alert
-                .alert(newPasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
-                    Button("ok".localized(), role: .cancel) { // موافق
-                        showLoginView = true
-                    }
-                }
-                .navigationDestination(isPresented: $showLoginView) {
-                    LoginView()
-                }
+                submitButton()
 
                 Spacer()
             }
+            .direction(appLanguage)
+            .environment(\.locale, .init(identifier: appLanguage))
+            .overlay {
+                if newPasswordViewModel.isLoading {
+                    ProgressView("loading".localized())
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.3))
+                        .ignoresSafeArea()
+                }
+            }
+            .alert(newPasswordViewModel.successMessage, isPresented: Binding(
+                get: { !newPasswordViewModel.successMessage.isEmpty },
+                set: { _ in }
+            )) {
+                Button("ok".localized(), role: .cancel) {
+                    showLoginView = true
+                }
+            }
+            .alert("error".localized(), isPresented: $isErrorAlertPresented) {
+                Button("ok".localized(), role: .cancel) {}
+            } message: {
+                Text(newPasswordViewModel.apiErrorMessage.localized())
+            }
+            .navigationDestination(isPresented: $showLoginView) {
+                LoginView()
+            }
         }
-        .direction(appLanguage) // اتجاه النصوص
-        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+    }
+
+    // MARK: - Header View
+    private func headerView() -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("enter_new_password".localized())
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(Color.accentColor)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 20)
+        .padding(.top, 100)
+    }
+
+    // MARK: - Password Field
+    private func passwordField() -> some View {
+        PasswordField(
+            password: $newPasswordViewModel.model.password,
+            placeholder: "enter_password".localized(),
+            label: "password".localized()
+        )
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+    }
+
+    // MARK: - Confirm Password Field
+    private func confirmPasswordField() -> some View {
+        PasswordField(
+            password: $newPasswordViewModel.model.confirmPassword,
+            placeholder: "confirm_password".localized(),
+            label: "confirm_password".localized()
+        )
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+    }
+
+    // MARK: - Error Message View
+    private func errorMessageView(message: String) -> some View {
+        Text(message)
+            .font(.caption)
+            .foregroundColor(.red)
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: - Submit Button
+    private func submitButton() -> some View {
+        Button(action: {
+            newPasswordViewModel.validateAndChangePassword { success in
+                if success {
+                    showLoginView = true
+                } else {
+                    isErrorAlertPresented = true
+                }
+            }
+        }) {
+            Text("submit".localized())
+                .font(.headline)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.accentColor)
+                .cornerRadius(10)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 40)
     }
 }
 
 // MARK: - Preview
 #Preview {
-    NewPasswordView()
+    NewPasswordView(token: "")
 }

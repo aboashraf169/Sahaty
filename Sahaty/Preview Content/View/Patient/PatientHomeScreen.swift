@@ -21,7 +21,7 @@ struct PatientHomeScreen: View {
             VStack {
                 // MARK: - Header Section
                 HeaderHomeSectionView(
-                    userType: .patient,
+                    usersType: .patient,
                     searchText: $searchText, // تمرير نص البحث كـ Binding
                     onProfileTap: {
                         appState.selectedTabPatients = .settings
@@ -68,7 +68,7 @@ struct PatientHomeScreen: View {
                         } else {
                             VStack(spacing: 10) { // يمكنك إضافة تباعد بين المقالات هنا
                                 ForEach(articlesViewModel.Articals) { article in
-                                    ArticleView(articlesModel: ArticalModel(description: article.description, name: article.name, userName: article.userName, addTime: article.addTime, imagePost: article.imagePost, personImage: article.imagePost), articlesViewModel: articlesViewModel,userType: .patient)
+                                    ArticleView(articlesModel: ArticalModel(description: article.description, name: article.name, userName: article.userName, addTime: article.addTime, imagePost: article.imagePost, personImage: article.imagePost), articlesViewModel: articlesViewModel,usersType: .patient)
                                 }
                             }
                         }

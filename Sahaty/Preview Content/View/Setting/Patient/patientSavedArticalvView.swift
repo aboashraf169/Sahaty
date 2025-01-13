@@ -37,7 +37,7 @@ struct patientSavedArticalvView: View {
                         ArticleView(
                             articlesModel: article,
                             articlesViewModel: ArticalsViewModel(),
-                            userType: .patient
+                            usersType: .patient
                         )
                     }
                 }

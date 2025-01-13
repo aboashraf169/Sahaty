@@ -10,19 +10,16 @@ import Foundation
 
 class SignUpViewModel: ObservableObject {
     
-
+    // MARK: - Published Properties
     @Published var model = SignUpModel(
         fullName: "",
         email: "",
         password: "",
-        confirmPassword: "",
         specialization: nil,
         licenseNumber: nil,
-        userType: .patient
+        usersType: .patient
     )
     
-
-    // رسائل الأخطاء
     @Published var fullNameErrorMessage: String = ""
     @Published var emailErrorMessage: String = ""
     @Published var passwordErrorMessage: String = ""
@@ -30,12 +27,22 @@ class SignUpViewModel: ObservableObject {
     @Published var specializationErrorMessage: String = ""
     @Published var licenseNumberErrorMessage: String = ""
     @Published var successMessage: String = ""
-
-    @Published var confirmPasswordText: String = ""
-
-    // التحقق من إنشاء الحساب
-    func validateSignUp() -> Bool {
+    @Published var errorMessage: String = ""
+    @Published var isLoading: Bool = false
+    
+    // MARK: - Validation and API Call
+    func validateAndSignUp(completion: @escaping (Bool) -> Void) {
         clearErrors()
+        guard validateSignUp() else {
+            completion(false)
+            return
+        }
+        
+        // Call API to register user
+        signUpUser(completion: completion)
+    }
+    
+    private func validateSignUp() -> Bool {
         var isValid = true
 
         if model.fullName.isEmpty || model.fullName.count <= 2 {
@@ -53,12 +60,7 @@ class SignUpViewModel: ObservableObject {
             isValid = false
         }
 
-        if model.confirmPassword != model.password {
-            confirmPasswordErrorMessage = "passwords_not_matching".localized()
-            isValid = false
-        }
-
-        if model.userType == .doctor {
+        if model.usersType == .doctor {
             if let specialization = model.specialization, specialization.isEmpty {
                 specializationErrorMessage = "enter_specialization".localized()
                 isValid = false
@@ -70,13 +72,9 @@ class SignUpViewModel: ObservableObject {
             }
         }
 
-        if isValid {
-            successMessage = "signup_success".localized()
-        }
-
         return isValid
     }
-
+    
     private func clearErrors() {
         fullNameErrorMessage = ""
         emailErrorMessage = ""
@@ -84,5 +82,60 @@ class SignUpViewModel: ObservableObject {
         confirmPasswordErrorMessage = ""
         specializationErrorMessage = ""
         licenseNumberErrorMessage = ""
+        successMessage = ""
+        errorMessage = "" // Reset general error message
+    }
+    
+    private func signUpUser(completion: @escaping (Bool) -> Void) {
+        isLoading = true
+        APIManager.shared.sendRequest(
+            endpoint: "/register",
+            method: .post,
+            parameters: model.toDictionary()
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success(let data):
+                    do {
+                        // محاولة تحويل البيانات إلى JSON
+                        if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                           let token = json["token"] as? String {
+                            // تعيين التوكن في APIManager
+                            APIManager.shared.setBearerToken(token)
+                            self?.successMessage = "signup_success".localized()
+                            print("SignUp Success: \(json)")
+                            print("Token Saved: \(token)")
+                            completion(true)
+                        } else {
+                            self?.errorMessage = "response_parsing_error".localized()
+                            print("SignUp Failed: Invalid Response")
+                            completion(false)
+                        }
+                    } catch {
+                        self?.errorMessage = "response_parsing_error".localized()
+                        print("SignUp Failed: \(error.localizedDescription)")
+                        completion(false)
+                    }
+                case .failure(let error):
+                    self?.handleAPIError(error)
+                    completion(false)
+                }
+            }
+        }
+    }
+    
+    private func handleAPIError(_ error: Error) {
+        if let apiError = error as? APIError {
+            switch apiError {
+            case .decodingError:
+                emailErrorMessage = "response_parsing_error".localized()
+            default:
+                errorMessage = error.localizedDescription // استخدم خطأ عام
+            }
+        } else {
+            errorMessage = error.localizedDescription // خطأ عام
+        }
+        print("API Error: \(error.localizedDescription)")
     }
 }

@@ -1,29 +1,22 @@
 import SwiftUI
+import SwiftUI
 
 struct LoginView: View {
-    
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    @AppStorage("appLanguage") private var appLanguage = "ar"
     @StateObject private var loginViewModel = LoginViewModel()
     @State private var navigateToDoctorView = false
     @State private var navigateToPatientView = false
+    @State private var isErrorAlertPresented = false
 
-    // لتغير لون picker للون الأزرق
     init() {
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor.accent
         
         let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white]
         UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .selected)
     }
-    
-    func toggleLanguage() {
-        appLanguage = (appLanguage == "ar") ? "en" : "ar"
-        UserDefaults.standard.set(appLanguage, forKey: "appLanguage") // تحديث اللغة في UserDefaults
-    }
 
-    // MARK: - View
     var body: some View {
         NavigationStack {
-            
             VStack {
                 // MARK: - Header
                 HStack {
@@ -31,20 +24,17 @@ struct LoginView: View {
 
                     Button {
                         toggleLanguage()
-
                     } label: {
                         Image(systemName: "globe")
                             .font(.title)
                             .foregroundStyle(.accent)
                         Text("".localized())
-
                     }
-
                 }
                 .padding(.horizontal)
-                .padding(.vertical,10)
-               
-                VStack(alignment: .trailing, spacing: 8) {
+                .padding(.vertical, 10)
+
+                VStack(alignment: .leading, spacing: 8) {
                     Text("login_now".localized())
                         .font(.title2)
                         .fontWeight(.bold)
@@ -54,67 +44,36 @@ struct LoginView: View {
                 .padding(.horizontal, 20)
 
                 // اختيار نوع المستخدم
-                Picker("", selection: $loginViewModel.model.userType) {
-                    Text("patient".localized()).tag(UserType.patient)
-                    Text("doctor".localized()).tag(UserType.doctor)
+                Picker("", selection: $loginViewModel.model.usersType) {
+                    Text("patient".localized()).tag(UsersType.patient)
+                    Text("doctor".localized()).tag(UsersType.doctor)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(20)
 
                 // MARK: - Center
-                VStack(alignment: .leading, spacing: 5) {
+                VStack {
                     // البريد الإلكتروني
-                    Text("email".localized())
-                        .font(.callout)
-                        .foregroundColor(.secondary).opacity(0.7)
-                    
-                    TextField("enter_email".localized(), text: $loginViewModel.model.email)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                        .multilineTextAlignment(.leading)
+                    fieldView(
+                        label: "email".localized(),
+                        placeholder: "enter_email".localized(),
+                        text: $loginViewModel.model.email,
+                        errorMessage: loginViewModel.emailErrorMessage
+                    )
 
-                    if !loginViewModel.emailErrorMessage.isEmpty {
-                        Text(loginViewModel.emailErrorMessage)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .padding(.horizontal, 20)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-
-                VStack(alignment: .leading, spacing: 5) {
                     // كلمة المرور
-                    Text("password".localized())
-                        .font(.callout)
-                        .foregroundColor(.secondary).opacity(0.7)
-                    
-                    SecureField("enter_password".localized(), text: $loginViewModel.model.password)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                        .multilineTextAlignment(.leading)
-
-                    if !loginViewModel.passwordErrorMessage.isEmpty {
-                        Text(loginViewModel.passwordErrorMessage)
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .padding(.horizontal, 20)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+                    fieldView(
+                        label: "password".localized(),
+                        placeholder: "enter_password".localized(),
+                        text: $loginViewModel.model.password,
+                        errorMessage: loginViewModel.passwordErrorMessage,
+                        isSecure: true
+                    )
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
 
                 // رابط "نسيت كلمة المرور؟"
                 HStack {
-                    NavigationLink("forgot_password".localized(), destination: ForgotPasswordView(userType: loginViewModel.model.userType))
+                    NavigationLink("forgot_password".localized(), destination: ForgotPasswordView(userType: loginViewModel.model.usersType))
                         .font(.callout)
                         .foregroundColor(.secondary.opacity(0.7))
                     Spacer()
@@ -124,24 +83,42 @@ struct LoginView: View {
 
                 // زر تسجيل الدخول
                 Button(action: {
-                    if loginViewModel.validateLogin() {
-                        if loginViewModel.model.userType == .doctor {
-                            navigateToDoctorView = true
-                        } else {
-                            navigateToPatientView = true
+                    if !loginViewModel.isLoading { // منع الضغط أثناء التحميل
+                        loginViewModel.validateAndLogin { success in
+                            if success {
+                                if loginViewModel.model.usersType == .doctor {
+                                    navigateToDoctorView = true
+                                } else {
+                                    navigateToPatientView = true
+                                }
+                            } else {
+                                isErrorAlertPresented = true
+                            }
                         }
                     }
                 }) {
-                    Text("login".localized())
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.accentColor)
-                        .cornerRadius(10)
+                    if loginViewModel.isLoading {
+                        ProgressView() // عرض عنصر التحميل
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    } else {
+                        Text("login".localized()) // نص الزر عند عدم التحميل
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
                 }
+                .background(Color.accentColor) // تغيير لون الخلفية أثناء التحميل
+                .cornerRadius(10)
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
+//                .disabled(loginViewModel.isLoading) // تعطيل الزر أثناء التحميل
+                .opacity(loginViewModel.isLoading ? 0.7 : 1.0) // تغيير الشفافية فقط
+
+
+                // الانتقال بناءً على نوع المستخدم
                 .navigationDestination(isPresented: $navigateToDoctorView) {
                     DoctorTabBarView()
                 }
@@ -150,75 +127,7 @@ struct LoginView: View {
                 }
 
                 // MARK: - Footer
-                VStack(spacing: 10) {
-                    HStack {
-                        Rectangle()
-                            .frame(height: 1)
-                            .foregroundColor(.secondary.opacity(0.4))
-                        Text("login_with".localized())
-                            .font(.system(size: 15))
-                            .foregroundColor(.secondary).opacity(0.7)
-                        Rectangle()
-                            .frame(height: 1)
-                            .foregroundColor(.secondary.opacity(0.4))
-                    }
-                    .padding(.horizontal, 30)
-                    .padding(.top, 20)
-
-                    HStack(spacing: 15) {
-                        Button(action: {
-                            // هنا سيتم الانتقال لحساب جوجل
-                        }) {
-                            Image("googel")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 25, height: 25)
-                                .foregroundColor(.accent)
-                        }
-                        .frame(width: 100, height: 60)
-                        .background(Color.clear)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
-                        )
-                        .cornerRadius(10)
-
-                        Button(action: {
-                            // هنا سيتم الانتقال لحساب الفيسبوك
-                        }) {
-                            Image("facebook")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 25, height: 25)
-                                .foregroundColor(Color.accentColor)
-                        }
-                        .frame(width: 100, height: 60)
-                        .background(Color.clear)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
-                        )
-                        .cornerRadius(10)
-
-                        Button(action: {
-                            // هنا سيتم الانتقال لحساب التويتر
-                        }) {
-                            Image("twitter")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 25, height: 25)
-                                .foregroundColor(.accent)
-                        }
-                        .frame(width: 100, height: 60)
-                        .background(Color.clear)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
-                        )
-                        .cornerRadius(10)
-                    }
-                    .padding(.top)
-                }
+                footerView()
 
                 // الانتقال لشاشة إنشاء حساب
                 NavigationLink("sign_up".localized(), destination: SignUpView())
@@ -226,15 +135,112 @@ struct LoginView: View {
                     .foregroundColor(.secondary)
                     .padding(.top, 20)
             }
-            .direction(appLanguage) // تطبيق الاتجاه
-            .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
-
+            .direction(appLanguage)
+            .environment(\.locale, .init(identifier: appLanguage))
+            .alert("error".localized(), isPresented: $isErrorAlertPresented) {
+                Button("ok".localized(), role: .cancel) {}
+            } message: {
+                Text(loginViewModel.apiErrorMessage.localized())
+            }
         }
+    }
+
+    // MARK: - Helper Views
+    private func fieldView(label: String, placeholder: String, text: Binding<String>, errorMessage: String, isSecure: Bool = false) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(label)
+                .font(.callout)
+                .foregroundColor(.secondary).opacity(0.7)
+
+            if isSecure {
+                SecureField(placeholder, text: text)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .multilineTextAlignment(.leading)
+            } else {
+                TextField(placeholder, text: text)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .multilineTextAlignment(.leading)
+            }
+
+            if !errorMessage.isEmpty {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .padding(.horizontal, 20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
+    }
+
+    private func footerView() -> some View {
+        VStack(spacing: 10) {
+            HStack {
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(.secondary.opacity(0.4))
+                Text("login_with".localized())
+                    .font(.system(size: 15))
+                    .foregroundColor(.secondary).opacity(0.7)
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(.secondary.opacity(0.4))
+            }
+            .padding(.horizontal, 30)
+            .padding(.top, 20)
+
+            HStack(spacing: 15) {
+                socialButton(imageName: "googel", action: {
+                    // Google login
+                })
+                socialButton(imageName: "facebook", action: {
+                    // Facebook login
+                })
+                socialButton(imageName: "twitter", action: {
+                    // Twitter login
+                })
+            }
+            .padding(.top)
+        }
+    }
+
+    private func socialButton(imageName: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 25, height: 25)
+        }
+        .frame(width: 100, height: 60)
+        .background(Color.clear)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
+        )
+        .cornerRadius(10)
+    }
+
+    private func toggleLanguage() {
+        appLanguage = (appLanguage == "ar") ? "en" : "ar"
+        UserDefaults.standard.set(appLanguage, forKey: "appLanguage")
     }
 }
 
 // MARK: - Preview
+#Preview {
+    LoginView()
+}
 
+// MARK: - Preview
 #Preview {
     LoginView()
 }

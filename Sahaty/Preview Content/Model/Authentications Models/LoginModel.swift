@@ -9,9 +9,9 @@
 import Foundation
 
 struct LoginModel: Codable {
-    let email: String
-    let password: String
-    let usersType: UsersType
+    var email: String
+    var password: String
+    var usersType: UsersType
 }
 
 // MARK: - API Request Body

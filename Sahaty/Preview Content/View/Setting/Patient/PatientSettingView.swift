@@ -106,7 +106,7 @@ struct PatientSettingView: View {
                     
                     MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
                         .sheet(isPresented: $showRestPasswordView) {
-                            changePasswordView(userType: .patient)
+                            changePasswordView(usersType: .patient)
                                 .presentationDetents([.fraction(0.65)])
                                 .presentationCornerRadius(30)
                         }
