@@ -113,7 +113,9 @@ struct PatientSettingView: View {
                     
                     MenuOption(title: "logout".localized(), icon: "arrowshape.turn.up.left", action: { showLogoutAlert.toggle() })
                         .alert("confirm_logout".localized(), isPresented: $showLogoutAlert) {
-                            Button("confirm".localized(), role: .destructive) {}
+                            Button("confirm".localized(), role: .destructive) {
+                                logout()
+                            }
                             Button("cancel".localized(), role: .cancel) {}
                         }
                     

@@ -72,7 +72,9 @@ struct DoctorSettingView: View {
                     
                     MenuOption(title: "logout".localized(), icon:    "arrowshape.turn.up.left", action: { showLogoutAleart.toggle() })
                         .alert("confirm_logout".localized(), isPresented: $showLogoutAleart) {
-                            Button("confirm".localized(), role: .destructive) {}
+                            Button("confirm".localized(), role: .destructive) {
+                                logout()
+                            }
                             Button("cancel".localized(), role: .cancel) {}
                         }
                     Toggle(isOn: $isDarkModeDoctor) {
@@ -125,6 +127,27 @@ struct DoctorSettingView: View {
     }
 }
 
+func logout() {
+    // إزالة التوكن
+    APIManager.shared.setBearerToken("") // مسح التوكن
+    let isTokenDeleted = KeychainManager.shared.deleteToken()
+
+    if isTokenDeleted {
+        print("Token deleted successfully.")
+        // قم بتوجيه المستخدم إلى شاشة تسجيل الدخول
+    } else {
+        print("Failed to delete token.")
+        // التعامل مع الخطأ إذا لزم الأمر
+    }
+    // إعادة التوجيه إلى شاشة تسجيل الدخول
+    if let window = UIApplication.shared.connectedScenes
+        .compactMap({ $0 as? UIWindowScene })
+        .flatMap({ $0.windows })
+        .first(where: { $0.isKeyWindow }) {
+        window.rootViewController = UIHostingController(rootView: LoginView())
+        window.makeKeyAndVisible()
+    }
+}
 
 
 #Preview {

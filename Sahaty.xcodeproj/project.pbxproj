@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		ADF1ED612D36870C007D6619 /* AppDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED5F2D36870C007D6619 /* AppDataModel.xcdatamodeld */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		AD31E7542D01CCE500748293 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		AD31E7432D01CCE300748293 /* Sahaty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sahaty.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD31E7532D01CCE500748293 /* SahatyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SahatyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD31E75D2D01CCE500748293 /* SahatyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SahatyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADF1ED602D36870C007D6619 /* AppDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = AppDataModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +80,7 @@
 		AD31E73A2D01CCE300748293 = {
 			isa = PBXGroup;
 			children = (
+				ADF1ED5F2D36870C007D6619 /* AppDataModel.xcdatamodeld */,
 				AD31E7452D01CCE300748293 /* Sahaty */,
 				AD31E7562D01CCE500748293 /* SahatyTests */,
 				AD31E7602D01CCE500748293 /* SahatyUITests */,
@@ -237,6 +243,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADF1ED612D36870C007D6619 /* AppDataModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,6 +568,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		ADF1ED5F2D36870C007D6619 /* AppDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				ADF1ED602D36870C007D6619 /* AppDataModel.xcdatamodel */,
+			);
+			currentVersion = ADF1ED602D36870C007D6619 /* AppDataModel.xcdatamodel */;
+			path = AppDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = AD31E73B2D01CCE300748293 /* Project object */;
 }

@@ -88,6 +88,11 @@ class LoginViewModel: ObservableObject {
         print("Login Response: \(json)")
 
         // تخزين التوكن
+        if KeychainManager.shared.saveToken(token) {
+            print("Token saved successfully.")
+        } else {
+            print("Failed to save token.")
+        }
         APIManager.shared.setBearerToken(token)
         completion(true)
     }
