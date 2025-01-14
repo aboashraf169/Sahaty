@@ -51,4 +51,11 @@ class KeychainManager {
         let status = SecItemDelete(query)
         return status == errSecSuccess
     }
+    
+    func isTokenAvailable(forKey key: String) -> Bool {
+        guard let token = getToken(forKey: key) else {
+            return false
+        }
+        return !token.isEmpty
+    }
 }

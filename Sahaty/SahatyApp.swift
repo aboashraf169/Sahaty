@@ -20,8 +20,6 @@ struct SahatyApp: App {
 
 }
 
-
-
 extension View {
     func direction(_ language: String) -> some View {
         self.environment(\.layoutDirection, language == "ar" ? .rightToLeft : .leftToRight)

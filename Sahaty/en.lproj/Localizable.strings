@@ -332,3 +332,5 @@
 
 "invalid_otp" = "invalid OTP";
 "submit"  = "save";
+
+"user_type_mismatch" = "Your user type selection is not compatible with the user type";

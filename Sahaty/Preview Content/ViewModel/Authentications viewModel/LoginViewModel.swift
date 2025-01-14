@@ -72,29 +72,54 @@ class LoginViewModel: ObservableObject {
                 }
             }
         }
+        
     }
 
-
     private func handleLoginSuccess(data: Data, completion: @escaping (Bool) -> Void) {
-        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-              let token = json["token"] as? String else {
-            apiErrorMessage = "invalid_credentials".localized() // إضافة رسالة خطأ
+        do {
+            // محاولة فك البيانات القادمة من الـ API
+            guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                  let token = json["token"] as? String,
+                  let userInfo = json["user"] as? [String: Any],
+                  let isDoctor = userInfo["is_doctor"] as? Bool else {
+                // إذا فشل فك البيانات أو لم يتم العثور على الحقول المتوقعة
+                apiErrorMessage = "invalid_credentials".localized()
+                completion(false)
+                return
+            }
+            
+            // إذا نجح تسجيل الدخول
+            successMessage = "login_success".localized()
+            print("Login Response: \(json)")
+
+            
+            
+            // التحقق من أن اختيار المستخدم يطابق النوع الحقيقي
+            if (model.usersType == .doctor && !isDoctor) || (model.usersType == .patient && isDoctor) {
+                apiErrorMessage = "user_type_mismatch".localized() // رسالة توضح الخطأ
+                print("User type mismatch: Selected \(model.usersType), Server returned \(isDoctor ? "Doctor" : "Patient")")
+                completion(false)
+                return
+            }
+            
+            // تخزين التوكن
+            if KeychainManager.shared.saveToken(token) {
+                print("Token saved successfully.")
+            } else {
+                print("Failed to save token.")
+            }
+            APIManager.shared.setBearerToken(token)
+
+            // تحديث نوع المستخدم بناءً على الرد
+            model.usersType = isDoctor ? .doctor : .patient
+            
+            completion(true)
+        } catch {
+            // التعامل مع أي خطأ أثناء فك البيانات
+            apiErrorMessage = "response_parsing_error".localized()
+            print("Error parsing login response: \(error.localizedDescription)")
             completion(false)
-            return
         }
-
-        // إذا نجح تسجيل الدخول
-        successMessage = "login_success".localized()
-        print("Login Response: \(json)")
-
-        // تخزين التوكن
-        if KeychainManager.shared.saveToken(token) {
-            print("Token saved successfully.")
-        } else {
-            print("Failed to save token.")
-        }
-        APIManager.shared.setBearerToken(token)
-        completion(true)
     }
 
     private func handleAPIError(_ error: Error) {

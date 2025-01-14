@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftUI
 
 struct LoginView: View {
     @AppStorage("appLanguage") private var appLanguage = "ar"
@@ -116,8 +115,11 @@ struct LoginView: View {
                 .padding(.top, 20)
 //                .disabled(loginViewModel.isLoading) // تعطيل الزر أثناء التحميل
                 .opacity(loginViewModel.isLoading ? 0.7 : 1.0) // تغيير الشفافية فقط
-
-
+                .alert("error".localized(), isPresented: $isErrorAlertPresented) {
+                    Button("ok".localized(), role: .cancel) {}
+                } message: {
+                    Text(loginViewModel.apiErrorMessage.localized())
+                }
                 // الانتقال بناءً على نوع المستخدم
                 .navigationDestination(isPresented: $navigateToDoctorView) {
                     DoctorTabBarView()
@@ -233,11 +235,6 @@ struct LoginView: View {
         appLanguage = (appLanguage == "ar") ? "en" : "ar"
         UserDefaults.standard.set(appLanguage, forKey: "appLanguage")
     }
-}
-
-// MARK: - Preview
-#Preview {
-    LoginView()
 }
 
 // MARK: - Preview
