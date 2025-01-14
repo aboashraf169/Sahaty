@@ -130,6 +130,7 @@ struct DoctorSettingView: View {
 func logout() {
     // إزالة التوكن
     APIManager.shared.setBearerToken("") // مسح التوكن
+    SessionManager.shared.clearSession()
     let isTokenDeleted = KeychainManager.shared.deleteToken()
 
     if isTokenDeleted {

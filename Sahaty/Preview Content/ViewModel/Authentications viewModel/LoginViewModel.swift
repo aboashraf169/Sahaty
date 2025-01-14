@@ -102,6 +102,7 @@ class LoginViewModel: ObservableObject {
                 return
             }
             
+            
             // تخزين التوكن
             if KeychainManager.shared.saveToken(token) {
                 print("Token saved successfully.")
@@ -112,6 +113,9 @@ class LoginViewModel: ObservableObject {
 
             // تحديث نوع المستخدم بناءً على الرد
             model.usersType = isDoctor ? .doctor : .patient
+            
+            // Save session
+            SessionManager.shared.saveSession(token: token, userType: model.usersType, userData: userInfo)
             
             completion(true)
         } catch {

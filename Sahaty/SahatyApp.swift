@@ -10,11 +10,22 @@ import Foundation
 
 @main
 struct SahatyApp: App {
-    
+    @State private var isUserLoggedIn = SessionManager.shared.isUserLoggedIn()
+    @State private var userType = SessionManager.shared.getUserType()
+
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            if isUserLoggedIn {
+                if userType == .doctor {
+                    DoctorTabBarView()
+                } else {
+                    PatientTabBarView()
+                }
+            } else {
+                LoginView()
+            }
         }
     }
 
