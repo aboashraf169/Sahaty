@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24C101" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
-    <entity name="AdviceEntity" representedClassName="AdviceEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="authorName" optional="YES" attributeType="String"/>
-        <attribute name="content" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="String"/>
-        <attribute name="publishDate" optional="YES" attributeType="String"/>
+    <entity name="AdviceEntity" representedClassName="AdviceEntity" syncable="YES">
+        <attribute name="advice" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="String"/>
+        <attribute name="doctorID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="ArticleEntity" representedClassName="ArticleEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="authorName" optional="YES" attributeType="String"/>
-        <attribute name="content" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="String"/>
-        <attribute name="publishDate" optional="YES" attributeType="String"/>
+    <entity name="ArticleEntity" representedClassName="ArticleEntity" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="img" optional="YES" attributeType="String"/>
+        <attribute name="subject" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="updatedAt" optional="YES" attributeType="String"/>
+        <attribute name="userID" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
-    <entity name="UserEntity" representedClassName="UserEntity" syncable="YES" codeGenerationType="class">
+    <entity name="DoctorEntity" representedClassName="DoctorEntity" syncable="YES">
+        <attribute name="bio" optional="YES" attributeType="String"/>
         <attribute name="email" optional="YES" attributeType="String"/>
-        <attribute name="fullName" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="String"/>
-        <attribute name="profilePicture" optional="YES" attributeType="String"/>
-        <attribute name="specialization" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isDoctor" optional="YES" attributeType="Integer 64" usesScalarValueType="YES"/>
+        <attribute name="jobSpecialtyNumber" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="specialties" optional="YES" attributeType="String"/>
     </entity>
 </model>

@@ -12,28 +12,11 @@ struct DoctorTabBarView: View {
     @StateObject var appState = AppState()
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
-    @State var doctor = DoctorModel(
-        fullName: "د. محمد أشرف",
-        email: "doctor@example.com",
-        specialization: "طب الأطفال",
-        licenseNumber: "12345",
-        profilePicture: nil,
-        biography: nil,
-        articlesCount: 10,
-        advicesCount: 20,
-        followersCount: 50,
-        articles: [],
-        advices: [],
-        comments: [],
-        likedArticles: []
-    )
-
 
     var body: some View {
         
         TabView(selection: $appState.selectedTabDoctors){
-
-            DoctorHomeScreen(doctor: doctor)
+            DoctorHomeScreen(adviceViewModel: AdviceViewModel(), articlesViewModel: ArticalsViewModel())
                     .tabItem{
                         HStack{
                             Text(("Home").localized())
@@ -43,7 +26,7 @@ struct DoctorTabBarView: View {
                     .tag(TabDoctor.home)
             
             
-                 ProfileView(viewModel: DoctorProfileViewModel(doctor: doctor))
+            ProfileView(viewModel: DoctorProfileViewModel())
                  .tabItem{
                      HStack{
                          Text("Profile".localized())
@@ -77,7 +60,7 @@ struct DoctorTabBarView: View {
             .badge(10)
     
     
-            DoctorSettingView(viewModel: DoctorProfileViewModel(doctor: doctor))
+            DoctorSettingView(viewModel: DoctorProfileViewModel())
                 .padding()
             .tabItem{
                 HStack{

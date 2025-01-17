@@ -68,6 +68,24 @@ class APIManager {
         }
         task.resume()
     }
+    
+    func fetchArticles(completion: @escaping (Result<[ArticleModel], Error>) -> Void) {
+    sendRequest(endpoint: "/doctor/articles", method: .get) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let decodedResponse = try JSONDecoder().decode(ArticleResponse.self, from: data)
+                    completion(.success(decodedResponse.data))
+                } catch {
+                    print("Failed to decode articles: \(error.localizedDescription)")
+                    completion(.failure(APIError.decodingError))
+                }
+            case .failure(let error):
+                print("Failed to fetch articles: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+    }
 }
 
 // MARK: - HTTPMethod Enum
@@ -77,6 +95,8 @@ enum HTTPMethod: String {
     case put = "PUT"
     case delete = "DELETE"
 }
+
+
 
 // MARK: - APIError Enum
 enum APIError: Error, LocalizedError {
@@ -104,3 +124,6 @@ enum APIError: Error, LocalizedError {
 
 
 
+struct ArticleResponse: Codable {
+    let data: [ArticleModel]
+}

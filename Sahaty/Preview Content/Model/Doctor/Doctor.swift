@@ -7,31 +7,28 @@
 
 import Foundation
 
-struct DoctorModel: Identifiable {
-    
-    
-    var id = UUID() // معرف فريد للطبيب
-    var fullName: String // الاسم الكامل
+struct DoctorModel: Identifiable, Codable {
+    var id: Int // معرف الدكتور
+    var name: String // اسم الدكتور
     var email: String // البريد الإلكتروني
-    var specialization: String // التخصص
-    var licenseNumber: String // رقم الترخيص
-    var profilePicture: String? // رابط الصورة الشخصية (اختياري)
-    var biography: String? // السيرة الذاتية (اختياري)
-    var articlesCount: Int // عدد المقالات المنشورة
-    var advicesCount: Int // عدد النصائح
-    var followersCount: Int // عدد المتابعين
+    var isDoctor: Int // هل هو دكتور
+    var jobSpecialtyNumber: Int // رقم التخصص المهني
+    var bio: String? // السيرة الذاتية
+    var specialties: [Specialty] // قائمة التخصصات
     
-    
-    
-    // العلاقات
-    var articles: [ArticalModel] // قائمة المقالات التي نشرها
-    var advices: [AdviceModel] // قائمة النصائح التي نشرها
-    var comments: [CommentModel] // قائمة التعليقات التي نشرها الطبيب
-    var likedArticles: [AdviceModel] // قائمة المقالات التي أعجب بها الطبيب
-
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case email
+        case isDoctor = "is_doctor"
+        case jobSpecialtyNumber = "jop_specialty_number"
+        case bio
+        case specialties = "specialty"
+    }
 }
 
-
-
-
-
+struct Specialty: Identifiable, Codable {
+    var id: Int // معرف التخصص
+    var name: String // اسم التخصص
+    var description: String // وصف التخصص
+}

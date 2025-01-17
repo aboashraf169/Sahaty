@@ -7,9 +7,19 @@
 
 import Foundation
 
-struct AdviceModel: Identifiable ,Equatable{
-    let id = UUID()
-    var content: String
-    var authorName: String
-    var publishDate: Date
+struct AdviceModel: Identifiable, Decodable {
+    var id: Int
+    var advice: String
+    var doctorID: Int?
+    var createdAt: String
+    var updatedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case advice
+        case doctorID = "doctor_id"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
 }
+

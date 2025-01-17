@@ -21,7 +21,7 @@ struct SahatyApp: App {
                 if userType == .doctor {
                     DoctorTabBarView()
                 } else {
-                    PatientTabBarView()
+                    PatientTabBarView(Patient: PatiantModel(id: 0, fullName: "", email: ""))
                 }
             } else {
                 LoginView()

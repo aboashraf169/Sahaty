@@ -9,13 +9,13 @@ import SwiftUI
 
 struct PatientTabBarView: View {
     @StateObject var appState = AppState()
-    @State var Patient: PatiantModel = PatiantModel.defaultData
+    @State var Patient: PatiantModel
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         TabView(selection: $appState.selectedTabPatients) {
             // MARK: - Home Tab
-            PatientHomeScreen()
+            PatientHomeScreen(adviceViewModel: AdviceViewModel(), articlesViewModel: ArticalsViewModel())
                 .tabItem {
                     HStack {
                         Text("home".localized()) // الرئيسية
@@ -46,7 +46,7 @@ struct PatientTabBarView: View {
                 .badge(5) // عدد الإشعارات
 
             // MARK: - Settings Tab
-            PatientSettingView(viewModel: Patient)
+            PatientSettingView(viewModel: PatiantModel(id: 0, fullName: "mido", email: "mido@gmail.com"))
                 .padding()
                 .tabItem {
                     HStack {
@@ -64,7 +64,7 @@ struct PatientTabBarView: View {
 
 // MARK: - Preview
 #Preview {
-    PatientTabBarView()
+    PatientTabBarView(Patient: PatiantModel(id: 0, fullName: "mido", email: "asdvdsv@gmail.com"))
 }
 
 

@@ -14,8 +14,7 @@ struct EditDoctorDataProfileView: View {
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
-    
-    @StateObject private var viewModel = DoctorProfileViewModel(doctor: DoctorModel(fullName: "محمد اشرف", email: "mido@gmail.com", specialization: "طب عيون", licenseNumber: "323434832432", articlesCount: 0, advicesCount: 0, followersCount: 0, articles: [], advices: [], comments: [], likedArticles: []))
+    @ObservedObject var viewModel = DoctorProfileViewModel()
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
@@ -34,14 +33,16 @@ struct EditDoctorDataProfileView: View {
                                 .frame(width: 120, height: 120)
                                 .clipShape(Circle())
                                 .shadow(radius: 5)
-                        } else if let image = viewModel.doctor.profilePicture {
-                            Image(image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 120, height: 120)
-                                .clipShape(Circle())
-                                .shadow(radius: 5)
-                        } else {
+                        }
+                        //                            else if let image = viewModel.doctor.profilePicture {
+                        //                            Image(image)
+                        //                                .resizable()
+                        //                                .scaledToFill()
+                        //                                .frame(width: 120, height: 120)
+                        //                                .clipShape(Circle())
+                        //                                .shadow(radius: 5)
+//                    }
+                        else {
                             Image(systemName: "person.fill")
                                 .resizable()
                                 .scaledToFit()
@@ -64,13 +65,10 @@ struct EditDoctorDataProfileView: View {
              
                     }
                     
-                    Text(viewModel.userProfile.fullName)
+                    Text(viewModel.doctor.name)
                         .font(.headline)
                         .fontWeight(.medium)
-                    
-                    Text(viewModel.userProfile.specialization)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                   
                 }
                     .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
                     .onChange(of: selectedImageItem) { _, newValue in
@@ -80,24 +78,37 @@ struct EditDoctorDataProfileView: View {
                 Divider()
             ScrollView{
                                 
-                EditField(title: "name".localized(), text: $viewModel.userProfile.fullName)
+                EditField(title: "name".localized(), text: $viewModel.doctor.name)
 
                 EditField(title: "personal_bio".localized(),
                                 text: Binding(
-                                get: { viewModel.userProfile.biography ?? "" },
-                                set: { viewModel.userProfile.biography = $0 }))
+                                    get: { viewModel.doctor.bio ?? "" },
+                                set: { viewModel.doctor.bio = $0 }))
                 
-                EditField(title: "email".localized(), text: $viewModel.userProfile.email)
+                EditField(title: "email".localized(), text: $viewModel.doctor.email)
+//
+//                EditField(title: "medical_specialization".localized(), text: $viewModel.doctor.specialties.first)
+                EditField(
+                    title: "license_number".localized(),
+                    text: Binding(
+                        get: { viewModel.doctor.jobSpecialtyNumber == 0 ? "" : String(viewModel.doctor.jobSpecialtyNumber) },
+                        set: { viewModel.doctor.jobSpecialtyNumber = Int($0) ?? 0 }
+                    )
+                )
 
-                EditField(title: "medical_specialization".localized(), text: $viewModel.userProfile.specialization)
-
-                EditField(title: "license_number".localized(), text: $viewModel.userProfile.licenseNumber)
+//                EditField(
+//                    title: "license_number".localized(),
+//                    text: Binding(
+//                        get: { String(viewModel.doctor.jobSpecialtyNumber) }, // تحويل الرقم إلى نص
+//                        set: { viewModel.doctor.jobSpecialtyNumber = Int($0) ?? 0 } // تحويل النص إلى رقم
+//                    )
+//                )
 
                 }
                 
                 // Save Button
                 Button(action: {
-                    viewModel.saveChanges()
+//                    viewModel.saveChanges()
                 }) {
                     Text("save_changes".localized())
                         .font(.headline)
@@ -112,7 +123,6 @@ struct EditDoctorDataProfileView: View {
             }
              .direction(appLanguage) // ضبط الاتجاه
              .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
-        
     }
     
     private func loadImage(_ item: PhotosPickerItem?) {
@@ -159,7 +169,5 @@ struct EditField: View {
 
 
 #Preview{
-    
     EditDoctorDataProfileView()
-
 }

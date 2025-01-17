@@ -2,7 +2,7 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @StateObject var viewModel: DoctorProfileViewModel
+    @StateObject var viewModel = DoctorProfileViewModel() // إنشاء viewModel مرة واحدة
     @State private var isEditingBio = false
     @State private var editedBio: String = ""
     @State private var showImagePicker = false
@@ -16,6 +16,25 @@ struct ProfileView: View {
 
     var body: some View {
         NavigationStack {
+            if viewModel.isLoading {
+                ProgressView("Loading Profile...".localized())
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding()
+            }else if let errorMessage = viewModel.errorMessage {
+                VStack {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                    Button("Retry".localized()) {
+//                        viewModel.fetchDoctorProfile()
+                    }
+                    .padding()
+                    .background(Color.accentColor)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding()
+            }else {
             ScrollView {
                 VStack {
                     // Header Section
@@ -28,9 +47,9 @@ struct ProfileView: View {
                     BioSectionView(
                         isEditingBio: $isEditingBio,
                         editedBio: $editedBio,
-                        biography: viewModel.doctor.biography,
+                        biography: viewModel.doctor.bio,
                         onSave: {
-                            viewModel.doctor.biography = editedBio
+                            viewModel.doctor.bio = editedBio
                             isEditingBio = false
                         }
                     )
@@ -41,10 +60,10 @@ struct ProfileView: View {
                     Divider()
                     ArticlesSectionView(viewModel: viewModel, showAllArticles: $showAllArticles)
                     // Advice Section
-                 
+                    
                     
                     // Articles Section
-                   
+                    
                 }
                 .padding(.horizontal)
             }
@@ -57,17 +76,19 @@ struct ProfileView: View {
             // Navigate to All Advices
             .sheet(isPresented: $showAllAdvices) {
                 AllAdvicesView(adviceViewModel: AdviceViewModel())
-
-//                AllAdvicesView(advices: viewModel.advices)
+                
+                //                AllAdvicesView(advices: viewModel.advices)
             }
             // Navigate to All Articles
             .sheet(isPresented: $showAllArticles) {
-                AllArticlesView(articles: viewModel.articles)
+//                AllArticlesView(articles: viewModel.articles)
             }
             .direction(appLanguage) // ضبط الاتجاه
             .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
         }
     }
+    }
+    
     
     private func loadImage(_ item: PhotosPickerItem?) {
         if let item = item {
@@ -109,12 +130,12 @@ struct AdviceSectionView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(viewModel.advices) { advice in
-                        AdviceView(advice: advice)
-                            .frame(width: 230, height: 80)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                    }
+//                    ForEach(viewModel.advices) { advice in
+//                        AdviceView(advice: advice)
+//                            .frame(width: 230, height: 80)
+//                            .background(Color(.systemGray6))
+//                            .cornerRadius(12)
+//                    }
                 }
             }
         }
@@ -123,7 +144,7 @@ struct AdviceSectionView: View {
 
 // MARK: - AllArticlesView
 struct AllArticlesView: View {
-    let articles: [ArticalModel]
+    let articles: [ArticleModel]
 
     var body: some View {
         NavigationStack {
@@ -168,13 +189,13 @@ struct ArticlesSectionView: View {
             
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 12) {
-                    ForEach(viewModel.articles) { article in
-                        ArticleView(
-                            articlesModel: article,
-                            articlesViewModel: ArticalsViewModel(currentUser: .doctor(viewModel.doctor)),
-                            usersType: .doctor
-                        )
-                    }
+//                    ForEach(viewModel.articles) { article in
+//                        ArticleView(
+//                            articlesModel: article,
+//                            articlesViewModel: ArticalsViewModel(),
+//                            usersType: .doctor
+//                        )
+//                    }
                 }
             }
         }
@@ -188,53 +209,7 @@ struct AllAdvicesView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(Array(adviceViewModel.advices.enumerated()), id: \.element.id) { index, advice in
-                    HStack {
-                        Text(".\(index + 1)") // رقم النصيحة
-                            .font(.headline)
-                            .foregroundColor(.accentColor)
 
-                            Text(advice.content)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        
-                    }
-                    .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                        // زر التعديل
-                        Button {
-                            selectedAdvice = advice
-                            adviceViewModel.startEditing(advice: advice) // بدء التعديل
-                            showAddAdviceSheet.toggle() // عرض شاشة التعديل
-                        } label: {
-                            Label("Edit".localized(), systemImage: "pencil")
-                        }
-                        .tint(.accentColor)
-
-                        // زر الحذف
-                        Button(role: .destructive) {
-                            if let indexToDelete = adviceViewModel.advices.firstIndex(where: { $0.id == advice.id }) {
-                                adviceViewModel.deleteAdvice(at: IndexSet(integer: indexToDelete))
-                            }
-                        } label: {
-                            Label("Delete".localized(), systemImage: "trash")
-                        }
-                    }
-                }
-            }
-            .listStyle(.insetGrouped)
-            .navigationTitle("all_advice".localized())
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(
-                leading: Button("Add".localized()) {
-                    adviceViewModel.clearEditing() // إلغاء أي تعديل سابق
-                    showAddAdviceSheet.toggle() // عرض شاشة الإضافة
-                })
-            .sheet(isPresented: $showAddAdviceSheet) {
-                AddAdviceSheetView(adviceViewModel: adviceViewModel)
-                    .presentationDetents([.fraction(0.45)])
-                    .presentationCornerRadius(30)
-            }
         }
     }
 }
@@ -262,14 +237,16 @@ struct ProfileHeaderView: View {
                         .frame(width: 120, height: 120)
                         .clipShape(Circle())
                         .shadow(radius: 5)
-                } else if let image = viewModel.doctor.profilePicture {
-                    Image(image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 120, height: 120)
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
-                } else {
+                }
+//                else if let image = viewModel.doctor.profilePicture {
+//                    Image(image)
+//                        .resizable()
+//                        .scaledToFill()
+//                        .frame(width: 120, height: 120)
+//                        .clipShape(Circle())
+//                        .shadow(radius: 5)
+//                }
+                else {
                     Image(systemName: "person.fill")
                         .resizable()
                         .scaledToFit()
@@ -292,13 +269,13 @@ struct ProfileHeaderView: View {
      
             }
             
-            Text(viewModel.doctor.fullName)
+            Text(viewModel.doctor.name)
                 .font(.headline)
                 .fontWeight(.medium)
             
-            Text(viewModel.doctor.specialization)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+//            Text(viewModel.doctor.specialties)
+//                .font(.subheadline)
+//                .foregroundStyle(.secondary)
         }
     }
 }
@@ -309,9 +286,9 @@ struct DoctorStatisticsView: View {
     
     var body: some View {
         HStack(spacing: 20) {
-            StatisticView(title: "Followers".localized(), value: "\(viewModel.doctor.followersCount)")
-            StatisticView(title: "Articles".localized(), value: "\(viewModel.doctor.articlesCount)")
-            StatisticView(title: "Advices".localized(), value: "\(viewModel.doctor.advicesCount)")
+            StatisticView(title: "Followers".localized(), value: "\(0)")
+            StatisticView(title: "Articles".localized(), value: "\(0)")
+            StatisticView(title: "Advices".localized(), value: "\(0)")
         }
 //        .padding(.vertical)
     }
@@ -410,26 +387,22 @@ struct BioSectionView: View {
 
 
 #Preview {
-    let doctor = DoctorModel(
-        id: UUID(),
-        fullName: "د. محمد اشرف",
-        email: "ahmedalkhairy@example.com",
-        specialization: "أخصائي الغدد الصماء",
-        licenseNumber: "12345",
-        profilePicture: "post", // اسم الصورة في Assets
-        biography: nil,
-        articlesCount: 0,
-        advicesCount: 0,
-        followersCount: 0,
-        articles: [],
-        advices: [],
-        comments: [],
-        likedArticles: []
-    )
-
-    let viewModel = DoctorProfileViewModel(doctor: doctor)
-
-    ProfileView(viewModel: viewModel)
+//    let doctor = DoctorModel(
+//        id: "",
+//        fullName: "د. محمد اشرف",
+//        email: "ahmedalkhairy@example.com",
+//        specialization: "أخصائي الغدد الصماء",
+//        licenseNumber: "12345",
+//        profilePicture: "post", // اسم الصورة في Assets
+//        biography: nil,
+//        articlesCount: 0,
+//        advicesCount: 0,
+//        followersCount: 0
+//    )
+//
+//    let viewModel = DoctorProfileViewModel(doctor: doctor)
+//
+//    ProfileView(viewModel: viewModel)
 }
 
 

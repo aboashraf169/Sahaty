@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PicturePatientSetting: View {
 //    var profilePicture: UIImage?
-    var viewModel = PatiantModel.defaultData
+    var viewModel : PatiantModel
     @Binding var selectedImage: UIImage?
     @Binding var showImagePicker: Bool
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة

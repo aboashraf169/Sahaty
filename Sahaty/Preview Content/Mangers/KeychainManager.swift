@@ -49,7 +49,17 @@ class KeychainManager {
         ] as CFDictionary
 
         let status = SecItemDelete(query)
-        return status == errSecSuccess
+        if status == errSecSuccess {
+            print("Token deleted successfully from Keychain.")
+            return true
+        } else if status == errSecItemNotFound {
+            print("Token not found in Keychain.")
+            return false
+        } else {
+            print("Failed to delete token. Status code: \(status)")
+            return false
+        }
+
     }
     
     func isTokenAvailable(forKey key: String) -> Bool {

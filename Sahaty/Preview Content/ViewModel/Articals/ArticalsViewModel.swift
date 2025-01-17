@@ -5,45 +5,15 @@ import Combine
 
 class ArticalsViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var Articals: [ArticalModel] = [] // قائمة المقالات
+    @Published var Articals: [ArticleModel] = [] // قائمة المقالات
     @Published var articleText: String = "" // النص الجديد للمقالة
     @Published var selectedImage: UIImage? = nil // الصورة المختارة
     @Published var selectedImageItem: PhotosPickerItem? = nil
-    @Published var editingArticle: ArticalModel? // المقالة التي يتم تعديلها
+    @Published var editingArticle: ArticleModel? // المقالة التي يتم تعديلها
     @Published var showImagePicker: Bool = false
     @Published var showAlert: Bool = false
     @Published var alertTitle: String = ""
     @Published var alertMessage: String = ""
-
-    var currentUser: CommentAuthor? // المستخدم الحالي (Doctor أو Patient)
-
-    // MARK: - Initialization
-    init(currentUser: CommentAuthor? = nil) {
-        self.currentUser = currentUser
-        addDefaultData()
-    }
-
-    // MARK: - Add Default Articles
-    private func addDefaultData() {
-        Articals = [
-            ArticalModel(
-                description: "default_article_1".localized(),
-                name: "default_author_1".localized(),
-                userName: "@midoMj",
-                addTime: "2_hours_ago".localized(),
-                imagePost: "post",
-                personImage: "doctor"
-            ),
-            ArticalModel(
-                description: "default_article_2".localized(),
-                name: "default_author_2".localized(),
-                userName: "@ahmedAli",
-                addTime: "1_hour_ago".localized(),
-                imagePost: nil,
-                personImage: "doctor"
-            )
-        ]
-    }
 
     // MARK: - Add or Edit Article
     func saveArticle() {
@@ -57,37 +27,56 @@ class ArticalsViewModel: ObservableObject {
 
         if let editingIndex = Articals.firstIndex(where: { $0.id == editingArticle?.id }) {
             // تعديل المقالة
-            Articals[editingIndex].description = trimmedText
+            Articals[editingIndex].subject = trimmedText
             editingArticle = nil
         } else {
             // إضافة مقالة جديدة
-            let newArticle = ArticalModel(
-                description: trimmedText,
-                name: getCurrentUserName(),
-                userName: "@\(getCurrentUserName().replacingOccurrences(of: " ", with: ""))",
-                addTime: "now".localized(),
-                imagePost: selectedImage != nil ? "newImage" : nil, // رابط الصورة إذا وجدت
-                personImage: "doctor" // صورة المستخدم (افتراضية هنا)
-            )
-            Articals.append(newArticle)
+//            let newArticle =
+//            ArticleModel(id: 0, title: "عنوان", description: trimmedText, author: "محمد اشرف", publishDate: "ساعة", imagePost: selectedImage != nil ? "newImage" : nil, likeCount: 0, commentCount: 0)
+//            Articals.append(newArticle)
         }
 
         resetFields()
     }
+    
+    func fetchArticles() {
+        // جلب المقالات من Core Data
+        let localArticles = CoreDataManager.shared.fetchArticles()
+        if !localArticles.isEmpty {
+            self.Articals = localArticles
+        }
+        
+        // التحقق من الاتصال بالإنترنت
+        APIManager.shared.fetchArticles { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let articles):
+                    self?.Articals = articles
+                    print("Received Articles: \(articles)")
+                    CoreDataManager.shared.saveArticles(articles)
+                case .failure(let error):
+                    print("Failed to fetch articles from API: \(error.localizedDescription)")
+                }
+            }
+        }
+
+
+    }
+
 
     // MARK: - Start Editing Article
-    func startEditing(article: ArticalModel) {
+    func startEditing(article: ArticleModel) {
         editingArticle = article
-        articleText = article.description // تعبئة النص الحالي في الحقل
+        articleText = article.subject // تعبئة النص الحالي في الحقل
     }
 
     // MARK: - Delete Article
     func deleteArticle(id: UUID) {
-        if let index = Articals.firstIndex(where: { $0.id == id }) {
-            Articals.remove(at: index)
-        } else {
-            showAlert(title: "error_title".localized(), message: "article_not_found_error".localized())
-        }
+//        if let index = Articals.firstIndex(where: { $0.id == id }) {
+//            Articals.remove(at: index)
+//        } else {
+//            showAlert(title: "error_title".localized(), message: "article_not_found_error".localized())
+//        }
     }
 
     // MARK: - Reset Fields
@@ -111,19 +100,7 @@ class ArticalsViewModel: ObservableObject {
             }
         }
     }
-
-    // MARK: - Utility Methods
-    private func getCurrentUserName() -> String {
-        switch currentUser {
-        case .doctor(let doctor):
-            return doctor.fullName
-        case .patient(let patient):
-            return patient.fullName
-        default:
-            return "unknown_user".localized()
-        }
-    }
-
+    
     private func showAlert(title: String, message: String) {
         self.alertTitle = title
         self.alertMessage = message

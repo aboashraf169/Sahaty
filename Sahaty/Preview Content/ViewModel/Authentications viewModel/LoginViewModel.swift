@@ -84,6 +84,7 @@ class LoginViewModel: ObservableObject {
                   let isDoctor = userInfo["is_doctor"] as? Bool else {
                 // إذا فشل فك البيانات أو لم يتم العثور على الحقول المتوقعة
                 apiErrorMessage = "invalid_credentials".localized()
+                print("Login Response Error: Missing expected fields.")
                 completion(false)
                 return
             }
@@ -92,8 +93,6 @@ class LoginViewModel: ObservableObject {
             successMessage = "login_success".localized()
             print("Login Response: \(json)")
 
-            
-            
             // التحقق من أن اختيار المستخدم يطابق النوع الحقيقي
             if (model.usersType == .doctor && !isDoctor) || (model.usersType == .patient && isDoctor) {
                 apiErrorMessage = "user_type_mismatch".localized() // رسالة توضح الخطأ
@@ -101,8 +100,7 @@ class LoginViewModel: ObservableObject {
                 completion(false)
                 return
             }
-            
-            
+
             // تخزين التوكن
             if KeychainManager.shared.saveToken(token) {
                 print("Token saved successfully.")
@@ -113,10 +111,21 @@ class LoginViewModel: ObservableObject {
 
             // تحديث نوع المستخدم بناءً على الرد
             model.usersType = isDoctor ? .doctor : .patient
-            
-            // Save session
-            SessionManager.shared.saveSession(token: token, userType: model.usersType, userData: userInfo)
-            
+
+            // تحويل بيانات المستخدم إلى النموذج المناسب
+            if let userModel = mapUserInfoToModel(userInfo: userInfo, isDoctor: isDoctor)  as? DoctorModel{
+                CoreDataManager.shared.saveDoctor(userModel)
+                print("Job Specialty Number from API: \(userInfo["jop_specialty_number"] ?? "Not Found")")
+                print("Doctor data saved successfully to Core Data.")
+                SessionManager.shared.saveSession(token: token, userType: model.usersType, userData: userInfo)
+                print("Session saved successfully with user data.")
+            } else {
+                print("Failed to map user info to model.")
+                apiErrorMessage = "response_parsing_error".localized()
+                completion(false)
+                return
+            }
+
             completion(true)
         } catch {
             // التعامل مع أي خطأ أثناء فك البيانات
@@ -125,6 +134,64 @@ class LoginViewModel: ObservableObject {
             completion(false)
         }
     }
+
+    private func mapUserInfoToModel(userInfo: [String: Any], isDoctor: Bool) -> Any? {
+        if isDoctor {
+            // تحويل بيانات الدكتور إلى DoctorModel
+            let specialties = (userInfo["specialty"] as? [[String: Any]])?.compactMap { specialtyData in
+                Specialty(
+                    id: specialtyData["id"] as? Int ?? 0,
+                    name: specialtyData["name"] as? String ?? "",
+                    description: specialtyData["description"] as? String ?? ""
+                )
+            } ?? []
+            let jobSpecialtyNumber = (userInfo["jop_specialty_number"] as? Int)
+                ?? Int(userInfo["jop_specialty_number"] as? String ?? "")
+                ?? 0
+            print("Mapping Job Specialty Number: \(userInfo["jop_specialty_number"] ?? "Not Found")")
+            return DoctorModel(
+                id: userInfo["id"] as? Int ?? 0,
+                name: userInfo["name"] as? String ?? "",
+                email: userInfo["email"] as? String ?? "",
+                isDoctor: userInfo["is_doctor"] as? Int ?? 0,
+                jobSpecialtyNumber: jobSpecialtyNumber, // تأكد من تعيين القيمة الصحيحة
+                bio: userInfo["bio"] as? String,
+                specialties: specialties
+            )
+            
+        } else {
+            // تحويل بيانات المريض إلى PatiantModel
+            return PatiantModel(
+                id: userInfo["id"] as? Int ?? 0,
+                fullName: userInfo["name"] as? String ?? "",
+                email: userInfo["email"] as? String ?? "",
+                profilePicture: userInfo["profile_picture"] as? String,
+                age: userInfo["age"] as? Int,
+                gender: userInfo["gender"] as? String,
+                medicalHistory: userInfo["medical_history"] as? String,
+                followedDoctors: (userInfo["followed_doctors"] as? [[String: Any]])?.compactMap { doctorData in
+                    let specialties = (doctorData["specialty"] as? [[String: Any]])?.compactMap { specialtyData in
+                        Specialty(
+                            id: specialtyData["id"] as? Int ?? 0,
+                            name: specialtyData["name"] as? String ?? "",
+                            description: specialtyData["description"] as? String ?? ""
+                        )
+                    } ?? []
+                    
+                    return DoctorModel(
+                        id: doctorData["id"] as? Int ?? 0,
+                        name: doctorData["name"] as? String ?? "",
+                        email: doctorData["email"] as? String ?? "",
+                        isDoctor: userInfo["is_doctor"] as? Int ?? 0,
+                        jobSpecialtyNumber: doctorData["jop_specialty_number"] as? Int ?? 0,
+                        bio: doctorData["bio"] as? String,
+                        specialties: specialties
+                    )
+                }
+            )
+        }
+    }
+
 
     private func handleAPIError(_ error: Error) {
         if let apiError = error as? APIError {
@@ -142,6 +209,7 @@ class LoginViewModel: ObservableObject {
         print("API Error: \(apiErrorMessage)")
     }
 
+    
     private func extractToken(from response: String) -> String? {
         guard let data = response.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],

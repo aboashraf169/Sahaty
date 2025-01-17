@@ -56,7 +56,7 @@ class SessionManager {
     // MARK: - Destroy Session
     func clearSession() {
         // Remove token from Keychain
-        keychain.deleteToken()
+     let _ = keychain.deleteToken(forKey: "BearerToken")
         
         // Remove user data from UserDefaults
         userDefaults.removeObject(forKey: userTypeKey)

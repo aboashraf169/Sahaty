@@ -120,12 +120,15 @@ struct LoginView: View {
                 } message: {
                     Text(loginViewModel.apiErrorMessage.localized())
                 }
+                
                 // الانتقال بناءً على نوع المستخدم
                 .navigationDestination(isPresented: $navigateToDoctorView) {
                     DoctorTabBarView()
+                        .navigationBarBackButtonHidden(true)
                 }
                 .navigationDestination(isPresented: $navigateToPatientView) {
-                    PatientTabBarView()
+                    PatientTabBarView(Patient: PatiantModel(id: 0, fullName: "", email: ""))
+                        .navigationBarBackButtonHidden(true)
                 }
 
                 // MARK: - Footer

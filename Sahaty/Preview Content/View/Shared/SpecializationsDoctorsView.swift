@@ -43,16 +43,16 @@ struct SpecializationsDoctorsView: View {
 
     private var doctorList: some View {
         List {
-            ForEach(viewModel.filteredSpecializations(searchText: searchText)) { specialization in
-                Section(header: Text(specialization.name.localized())
-                            .font(.headline)
-                            .foregroundColor(.accentColor)) {
-                    ForEach(specialization.doctors) { doctor in
-                        DoctorRowView(doctor: doctor)
-                            .environmentObject(appState)
-                    }
-                }
-            }
+//            ForEach(viewModel.filteredSpecializations(searchText: searchText)) { specialization in
+//                Section(header: Text(specialization.name.localized())
+//                            .font(.headline)
+//                            .foregroundColor(.accentColor)) {
+//                    ForEach(specialization.doctors) { doctor in
+//                        DoctorRowView(doctor: doctor)
+//                            .environmentObject(appState)
+//                    }
+//                }
+//            }
         }
         .listStyle(.plain)
     }
@@ -67,24 +67,24 @@ struct DoctorRowView: View {
     var body: some View {
         HStack {
             // صورة الطبيب
-            if let profilePicture = doctor.profilePicture {
-                Image(profilePicture)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-                    .clipShape(Circle())
-            } else {
-                Image("doctor")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-                    .foregroundColor(.gray)
-                    .clipShape(Circle())
-            }
+//            if let profilePicture = doctor.profilePicture {
+//                Image(profilePicture)
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(width: 50, height: 50)
+//                    .clipShape(Circle())
+//            } else {
+//                Image("doctor")
+//                    .resizable()
+//                    .scaledToFit()
+//                    .frame(width: 50, height: 50)
+//                    .foregroundColor(.gray)
+//                    .clipShape(Circle())
+//            }
 
             // معلومات الطبيب
             VStack(alignment: .leading) {
-                Text("doctor_title".localized() + doctor.fullName)
+                Text("doctor_title".localized() + doctor.name)
                     .font(.subheadline)
                     .bold()
                     .foregroundStyle(.secondary)
@@ -99,7 +99,7 @@ struct DoctorRowView: View {
             // زر المحادثة
             Button(action: {
                 appState.selectedTabPatients = .chat
-                print("بدء المحادثة مع \(doctor.fullName)")
+                print("بدء المحادثة مع \(doctor.name)")
             }) {
                 HStack {
                     Image(systemName: "message.fill")

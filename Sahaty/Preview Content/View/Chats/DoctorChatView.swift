@@ -11,7 +11,7 @@ struct DoctorChatView: View {
 
     var body: some View {
         VStack {
-            Text("محادثة مع \(doctor.fullName)")
+            Text("محادثة مع \(doctor.name)")
                 .font(.title2)
                 .padding()
 

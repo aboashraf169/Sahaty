@@ -81,22 +81,7 @@ struct FotterArtical: View {
                 getActionSheet()
             }
             .sheet(isPresented: $showCommentView) {
-                AddCommentView(currentUser: .doctor(DoctorModel(
-                    id: UUID(),
-                    fullName: "الحارث نبيل",
-                    email: "ahmed@example.com",
-                    specialization: "Cardiology",
-                    licenseNumber: "12345",
-                    profilePicture: "doctor",
-                    biography: "طبيب مختص في أمراض القلب.",
-                    articlesCount: 25,
-                    advicesCount: 10,
-                    followersCount: 500,
-                    articles: [],
-                    advices: [],
-                    comments: [],
-                    likedArticles: []
-                )))
+                AddCommentView()
                     .presentationDragIndicator(.visible)
                     .presentationDetents([.fraction(0.7)])
             }
@@ -120,28 +105,24 @@ struct FotterArtical: View {
 }
 
 #Preview {
-    FotterArtical(comments: [
-        CommentModel(
-            text: "تعليق ممتاز جدًا!",
-            author: .doctor(DoctorModel(
-                id: UUID(),
-                fullName: "د. أحمد خالد",
-                email: "ahmed@example.com",
-                specialization: "القلب والأوعية",
-                licenseNumber: "123456",
-                profilePicture: "doctor",
-                biography: "خبرة 15 سنة في أمراض القلب.",
-                articlesCount: 10,
-                advicesCount: 5,
-                followersCount: 200,
-                articles: [],
-                advices: [],
-                comments: [],
-                likedArticles: []
-            )),
-            publishDate: Date(),
-            likeCount: 10,
-            CommentCount: 5
-        )
-    ])
+//    FotterArtical(comments: [
+//        CommentModel(
+//            text: "تعليق ممتاز جدًا!",
+//            author: .doctor(DoctorModel(
+//                id: "",
+//                fullName: "د. أحمد خالد",
+//                email: "ahmed@example.com",
+//                specialization: "القلب والأوعية",
+//                licenseNumber: "123456",
+//                profilePicture: "doctor",
+//                biography: "خبرة 15 سنة في أمراض القلب.",
+//                articlesCount: 10,
+//                advicesCount: 5,
+//                followersCount: 200
+//            )),
+//            publishDate: Date(),
+//            likeCount: 10,
+//            CommentCount: 5
+//        )
+//    ])
 }

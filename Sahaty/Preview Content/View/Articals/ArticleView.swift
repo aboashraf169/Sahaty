@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct ArticleView: View {
-    var articlesModel: ArticalModel
+    var articlesModel: ArticleModel
     @StateObject var articlesViewModel: ArticalsViewModel
     var usersType: UsersType // نوع المستخدم (Doctor أو Patient)
     @State private var showEditSheet = false // التحكم بعرض شاشة التعديل
@@ -22,7 +22,7 @@ struct ArticleView: View {
                 // إعدادات المنشور للأطباء فقط
                 
                 // صورة صاحب المنشور
-                if let image = articlesModel.personImage {
+                if let image = articlesModel.img {
                     Image(image)
                         .resizable()
                         .scaledToFit()
@@ -41,19 +41,19 @@ struct ArticleView: View {
 
                 // بيانات صاحب المنشور
                 VStack(alignment: .leading) {
-                    Text(articlesModel.name)
+                    Text("\(articlesModel.userID)")
                         .font(.headline)
                         .fontWeight(.regular)
                     
-                    HStack {
-                        Text(articlesModel.userName)
-                            .font(.subheadline)
-                            .fontWeight(.light)
-                        Text("\("since".localized()) \(articlesModel.addTime)")
-                            .font(.subheadline)
-                            .fontWeight(.light)
-            
-                    }
+//                    HStack {
+//                        Text(articlesModel.userName)
+//                            .font(.subheadline)
+//                            .fontWeight(.light)
+//                        Text("\("since".localized()) \(articlesModel.addTime)")
+//                            .font(.subheadline)
+//                            .fontWeight(.light)
+//            
+//                    }
                     .opacity(0.6)
                 }
                 .padding(.horizontal, 5)
@@ -69,9 +69,9 @@ struct ArticleView: View {
                 .foregroundStyle(.primary)
                 .alert("delete_article".localized(), isPresented: $showDeleteAlert) {
                          
-                               Button("confirm".localized(), role: .destructive) {
-                                   articlesViewModel.deleteArticle(id: articlesModel.id)
-                               }
+//                               Button("confirm".localized(), role: .destructive) {
+//                                   articlesViewModel.deleteArticle(id: articlesModel.id)
+//                               }
                                Button("cancel".localized(), role: .cancel) {}
                            
                        } message: {
@@ -80,7 +80,7 @@ struct ArticleView: View {
                    
                     // زر التعديل
                         Button {
-                            articlesViewModel.startEditing(article: articlesModel)
+//                            articlesViewModel.startEditing(article: articlesModel)
                             showEditSheet.toggle() // عرض شاشة التعديل
                         } label: {
                             Label("", systemImage: "pencil.line")
@@ -94,12 +94,12 @@ struct ArticleView: View {
             }
 
             // وصف المنشور
-            Text(articlesModel.description)
+            Text(articlesModel.subject)
                 .font(.callout)
                 .fontWeight(.light)
 
             
-            if let image = articlesModel.imagePost {
+            if let image = articlesModel.img {
                 Rectangle()
                     .frame(maxWidth: .infinity)
                     .frame(height: 200)
@@ -114,7 +114,7 @@ struct ArticleView: View {
             }
         
             // خيارات التفاعل
-            FotterArtical(comments:articlesModel.comments)
+//            FotterArtical(comments:articlesModel)
 
         }
         .padding(.horizontal)
@@ -124,11 +124,14 @@ struct ArticleView: View {
         }
         .direction(appLanguage) // لضبط اتجاه النصوص بناءً على اللغة
                .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
+        .onAppear {
+            articlesViewModel.fetchArticles()
+        }
     }
 }
 
 #Preview {
     
-    ArticleView(articlesModel: ArticalModel(description:  "السكري حالة شائعة يمكن التحكم بها عبر نظام غذائي متوازن، ممارسة الرياضة بانتظام، ومراقبة مستوى السكر باستمرار.", name: "محمد اشرف", userName: "midoMj@", addTime: "ساعتين",imagePost: "post"), articlesViewModel: ArticalsViewModel(), usersType: .doctor)
+//    ArticleView(articlesModel:ArticalModel(id: 0, title: "", description: "", author: "", publishDate: "", likeCount: 0, commentCount: 0), articlesViewModel: ArticalsViewModel(), usersType: .doctor)
 }
 

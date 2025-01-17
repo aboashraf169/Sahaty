@@ -8,7 +8,7 @@ class CommentViewModel: ObservableObject {
     @Published var successMessage: String? = nil // رسالة نجاح
 
     // إضافة تعليق جديد
-    func addComment(author: CommentAuthor) {
+    func addComment(author: String) {
         let trimmedText = newCommentText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else {
             errorMessage = "empty_comment".localized()
@@ -17,16 +17,13 @@ class CommentViewModel: ObservableObject {
         
         if let editingIndex = comments.firstIndex(where: { $0.id == editingComment?.id }) {
             // تعديل تعليق موجود
-            comments[editingIndex].text = trimmedText
+            comments[editingIndex].content = trimmedText
             editingComment = nil
             successMessage = "comment_edited".localized()
         } else {
             // إضافة تعليق جديد
-            let newComment = CommentModel(
-                text: trimmedText,
-                author: author,
-                publishDate: Date()
-            )
+            let newComment =
+            CommentModel(id: 0, content: trimmedText, authorName: author, authorImage: "doctor", createdAt: "")
             comments.append(newComment)
             successMessage = "comment_added".localized()
         }
@@ -36,17 +33,17 @@ class CommentViewModel: ObservableObject {
 
     // حذف تعليق
     func deleteComment(id: UUID) {
-        if let index = comments.firstIndex(where: { $0.id == id }) {
-            comments.remove(at: index)
-            successMessage = "comment_deleted".localized()
-        } else {
-            errorMessage = "comment_not_found".localized()
-        }
+//        if let index = comments.firstIndex(where: { $0.id == id }) {
+//            comments.remove(at: index)
+//            successMessage = "comment_deleted".localized()
+//        } else {
+//            errorMessage = "comment_not_found".localized()
+//        }
     }
 
     // بدء تعديل تعليق
     func startEditing(comment: CommentModel) {
         editingComment = comment
-        newCommentText = comment.text
+        newCommentText = comment.content
     }
 }

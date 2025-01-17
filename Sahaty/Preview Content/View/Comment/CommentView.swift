@@ -13,14 +13,14 @@ struct CommentView: View {
         HStack(alignment: .top, spacing: 10) {
 
             // الصورة الرمزية
-            if let image = comment.author.image {
-                Image(image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 40, height: 40)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.accentColor, lineWidth: 3))
-            } else {
+//            if let image = comment.author.image {
+//                Image(image)
+//                    .resizable()
+//                    .scaledToFill()
+//                    .frame(width: 40, height: 40)
+//                    .clipShape(Circle())
+//                    .overlay(Circle().stroke(Color.accentColor, lineWidth: 3))
+//            } else {
                 Image(systemName: "person.fill")
                     .resizable()
                     .scaledToFit()
@@ -29,17 +29,17 @@ struct CommentView: View {
                     .foregroundStyle(.accent)
                     .clipShape(Circle())
                     .overlay(Circle().stroke(Color.accentColor, lineWidth: 3))
-            }
+//            }
             
 
             // المحتوى
             VStack(alignment: .leading, spacing: 5) {
-                Text(comment.author.name)
+                Text(comment.authorName)
                     .font(.headline)
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.leading)
                 
-                Text(comment.text)
+                Text(comment.content)
                     .font(.body)
                     .foregroundColor(.secondary)
             }

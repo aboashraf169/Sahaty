@@ -34,7 +34,7 @@ struct SplashScreenView: View {
             DoctorTabBarView()
         }
         .navigationDestination(isPresented: $navigateToPatient) {
-            PatientTabBarView()
+            PatientTabBarView(Patient: PatiantModel(id: 0, fullName: "", email: ""))
         }
         .navigationDestination(isPresented: $navigateToLogin) {
             LoginView()

@@ -3,7 +3,7 @@ import PhotosUI
 
 struct PatientSettingView: View {
     
-    var viewModel = PatiantModel.defaultData
+    var viewModel : PatiantModel
     @AppStorage("isDarkModePatient") private var isDarkModePatient = false // حفظ الاختيار
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
@@ -74,7 +74,8 @@ struct PatientSettingView: View {
                 }
 
                 // Navigation Links
-                NavigationLink("edit_profile".localized(), destination: EditPationtDataProfileView())
+                NavigationLink("edit_profile".localized(), destination:
+                                EditPationtDataProfileView(viewModel: PatiantModel(id: 0, fullName: "", email: "")))
                     .padding(.horizontal)
                     .foregroundStyle(.white)
                     .padding(10)
@@ -101,7 +102,7 @@ struct PatientSettingView: View {
                     
                     MenuOption(title: "saved_items".localized(), icon: "bookmark", action: { showSavedView.toggle() })
                         .sheet(isPresented: $showSavedView) {
-                            patientSavedArticalvView()
+                            patientSavedArticalvView(articles: [])
                         }
                     
                     MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
@@ -164,5 +165,5 @@ struct PatientSettingView: View {
 }
 
 #Preview {
-    PatientSettingView()
+//    PatientSettingView(viewModel: Pa)
 }

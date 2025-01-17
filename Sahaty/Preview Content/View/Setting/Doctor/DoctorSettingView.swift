@@ -11,8 +11,8 @@ import PhotosUI
 
 struct DoctorSettingView: View {
     
-    var viewModel : DoctorProfileViewModel
-    
+    @ObservedObject var viewModel = DoctorProfileViewModel()
+
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
@@ -106,8 +106,6 @@ struct DoctorSettingView: View {
         }
         .direction(appLanguage) // ضبط اتجاه النصوص
         .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
-       
-        
     }
     
     
@@ -129,17 +127,15 @@ struct DoctorSettingView: View {
 
 func logout() {
     // إزالة التوكن
-    APIManager.shared.setBearerToken("") // مسح التوكن
+    let _ = KeychainManager.shared.deleteToken()
+    // ازالة الجلسة
     SessionManager.shared.clearSession()
-    let isTokenDeleted = KeychainManager.shared.deleteToken()
-
-    if isTokenDeleted {
-        print("Token deleted successfully.")
-        // قم بتوجيه المستخدم إلى شاشة تسجيل الدخول
-    } else {
-        print("Failed to delete token.")
-        // التعامل مع الخطأ إذا لزم الأمر
-    }
+    // ازالة البيانات من كور داتا
+    CoreDataManager.shared.deleteAllDoctors()
+    // ازالة البيانات الكاش
+    CoreDataManager.shared.clearCache()
+    // إزالة البيانات
+    AdviceViewModel().clearLocalData()
     // إعادة التوجيه إلى شاشة تسجيل الدخول
     if let window = UIApplication.shared.connectedScenes
         .compactMap({ $0 as? UIWindowScene })
@@ -152,6 +148,5 @@ func logout() {
 
 
 #Preview {
-    DoctorSettingView(viewModel: DoctorProfileViewModel(doctor: DoctorModel(fullName: "محمد أشرف", email: "mido@gmail.com", specialization: "طب عيون", licenseNumber: "", articlesCount: 0, advicesCount: 0, followersCount: 0,articles: [], advices: [], comments: [], likedArticles: [])))
-    
+    DoctorSettingView(viewModel: DoctorProfileViewModel())
 }

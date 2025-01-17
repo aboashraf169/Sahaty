@@ -16,7 +16,7 @@ struct EditPationtDataProfileView: View {
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
     
-    @State private var viewModel = PatiantModel.defaultData
+    @State var viewModel : PatiantModel
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
@@ -149,6 +149,5 @@ struct EditPationtDataProfileView: View {
 
 
 #Preview {
-    EditPationtDataProfileView()
-    
+//    EditPationtDataProfileView()    
 }

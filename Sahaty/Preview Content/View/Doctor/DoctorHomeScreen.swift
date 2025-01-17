@@ -4,22 +4,15 @@ struct DoctorHomeScreen: View {
     
     @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
     
-    var currentUser: CommentAuthor?
+    var currentUser:String =  ""
     
     @StateObject var adviceViewModel: AdviceViewModel
     @StateObject var articlesViewModel: ArticalsViewModel
     @State private var showAddAdviceView: Bool = false
     @State private var showAddArticleView: Bool = false
-    @State private var selectedArticle: ArticalModel? = nil
+    @State private var selectedArticle: ArticleModel? = nil
     @State private var showEditArticleSheet = false
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
-    
-    init(doctor: DoctorModel) {
-        let adviceViewModel = AdviceViewModel(author: doctor)
-        let articlesViewModel = ArticalsViewModel(currentUser: .doctor(doctor))
-        _adviceViewModel = StateObject(wrappedValue: adviceViewModel)
-        _articlesViewModel = StateObject(wrappedValue: articlesViewModel)
-    }
     
     var body: some View {
         NavigationStack {
@@ -50,81 +43,77 @@ struct DoctorHomeScreen: View {
         }
         .direction(appLanguage) // اتجاه النصوص
         .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+        .onAppear{
+            adviceViewModel.loadAdvicesFromCoreData()
+        }
+        
     }
     
     // MARK: - Advice Section
     private var adviceSection: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            // العنوان وزر الإضافة
             HStack {
-                if !$adviceViewModel.advices.isEmpty {
-                    Button {
-                        showAddAdviceView.toggle()
-                    } label: {
-                        Image(systemName: "plus.circle")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .foregroundStyle(.primary)
-                    }
-                }
-                Text("daily_advices")
+                Text("daily_advices".localized())
                     .font(.headline)
                     .fontWeight(.regular)
+                
                 Spacer()
+                
+                Button {
+                    showAddAdviceView.toggle()
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .foregroundStyle(.accent)
+                }
+                .sheet(isPresented: $showAddAdviceView) {
+                    AddAdviceSheetView(adviceViewModel: adviceViewModel)
+                        .presentationDetents([.fraction(0.45)]) // نسبة العرض
+                        .presentationCornerRadius(30)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 10)
-            .sheet(isPresented: $showAddAdviceView) {
-                AddAdviceSheetView(adviceViewModel: adviceViewModel)
-                    .presentationDetents([.fraction(0.45)])
-                    .presentationCornerRadius(30)
-            }
             
+            // عرض النصائح
             if adviceViewModel.advices.isEmpty {
+                // في حال عدم وجود نصائح
                 HStack {
                     Text("no_advices".localized())
                         .fontWeight(.medium)
                         .foregroundStyle(.gray)
                     Spacer()
                 }
-                .padding(.horizontal,20)
+                .padding(.horizontal, 20)
             } else {
+                // في حال وجود نصائح
                 List {
                     ForEach(adviceViewModel.advices) { advice in
-                        AdviceView(advice: advice)
-                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                                swipeActions(for: advice)
+                        AdviceView(
+                            advice: advice,
+                            onEdit: { selectedAdvice in
+                                adviceViewModel.startEditing(advice: selectedAdvice) // بدء تعديل النصيحة
+                                showAddAdviceView.toggle()
+                            },
+                            onDelete: { selectedAdvice in
+                                adviceViewModel.deleteAdvice(id: selectedAdvice.id) { success in
+                                    if success {
+                                        print("Advice deleted.")
+                                    }
+                                }
                             }
+                        )
                     }
                 }
                 .listStyle(.plain)
-                .frame(height: 130)
+                .frame(maxHeight: 200) // ضبط أقصى ارتفاع للقائمة
             }
         }
     }
-    
-    // MARK: - Swipe Actions for Advice
-    func swipeActions(for advice: AdviceModel) -> some View {
-        Group {
-            Button {
-                adviceViewModel.startEditing(advice: advice)
-                showAddAdviceView.toggle()
-            } label: {
-                Label("edit", systemImage: "pencil")
-            }
-            .tint(.accent)
-            
-            Button {
-                if let index = adviceViewModel.advices.firstIndex(where: { $0.id == advice.id }) {
-                    adviceViewModel.deleteAdvice(at: IndexSet(integer: index))
-                }
-            } label: {
-                Label("delete", systemImage: "trash")
-            }
-            .tint(.red)
-        }
-    }
-    
+
     // MARK: - Articles Section
     private var articlesSection: some View {
         VStack {
@@ -180,21 +169,5 @@ struct DoctorHomeScreen: View {
     
 }
 #Preview {
-    let doctor = DoctorModel(
-        fullName: "د. محمد أشرف",
-        email: "doctor@example.com",
-        specialization: "طب الأطفال",
-        licenseNumber: "12345",
-        profilePicture: "post",
-        biography: nil,
-        articlesCount: 10,
-        advicesCount: 20,
-        followersCount: 50,
-        articles: [],
-        advices: [],
-        comments: [],
-        likedArticles: []
-    )
 
-    DoctorHomeScreen(doctor: doctor)
 }

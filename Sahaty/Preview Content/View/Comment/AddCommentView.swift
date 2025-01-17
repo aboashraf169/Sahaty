@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AddCommentView: View {
     @StateObject private var viewModel = CommentViewModel()
-    var currentUser: CommentAuthor // المستخدم الحالي (طبيب أو مريض)
+//    var currentUser: CommentAuthor // المستخدم الحالي (طبيب أو مريض)
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
@@ -28,7 +28,7 @@ struct AddCommentView: View {
                         .cornerRadius(10)
                     Spacer()
                     Button(action: {
-                        viewModel.addComment(author: currentUser)
+                        viewModel.addComment(author: "mido")
                     }) {
                         Image(systemName: "paperplane.fill")
                             .resizable()
@@ -68,7 +68,7 @@ struct AddCommentView: View {
 
             // حذف
             Button() {
-                viewModel.deleteComment(id: comment.id)
+//                viewModel.deleteComment(id: comment.id)
             } label: {
                 Label("delete".localized(), systemImage: "trash") // حذف
             }
@@ -80,21 +80,6 @@ struct AddCommentView: View {
 
 
 #Preview {
-    let currentUser = DoctorModel(
-        id: UUID(),
-        fullName: "الحارٍٍث نبيل",
-        email: "mohamed@example.com",
-        specialization: "Cardiology", // التخصص
-        licenseNumber: "123456789", // رقم الترخيص
-        profilePicture: nil, // صورة اختيارية
-        biography: "استشاري أمراض القلب", // السيرة الذاتية
-        articlesCount: 10, // عدد المقالات
-        advicesCount: 15, // عدد النصائح
-        followersCount: 200, // عدد المتابعين
-        articles: [], // قائمة المقالات
-        advices: [], // قائمة النصائح
-        comments: [], // قائمة التعليقات
-        likedArticles: [] // قائمة المقالات المعجب بها
-    )
-    AddCommentView(currentUser: .doctor(currentUser))
+
+//    AddCommentView(currentUser: .doctor(currentUser))
 }

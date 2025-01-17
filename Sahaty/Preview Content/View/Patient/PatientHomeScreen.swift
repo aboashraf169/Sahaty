@@ -2,18 +2,11 @@ import SwiftUI
 
 struct PatientHomeScreen: View {
     @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
-    @StateObject private var adviceViewModel: AdviceViewModel
-    @StateObject private var articlesViewModel: ArticalsViewModel
+    @StateObject  var adviceViewModel: AdviceViewModel
+    @StateObject  var articlesViewModel: ArticalsViewModel
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     @State private var searchText = ""
-
-        init() {
-            let patient = PatiantModel.defaultData
-            let adviceViewModel = AdviceViewModel(currentUser: .patient(patient))
-            _adviceViewModel = StateObject(wrappedValue: adviceViewModel)
-            _articlesViewModel = StateObject(wrappedValue: ArticalsViewModel(currentUser: .patient(patient)))
-        }
 
     
     var body: some View {
@@ -28,11 +21,7 @@ struct PatientHomeScreen: View {
                         print("تم النقر على صورة المستخدم (الدكتور)")
                     },
                     onAddTap: {
-                        print("تم النقر على زر الإضافة")
-                    }, onSearch: { query in
-                            adviceViewModel.searchText = query
-//                            articlesViewModel.searchText = query
-//                        
+                    }, onSearch: {_ in 
                     }
                 )
 
@@ -68,7 +57,9 @@ struct PatientHomeScreen: View {
                         } else {
                             VStack(spacing: 10) { // يمكنك إضافة تباعد بين المقالات هنا
                                 ForEach(articlesViewModel.Articals) { article in
-                                    ArticleView(articlesModel: ArticalModel(description: article.description, name: article.name, userName: article.userName, addTime: article.addTime, imagePost: article.imagePost, personImage: article.imagePost), articlesViewModel: articlesViewModel,usersType: .patient)
+//                                    ArticleView(articlesModel:
+//                                                    ArticleModel())
+//                                        ArticalModel(id: 0, title: "", description: article.description, author: article.author, publishDate: "", imagePost: article.imagePost, likeCount: 0, commentCount: 0), articlesViewModel: articlesViewModel,usersType: .patient)
                                 }
                             }
                         }
@@ -87,7 +78,7 @@ struct PatientHomeScreen: View {
         Group {
             if let advice = adviceViewModel.advices.first {
                 Button {
-                    print("عرض تفاصيل النصيحة: \(advice.content)")
+                    print("عرض تفاصيل النصيحة: \(advice.advice)")
                 } label: {
                     
                     Rectangle()
@@ -99,7 +90,7 @@ struct PatientHomeScreen: View {
                                 Image("idea")
 
                                 ViewThatFits {
-                                    Text("\"\(advice.content)\"")
+                                    Text("\"\(advice.advice)\"")
                                         .font(.callout)
                                         .foregroundColor(.white)
                                 }
@@ -181,5 +172,5 @@ struct Categoryy: View {
 
 // MARK: - Preview
 #Preview {
-    PatientHomeScreen()
+//    PatientHomeScreen()
 }
