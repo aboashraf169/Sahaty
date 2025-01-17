@@ -3,6 +3,7 @@ import PhotosUI
 
 struct ProfileView: View {
     @StateObject var viewModel = DoctorProfileViewModel() // إنشاء viewModel مرة واحدة
+    @ObservedObject var adviceViewModel = AdviceViewModel()
     @State private var isEditingBio = false
     @State private var editedBio: String = ""
     @State private var showImagePicker = false
@@ -55,7 +56,7 @@ struct ProfileView: View {
                     )
                     
                     Divider()
-                    AdviceSectionView(viewModel: viewModel, showAllAdvices: $showAllAdvices)
+                    AdviceSectionView(adviceViewModel: adviceViewModel, showAllAdvices: $showAllAdvices)
                     
                     Divider()
                     ArticlesSectionView(viewModel: viewModel, showAllArticles: $showAllArticles)
@@ -85,6 +86,9 @@ struct ProfileView: View {
             }
             .direction(appLanguage) // ضبط الاتجاه
             .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
+            .refreshable {
+                         adviceViewModel.fetchAdvices() // استدعاء التحديث عند السحب
+                     }
         }
     }
     }
@@ -108,7 +112,7 @@ struct ProfileView: View {
 
 // MARK: - AdviceSectionView
 struct AdviceSectionView: View {
-    @ObservedObject var viewModel: DoctorProfileViewModel
+    @ObservedObject var adviceViewModel = AdviceViewModel()
     @Binding var showAllAdvices: Bool
 
     var body: some View {
@@ -130,12 +134,12 @@ struct AdviceSectionView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-//                    ForEach(viewModel.advices) { advice in
-//                        AdviceView(advice: advice)
-//                            .frame(width: 230, height: 80)
-//                            .background(Color(.systemGray6))
-//                            .cornerRadius(12)
-//                    }
+                    ForEach(adviceViewModel.advices) { advice in
+                        AdviceView(advice: advice, onEdit: {_ in }, onDelete: {_ in })
+                            .frame(width: 230, height: 80)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+                    }
                 }
             }
         }
@@ -203,14 +207,26 @@ struct ArticlesSectionView: View {
 }
 
 struct AllAdvicesView: View {
-    @ObservedObject var adviceViewModel: AdviceViewModel // ملاحظة: يتم تمرير الـ ViewModel هنا
+    @ObservedObject var adviceViewModel: AdviceViewModel
     @State private var showAddAdviceSheet = false // عرض شاشة الإضافة/التعديل
     @State private var selectedAdvice: AdviceModel? // النصيحة المحددة للتعديل
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         NavigationStack {
+                    ForEach(adviceViewModel.advices) { advice in
+                        AdviceView(advice: advice, onEdit: {_ in }, onDelete: {_ in })
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+                    }
+                    .padding()
+            Spacer()
+                .navigationTitle("all_advice".localized())
+                .navigationBarTitleDisplayMode(.inline)
 
         }
+        .direction(appLanguage) // ضبط الاتجاه
+        .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
     }
 }
 
@@ -387,22 +403,6 @@ struct BioSectionView: View {
 
 
 #Preview {
-//    let doctor = DoctorModel(
-//        id: "",
-//        fullName: "د. محمد اشرف",
-//        email: "ahmedalkhairy@example.com",
-//        specialization: "أخصائي الغدد الصماء",
-//        licenseNumber: "12345",
-//        profilePicture: "post", // اسم الصورة في Assets
-//        biography: nil,
-//        articlesCount: 0,
-//        advicesCount: 0,
-//        followersCount: 0
-//    )
-//
-//    let viewModel = DoctorProfileViewModel(doctor: doctor)
-//
-//    ProfileView(viewModel: viewModel)
 }
 
 

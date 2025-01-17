@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct AdviceModel: Identifiable, Decodable {
+struct AdviceModel: Identifiable, Codable {
     var id: Int
     var advice: String
-    var doctorID: Int?
+    var doctorID: Int
     var createdAt: String
     var updatedAt: String
 
@@ -22,4 +22,5 @@ struct AdviceModel: Identifiable, Decodable {
         case updatedAt = "updated_at"
     }
 }
+
 

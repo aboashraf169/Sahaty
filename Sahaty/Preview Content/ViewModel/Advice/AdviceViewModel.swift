@@ -14,6 +14,12 @@ class AdviceViewModel: ObservableObject {
     @Published var editingAdvice: AdviceModel? = nil // النصيحة التي يتم تعديلها
 
     private var cancellables = Set<AnyCancellable>()
+    
+    init() {
+        fetchAdvices() // جلب النصائح من الخادم وحفظها في Core Data
+        loadAdvicesFromCoreData() // تحميل النصائح من Core Data عند عدم وجود اتصال
+        
+    }
 
     deinit {
         cancellables.forEach { $0.cancel() }
@@ -109,51 +115,53 @@ class AdviceViewModel: ObservableObject {
             }
 
             DispatchQueue.main.async {
-                if let index = self?.advices.firstIndex(where: { $0.id == id }) {
-                    self?.advices[index].advice = newContent
-                    CoreDataManager.shared.saveAdvicesToCoreData(self?.advices ?? [])
-                }
+                self?.fetchAdvices() // إعادة جلب النصائح من الخادم
                 completion(true)
             }
         }.resume()
     }
 
     // MARK: - Get Advices
+    
     func fetchAdvices() {
         isLoading = true
-        guard let url = URL(string: "http://127.0.0.1:8000/api/doctor/get-today-advice") else {
-            errorMessage = "Invalid URL"
-            isLoading = false
-            return
-        }
 
-        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+        // استخدام APIManager لإرسال الطلب
+        APIManager.shared.sendRequest(
+            endpoint: "/doctor/get-today-advice", // مسار الـ API
+            method: .get // نوع الطلب GET
+        ) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
+                switch result {
+                case .success(let data):
+                    // طباعة البيانات الخام للتحقق
+                    do {
+                        // فك ترميز البيانات
+                        let response = try JSONDecoder().decode(AdviceResponse.self, from: data)
+                        // تحديث النصائح في ViewModel
+                        self?.advices = response.data
+                        // حفظ النصائح في Core Data
+                        CoreDataManager.shared.saveAdvicesToCoreData(response.data)
+                        self?.advices = CoreDataManager.shared.fetchAdvices() // إعادة تحميل البيانات من Core Data
 
-                if let error = error {
+                        
+                    } catch {
+                        // التعامل مع أخطاء فك الترميز
+                        print("Decoding error: \(error.localizedDescription)")
+                        self?.errorMessage = "Failed to parse advice data."
+                        self?.advices = CoreDataManager.shared.fetchAdvices()
+                    }
+                case .failure(let error):
+                    // التعامل مع أخطاء الشبكة أو الخادم
                     print("Error fetching advices: \(error.localizedDescription)")
-                    self?.advices = CoreDataManager.shared.fetchAdvices()
-                    return
-                }
-
-                guard let data = data else {
-                    print("No data received.")
-                    self?.advices = CoreDataManager.shared.fetchAdvices()
-                    return
-                }
-
-                do {
-                    let response = try JSONDecoder().decode(AdviceResponse.self, from: data)
-                    self?.advices = response.data
-                    CoreDataManager.shared.saveAdvicesToCoreData(response.data)
-                } catch {
-                    print("Decoding error: \(error.localizedDescription)")
+                    self?.errorMessage = error.localizedDescription
                     self?.advices = CoreDataManager.shared.fetchAdvices()
                 }
             }
-        }.resume()
+        }
     }
+
 
     // MARK: - Delete Advice
     func deleteAdvice(id: Int, completion: @escaping (Bool) -> Void) {

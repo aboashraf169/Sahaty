@@ -1,4 +1,3 @@
-//
 //  CoreDataManager.swift
 //  Sahaty
 //
@@ -20,27 +19,10 @@ class CoreDataManager {
                 fatalError("Failed to load persistent stores: \(error)")
             }
         }
-        if let storeURL = persistentContainer.persistentStoreDescriptions.first?.url {
-             do {
-                 try FileManager.default.removeItem(at: storeURL)
-                 print("Old Persistent Store deleted.")
-             } catch {
-                 print("Failed to delete old Persistent Store: \(error)")
-             }
-         }
         // تمكين الترحيل التلقائي
         let description = persistentContainer.persistentStoreDescriptions.first
         description?.setOption(true as NSNumber, forKey: NSMigratePersistentStoresAutomaticallyOption)
         description?.setOption(true as NSNumber, forKey: NSInferMappingModelAutomaticallyOption)
-        
-        let container = NSPersistentContainer(name: "AppDataModel")
-
-
-        container.loadPersistentStores { _, error in
-            if let error = error {
-                fatalError("Failed to load persistent stores: \(error)")
-            }
-        }
 
     }
     
@@ -62,27 +44,26 @@ class CoreDataManager {
     
     // MARK: - Save Advice Doctor Data
     func saveAdvicesToCoreData(_ advices: [AdviceModel]) {
-        let context = CoreDataManager.shared.persistentContainer.viewContext
-
-        // حذف البيانات القديمة
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = AdviceEntity.fetchRequest()
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        do {
-            try context.execute(deleteRequest)
-        } catch {
-            print("Failed to delete old advices: \(error)")
-        }
-
-        // حفظ البيانات الجديدة
+        let context = persistentContainer.viewContext
         for advice in advices {
-            let entity = AdviceEntity(context: context)
-            entity.id = Int64(advice.id)
-            entity.advice = advice.advice
-            entity.doctorID = Int64(advice.doctorID ?? 0)
-            entity.createdAt = advice.createdAt
-            entity.updatedAt = advice.updatedAt
+            let fetchRequest: NSFetchRequest<AdviceEntity> = AdviceEntity.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %d", advice.id)
+            
+            if let existingEntity = try? context.fetch(fetchRequest).first {
+                // تحديث الكيان الموجود
+                existingEntity.advice = advice.advice
+                existingEntity.updatedAt = advice.updatedAt
+            } else {
+                // إضافة كيان جديد
+                let entity = AdviceEntity(context: context)
+                entity.id = Int64(advice.id)
+                entity.advice = advice.advice
+                entity.doctorID = Int64(advice.doctorID)
+                entity.createdAt = advice.createdAt
+                entity.updatedAt = advice.updatedAt
+            }
         }
-
+        
         do {
             try context.save()
             print("Advices saved successfully to Core Data.")
@@ -90,7 +71,6 @@ class CoreDataManager {
             print("Failed to save advices to Core Data: \(error)")
         }
     }
-    
     // MARK: - Fetch Advices Data
     func fetchAdvices() -> [AdviceModel] {
         let context = persistentContainer.viewContext
