@@ -7,28 +7,48 @@
 
 import Foundation
 
+
 struct DoctorModel: Identifiable, Codable {
-    var id: Int // معرف الدكتور
-    var name: String // اسم الدكتور
-    var email: String // البريد الإلكتروني
-    var isDoctor: Int // هل هو دكتور
-    var jobSpecialtyNumber: Int // رقم التخصص المهني
-    var bio: String? // السيرة الذاتية
-    var specialties: [Specialty] // قائمة التخصصات
+    
+    var id: Int = 0
+    var name:String = "defult"
+    var email:String = "defult@gmail.com"
+    var bio: String? = nil
+    var img: String? = nil
+    var jopSpecialtyNumber: String = "00000"
+    
     
     enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case email
-        case isDoctor = "is_doctor"
-        case jobSpecialtyNumber = "jop_specialty_number"
-        case bio
-        case specialties = "specialty"
+        case id, name, email, bio, img
+        case jopSpecialtyNumber = "jop_specialty_number"
     }
+    
+    
+    // MARK: - API Request Body
+    func toDectinary() -> [String : Any] {
+        return [
+            "name" : name,
+            "email" : email,
+            "bio" : bio ?? "",
+            "jop_specialty_number" : jopSpecialtyNumber,
+        ]
+    }
+    
+  
+}
+struct Response: Codable {
+    let message: String
+    let user: DoctorModel
 }
 
-struct Specialty: Identifiable, Codable {
-    var id: Int // معرف التخصص
-    var name: String // اسم التخصص
-    var description: String // وصف التخصص
+struct ResponseSpeciatyDoctor: Codable {
+    let data: [DoctorModel]
+}
+
+struct DoctorInfoData : Codable{
+    var doctor_name : String = ""
+    var doctor_img : String = ""
+    var number_of_followers : Int = 0
+    var number_of_articles : Int = 0
+    var number_of_advice : Int = 0
 }

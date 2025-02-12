@@ -9,37 +9,33 @@ import SwiftUI
 
 struct patientSavedArticalvView: View {
     
-    var articles: [ArticleModel]
-    @State var DefultArticle : [ArticleModel] = []
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
-
-    
-  
+    @ObservedObject var patientViewModel : PatientSettingViewModel
+    @StateObject var articalsViewModel =  ArticalsViewModel()
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack {
-                    ForEach(articles) { article in
-                        ArticleView(
-                            articlesModel: article,
-                            articlesViewModel: ArticalsViewModel(),
-                            usersType: .patient
-                        )
+                    ForEach(articalsViewModel.savedArticals) { savedArticals in
+                        ArticleView(articleModel: savedArticals, articalViewModel: articalsViewModel, usersType: .patient, path: articalsViewModel.article.img ?? "")
                     }
                 }
             }
             .navigationTitle("saved_articles".localized())
             .navigationBarTitleDisplayMode(.inline)
         }
-        .direction(appLanguage) // ضبط الاتجاه
-        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+        .direction(appLanguage)
+        .environment(\.locale, .init(identifier: appLanguage))
+        .onAppear {
+            articalsViewModel.fetchArticalSaved()
+        }
 
 
     }
 }
 
 #Preview {
-    patientSavedArticalvView(articles: [])
+    patientSavedArticalvView(patientViewModel: PatientSettingViewModel(), articalsViewModel: ArticalsViewModel())
 }
 

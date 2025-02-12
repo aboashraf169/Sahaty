@@ -10,11 +10,13 @@ import PhotosUI
 
 
 struct EditDoctorDataProfileView: View {
-        
+    @Environment(\.presentationMode) var presentationMode
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
-    @ObservedObject var viewModel = DoctorProfileViewModel()
+    @State private var showAlert = false
+    let imagePath: String
+    @ObservedObject var viewModel : DoctorProfileViewModel
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
@@ -26,7 +28,7 @@ struct EditDoctorDataProfileView: View {
                             .fill(Color.accentColor.opacity(0.1))
                             .frame(width: 120, height: 120)
                         
-                        if let selectedImage = selectedImage {
+                        if let selectedImage = viewModel.doctorProfileImage {
                             Image(uiImage: selectedImage)
                                 .resizable()
                                 .scaledToFill()
@@ -34,14 +36,14 @@ struct EditDoctorDataProfileView: View {
                                 .clipShape(Circle())
                                 .shadow(radius: 5)
                         }
-                        //                            else if let image = viewModel.doctor.profilePicture {
-                        //                            Image(image)
-                        //                                .resizable()
-                        //                                .scaledToFill()
-                        //                                .frame(width: 120, height: 120)
-                        //                                .clipShape(Circle())
-                        //                                .shadow(radius: 5)
-//                    }
+                        else if let image = viewModel.doctor.img {
+                          Image(image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 120, height: 120)
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
                         else {
                             Image(systemName: "person.fill")
                                 .resizable()
@@ -72,7 +74,6 @@ struct EditDoctorDataProfileView: View {
                 }
                     .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
                     .onChange(of: selectedImageItem) { _, newValue in
-                        loadImage(newValue)
                     }
                 
                 Divider()
@@ -86,30 +87,27 @@ struct EditDoctorDataProfileView: View {
                                 set: { viewModel.doctor.bio = $0 }))
                 
                 EditField(title: "email".localized(), text: $viewModel.doctor.email)
-//
-//                EditField(title: "medical_specialization".localized(), text: $viewModel.doctor.specialties.first)
                 EditField(
                     title: "license_number".localized(),
                     text: Binding(
-                        get: { viewModel.doctor.jobSpecialtyNumber == 0 ? "" : String(viewModel.doctor.jobSpecialtyNumber) },
-                        set: { viewModel.doctor.jobSpecialtyNumber = Int($0) ?? 0 }
+                        get: { viewModel.doctor.jopSpecialtyNumber},
+                        set: { viewModel.doctor.jopSpecialtyNumber = $0}
                     )
                 )
-
-//                EditField(
-//                    title: "license_number".localized(),
-//                    text: Binding(
-//                        get: { String(viewModel.doctor.jobSpecialtyNumber) }, // تحويل الرقم إلى نص
-//                        set: { viewModel.doctor.jobSpecialtyNumber = Int($0) ?? 0 } // تحويل النص إلى رقم
-//                    )
-//                )
 
                 }
                 
                 // Save Button
                 Button(action: {
-//                    viewModel.saveChanges()
-                }) {
+                    viewModel.updateData(UpdateData: viewModel.doctor) { result in
+                        if result {
+                            showAlert = true
+                            print("updated successfly")
+                        }else{
+                            print("not update data")
+                        }
+                    }
+                }){
                     Text("save_changes".localized())
                         .font(.headline)
                         .foregroundColor(.white)
@@ -119,26 +117,21 @@ struct EditDoctorDataProfileView: View {
                         .cornerRadius(10)
                 }
                 .padding()
+                .alert(viewModel.successMessage, isPresented: $showAlert) {
+                    Button("الغاء",role: .cancel){
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
 
             }
              .direction(appLanguage) // ضبط الاتجاه
-             .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+             .environment(\.locale, .init(identifier: appLanguage))
+             .onAppear {
+                 viewModel.loadImage(from: imagePath)
+             }
     }
     
-    private func loadImage(_ item: PhotosPickerItem?) {
-        if let item = item {
-            item.loadTransferable(type: ImageTransferable.self) { result in
-                switch result {
-                case .success(let image):
-                    if let image = image {
-                        selectedImage = image.image
-                    }
-                case .failure(let error):
-                    print("Error loading image: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
+
 }
 
 
@@ -169,5 +162,5 @@ struct EditField: View {
 
 
 #Preview{
-    EditDoctorDataProfileView()
+    EditDoctorDataProfileView(imagePath: "", viewModel: DoctorProfileViewModel())
 }

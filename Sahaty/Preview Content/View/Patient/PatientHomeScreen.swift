@@ -1,20 +1,22 @@
 import SwiftUI
 
 struct PatientHomeScreen: View {
-    @EnvironmentObject var appState: AppState // استقبال حالة التطبيق
-    @StateObject  var adviceViewModel: AdviceViewModel
-    @StateObject  var articlesViewModel: ArticalsViewModel
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
-
+    @ObservedObject  var adviceViewModel: AdviceViewModel
+    @ObservedObject  var articlesViewModel: ArticalsViewModel
+    @ObservedObject var patientViewModel : PatientSettingViewModel
+    @StateObject var specializationViewModel  = SpecializationViewModel()
+    @EnvironmentObject var appState: AppState
+    @AppStorage("appLanguage") private var appLanguage = "ar"
     @State private var searchText = ""
+    @State private var showAllSpecializations = false
 
     
     var body: some View {
         NavigationStack {
             VStack {
                 // MARK: - Header Section
-                HeaderHomeSectionView(
-                    usersType: .patient,
+                HeaderPatientHomeSectionView(
+                    patientViewModel : patientViewModel,
                     searchText: $searchText, // تمرير نص البحث كـ Binding
                     onProfileTap: {
                         appState.selectedTabPatients = .settings
@@ -24,28 +26,49 @@ struct PatientHomeScreen: View {
                     }, onSearch: {_ in 
                     }
                 )
-
                 ScrollView {
                     // MARK: - Daily Advice Section
                         titleCategory(title: "daily_advices".localized())
                         dailyAdviceSection
                                     
                     // MARK: - Categories Section
-                        titleCategory(title: "categories".localized())
-                        categoriesSection
+                    HStack {
+                        Text("categories".localized())
+                            .font(.headline)
+                            .fontWeight(.regular)
+                        Spacer()
+                        Button {
+                            showAllSpecializations.toggle()
+                        } label: {
+                            Text("Show All".localized())
+                                .font(.headline)
+                                .fontWeight(.regular)
+                                .foregroundStyle(Color.accent)
+                        }
+
+                       
+                    }
+                    .multilineTextAlignment(.leading)
+                    .padding(.vertical,10)
+                    .cornerRadius(10)
+                    .padding(.horizontal,10)
+                    .sheet(isPresented: $showAllSpecializations) {
+                        AllSpecializationsView(specializationViewModel: specializationViewModel)
+                    }
+                    
+                    categoriesSection
+                
                     // MARK: - Articles Section
                     titleCategory(title: "new_articles".localized())
-                        if articlesViewModel.Articals.isEmpty {
+                        if articlesViewModel.articals.isEmpty {
                                 VStack(spacing: 20) {
-                                    
                                     Image("noArtical")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(maxWidth: .infinity)
                                         .frame(height: 150)
                                         .foregroundColor(.gray.opacity(0.7))
-                                    //                     title: "no_articles",
-                                    //                    description: "add_new_article",
+
                                     Text("no_articles".localized())
                                         .font(.title2)
                                         .fontWeight(.medium)
@@ -55,32 +78,34 @@ struct PatientHomeScreen: View {
                                     
                                 }
                         } else {
-                            VStack(spacing: 10) { // يمكنك إضافة تباعد بين المقالات هنا
-                                ForEach(articlesViewModel.Articals) { article in
-//                                    ArticleView(articlesModel:
-//                                                    ArticleModel())
-//                                        ArticalModel(id: 0, title: "", description: article.description, author: article.author, publishDate: "", imagePost: article.imagePost, likeCount: 0, commentCount: 0), articlesViewModel: articlesViewModel,usersType: .patient)
+                            VStack(spacing: 10) {
+                                ForEach(articlesViewModel.articals) { article in
+                                    ArticleView(articleModel: article, articalViewModel: articlesViewModel, usersType: .patient,path: article.img ?? "")
                                 }
                             }
                         }
-                    
                     
                 }
             }
 
         }
-        .direction(appLanguage) // اتجاه النصوص
-        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+        .direction(appLanguage)
+        .environment(\.locale, .init(identifier: appLanguage))
+        .preferredColorScheme(patientViewModel.isDarkModePatient ? .dark : .light)
+        .onAppear{
+            articlesViewModel.fetchArtical(isDoctor: false)
+            specializationViewModel.getSpacialties()
+            adviceViewModel.getUserAdvice()
+        }
     }
     
     // MARK: - Daily Advice Section
     private var dailyAdviceSection: some View {
         Group {
-            if let advice = adviceViewModel.advices.first {
+            if let advice = adviceViewModel.userAdvices.last {
                 Button {
-                    print("عرض تفاصيل النصيحة: \(advice.advice)")
+                    print("عرض تفاصيل النصيحة: \(advice.advice) - \( advice.id)")
                 } label: {
-                    
                     Rectangle()
                         .frame(maxWidth: .infinity)
                         .frame(height: 80)
@@ -88,14 +113,14 @@ struct PatientHomeScreen: View {
                         .overlay(
                             HStack {
                                 Image("idea")
-
                                 ViewThatFits {
-                                    Text("\"\(advice.advice)\"")
+                                    Text((advice.advice))
                                         .font(.callout)
                                         .foregroundColor(.white)
                                 }
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.5)
+                                Spacer()
                             }
                             .padding()
                         )
@@ -112,19 +137,22 @@ struct PatientHomeScreen: View {
             }
         }
     }
-
     
     // MARK: - Categories Section
     private var categoriesSection: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                Categoryy(title: "mental_health".localized(), imageName: "face.smiling")
-                Categoryy(title: "chronic_diseases".localized(), imageName: "arrow.clockwise.heart")
-                Categoryy(title: "healthy_nutrition".localized(), imageName: "fork.knife.circle")
+                ForEach(specializationViewModel.specializations){ specialist in
+                    CategorySpecializaton(specialization: specialist){action in
+                    }
+                }
             }
             .padding(.horizontal)
         }
+        .frame(maxHeight: 100)
+       
     }
+    
     // MARK: - Title Category
     private func titleCategory(title: String) -> some View {
         HStack {
@@ -140,37 +168,75 @@ struct PatientHomeScreen: View {
     }
 }
 
-struct Categoryy: View {
-    var title: String
-    var imageName: String
-    
-    var body: some View {
-        Button {
-            // Add category selection action
-        } label: {
-            HStack {
-                Text(title)
-                    .font(.headline)
-                    .fontWeight(.light)
-                    .frame(maxWidth: .infinity)
-                Image(systemName: imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 25)
-                    .fontWeight(.light)
+
+
+// MARK: - All AllSpecializations
+struct AllSpecializationsView : View {
+    @ObservedObject var specializationViewModel  : SpecializationViewModel
+    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    var body : some View {
+        NavigationStack{
+            List{
+                ForEach(specializationViewModel.specializations){ specialist in
+                    Button{
+                        
+                    }label: {
+                        HStack {
+                            Text(".\(specialist.id)")
+                                .font(.footnote)
+                            Text(specialist.name)
+                            Spacer()
+                            Image(systemName: "square")
+                                .foregroundColor(.accent)
+                                .font(.title2)
+
+                        }
+                        .padding()
+                        .frame(height: 50)
+                        
+                        }
+                    .tint(.primary)
+                    
+                }
             }
-            .opacity(0.8)
+            .listStyle(PlainListStyle())
+            Spacer()
+            .navigationTitle("all_specialty".localized())
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .direction(appLanguage) // اتجاه النصوص
+        .environment(\.locale, .init(identifier: appLanguage))
+    }
+
+}
+
+    // MARK: - Category Specializaton
+struct CategorySpecializaton: View {
+    var specialization  : spectialties
+    var action : (Bool) -> Void
+    var body: some View {
+        Button{
+        }label: {
+            HStack {
+                Text(specialization.name)
+                Spacer()
+                Image(systemName: "square")
+                    .foregroundColor(.accent)
+                    .font(.title2)
+            }
             .padding()
-            .frame(width: 170, height: 50)
+            .frame(width: 220, height: 50)
             .background(Color(.systemGray6))
             .cornerRadius(10)
+            
+            }
+        .tint(.primary)
         }
-        .foregroundStyle(.primary)
-
     }
-}
+
+
 
 // MARK: - Preview
 #Preview {
-//    PatientHomeScreen()
+    PatientHomeScreen(adviceViewModel: AdviceViewModel(), articlesViewModel: ArticalsViewModel(), patientViewModel: PatientSettingViewModel())
 }

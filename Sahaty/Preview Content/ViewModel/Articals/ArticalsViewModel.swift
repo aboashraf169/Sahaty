@@ -1,138 +1,250 @@
 import Foundation
-import PhotosUI
 import SwiftUI
-import Combine
 
 class ArticalsViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var Articals: [ArticleModel] = [] // قائمة المقالات
-    @Published var articleText: String = "" // النص الجديد للمقالة
-    @Published var selectedImage: UIImage? = nil // الصورة المختارة
-    @Published var selectedImageItem: PhotosPickerItem? = nil
-    @Published var editingArticle: ArticleModel? // المقالة التي يتم تعديلها
-    @Published var showImagePicker: Bool = false
+    @Published var articals: [ArticleModel] = []
+    @Published var article : ArticleModel = ArticleModel()
+    @Published var loadedImage: UIImage? = nil
+    @Published var doctorImage: UIImage? = nil
+    @Published var image: UIImage? = nil
+    @Published var savedArticals : [ArticleModel] = []
     @Published var showAlert: Bool = false
+    @Published var isLodeing: Bool = false
     @Published var alertTitle: String = ""
     @Published var alertMessage: String = ""
+    
 
-    // MARK: - Add or Edit Article
-    func saveArticle() {
-        clearAlert()
+    // MARK: - Fetch Article
+    func fetchArtical(isDoctor: Bool){
+        isLodeing = true
+        APIManager.shared.sendRequest(endpoint:  isDoctor ? "/doctor/articles" : "/articles", method: .get) {result in
+            switch result {
+            case .success(let data) :
+               print("get data success")
+                guard let decodeData = try? JSONDecoder().decode(responseArticals.self, from: data) else {
+                    print("error to decode data!!!!")
+                    return
+                }
+                print("success to decode data \(decodeData.data)")
+                DispatchQueue.main.async { [weak self] in
+                    self?.isLodeing = false
+                    self?.articals = decodeData.data
+                    print("var Articals\(decodeData.data)")
+                }
+                print("fetch Articals successfully")
 
-        let trimmedText = articleText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedText.isEmpty else {
-            showAlert(title: "error_title".localized(), message: "empty_article_error".localized())
+                
+            case .failure(let error) :
+                print("error to get data:\(error)")
+            }
+        }
+    }
+    
+    
+    // MARK: - fetch Artical Saved
+    func fetchArticalSaved(){
+        isLodeing = true
+        APIManager.shared.sendRequest(endpoint: "/articles/saved", method: .get) {result in
+            switch result {
+            case .success(let data) :
+               print("get data success")
+                guard let decodeData = try? JSONDecoder().decode(responseArticals.self, from: data) else {
+                    print("error to decode data!!!!")
+                    return
+                }
+                print("success to decode data \(decodeData.data)")
+                DispatchQueue.main.async { [weak self] in
+                    self?.isLodeing = false
+                    self?.savedArticals = decodeData.data
+                    print("var Articals\(decodeData.data)")
+                }
+                print("fetch Articals successfully")
+
+                
+            case .failure(let error) :
+                print("error to get data:\(error)")
+            }
+        }
+    }
+    
+    
+    // MARK: - Add Article
+    func addArtical(artical : ArticleModel , completion : @escaping (Bool)-> Void){
+        isLodeing = true
+        guard let  url = URL(string: "http://127.0.0.1:8000/api/doctor/article/store") else {
+            print("url error!")
+            completion(false)
             return
         }
-
-        if let editingIndex = Articals.firstIndex(where: { $0.id == editingArticle?.id }) {
-            // تعديل المقالة
-            Articals[editingIndex].subject = trimmedText
-            editingArticle = nil
-        } else {
-            // إضافة مقالة جديدة
-//            let newArticle =
-//            ArticleModel(id: 0, title: "عنوان", description: trimmedText, author: "محمد اشرف", publishDate: "ساعة", imagePost: selectedImage != nil ? "newImage" : nil, likeCount: 0, commentCount: 0)
-//            Articals.append(newArticle)
-        }
-
-        resetFields()
-    }
-    
-    func fetchArticles() {
-        // جلب المقالات من Core Data
-        let localArticles = CoreDataManager.shared.fetchArticles()
-        if !localArticles.isEmpty {
-            self.Articals = localArticles
+        let method = "POST"
+        
+        var urlRequest = URLRequest(url: url)
+            urlRequest.httpMethod = method
+            let boundary = UUID().uuidString
+            urlRequest.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        
+        if let token = APIManager.shared.bearerToken {
+            print("Bearer Token being sent: \(token)")
+            urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }else{
+            print("error Bearer Token")
         }
         
-        // التحقق من الاتصال بالإنترنت
-        APIManager.shared.fetchArticles { [weak self] result in
+        if let image = self.image {
+            let httpBody = APIManager.shared.createMultipartBody(
+                parameters: ["title": artical.title, "subject": artical.subject],
+                image: image,
+                boundary: boundary
+            )
+            urlRequest.httpBody = httpBody
+        }else{
+           print("not found image!!!")
+        }
+        
+     
+        let task = URLSession.shared.dataTask(with: urlRequest){data, response, error in
+            
             DispatchQueue.main.async {
-                switch result {
-                case .success(let articles):
-                    self?.Articals = articles
-                    print("Received Articles: \(articles)")
-                    CoreDataManager.shared.saveArticles(articles)
-                case .failure(let error):
-                    print("Failed to fetch articles from API: \(error.localizedDescription)")
+//                [weak self] in
+                if let error  = error {
+                    print("error in request URLSession : \(error)")
+                    completion(false)
+                    return
                 }
+                guard let data = data else {
+                    print("error in request data")
+                    completion(false)
+                 
+                    return
+                }
+                self.article.subject = ""
+                self.article.title = ""
+                self.image = nil
+                
+                completion(true)
+//                guard let decodeData = try? JSONDecoder().decode(ArticleModel.self, from: data) else {
+//                    print("error to decode data!!!")
+//                    return
+//                }
+                print("successfully added artical  in server :\(data)")
+//                self?.articals.append(decodeData)
+
             }
         }
-
+        task.resume()
+        
+        
 
     }
-
-
-    // MARK: - Start Editing Article
-    func startEditing(article: ArticleModel) {
-        editingArticle = article
-        articleText = article.subject // تعبئة النص الحالي في الحقل
+    
+    
+    
+    // MARK: - update Article
+    func updateArtical(artical : ArticleModel , completion : @escaping (Bool) -> Void) {
+        self.isLodeing = true
+        APIManager.shared.sendRequest(
+            endpoint: "/doctor/article/\(artical.id)/update",
+            method: .post,
+            parameters:["title":artical.title,
+                        "subject" : artical.subject
+                       ]
+        ) { result in
+            DispatchQueue.main.async {[weak self] in
+                self?.isLodeing = false
+                switch result{
+                    case .success(let data):
+                    completion(true)
+                    self?.alertMessage = "update artical successfully"
+                   if let index = self?.articals.firstIndex(where: {$0.id == artical.id}){
+                        self?.articals[index] = artical
+                   }else{
+                       print("eror to set artical in array !!")
+                   }
+                    print("update artical successfully:\(data)")
+                    case .failure(let error) :
+                    completion(false)
+                    self?.alertMessage = "update artical successfully"
+                    print("eror update artical : \(error)")
+                }
+                }
+        }
+        
     }
-
+    
+    
+    
+    
     // MARK: - Delete Article
-    func deleteArticle(id: UUID) {
-//        if let index = Articals.firstIndex(where: { $0.id == id }) {
-//            Articals.remove(at: index)
-//        } else {
-//            showAlert(title: "error_title".localized(), message: "article_not_found_error".localized())
-//        }
-    }
-
-    // MARK: - Reset Fields
-    func resetFields() {
-        articleText = ""
-        selectedImage = nil
-        editingArticle = nil
-    }
-
-    // MARK: - Load Image
-    func loadImage(from item: PhotosPickerItem?) {
-        guard let item = item else { return }
-        item.loadTransferable(type: ImageTransferable.self) { result in
-            DispatchQueue.main.async {
+    func deleteAdvice(id : Int) {
+        self.isLodeing = true
+        APIManager.shared.sendRequest(endpoint: "/doctor/article/delete/\(id)", method: .delete) { result in
+            DispatchQueue.main.async {[weak self] in
+                self?.isLodeing = false
                 switch result {
-                case .success(let transferableImage):
-                    self.selectedImage = transferableImage?.image
+                case .success(_):
+                    print("Delete Successfully")
+                    self?.alertMessage = "Deleted Successfully"
+                    self?.articals.removeAll { $0.id == id }
                 case .failure(let error):
-                    self.showAlert(title: "error_title".localized(), message: error.localizedDescription)
+                    print("error to delete:\(error)")
+                }
+                
+            }
+        }
+    }
+    
+    
+    // MARK: - Save Article
+    
+    func savedArtical(id : Int) {
+        self.isLodeing = true
+        APIManager.shared.sendRequest(endpoint: "/article/\(id)/save", method: .post) { result in
+            DispatchQueue.main.async {[weak self] in
+                self?.isLodeing = false
+                switch result {
+                case .success(_):
+                    print("artical is saved")
+                case .failure(let error) :
+                    print("error to save artical:\(error)")
                 }
             }
         }
     }
     
-    private func showAlert(title: String, message: String) {
-        self.alertTitle = title
-        self.alertMessage = message
-        self.showAlert = true
-    }
-
-    private func clearAlert() {
-        alertTitle = ""
-        alertMessage = ""
-    }
-}
-
-/// A wrapper for UIImage that conforms to Transferable.
-struct ImageTransferable: Transferable {
-    let image: UIImage
     
-    static var transferRepresentation: some TransferRepresentation {
-        DataRepresentation(importedContentType: .image) { data in
-            guard let uiImage = UIImage(data: data) else {
-                throw ImageTransferableError.importFailed
+    // MARK: - like Article
+    func likeArtical(id : Int){
+        self.isLodeing = true
+        APIManager.shared.sendRequest(endpoint: "/article/\(id)/like", method: .post) { result in
+            DispatchQueue.main.async {[weak self] in
+                self?.isLodeing = false
+                switch result {
+                case .success(_):
+                    print("artical is liked")
+                case .failure(let error) :
+                    print("error to like artical:\(error)")
+                }
             }
-            return ImageTransferable(image: uiImage)
+        }
+    }
+    
+    func loadImage(from path: String) {
+        ImageManager.shared.fetchImage(imagePath: path) { image in
+            DispatchQueue.main.async {[weak self] in
+                self?.loadedImage = image
+            }
+        }
+    }
+    func doctorImage(from path: String) {
+        ImageManager.shared.fetchImage(imagePath: path) { image in
+            DispatchQueue.main.async {[weak self] in
+                self?.doctorImage = image
+            }
         }
     }
 }
-
-// Custom Error for Transferable
-enum ImageTransferableError: Error {
-    case importFailed
-}
-
-
 
 
 

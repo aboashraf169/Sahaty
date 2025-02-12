@@ -3,15 +3,17 @@ import SwiftUI
 struct LoginView: View {
     @AppStorage("appLanguage") private var appLanguage = "ar"
     @StateObject private var loginViewModel = LoginViewModel()
+    @StateObject var doctorProfileViewModel = DoctorProfileViewModel()
+    @StateObject var patientViewModel = PatientSettingViewModel()
     @State private var navigateToDoctorView = false
     @State private var navigateToPatientView = false
     @State private var isErrorAlertPresented = false
 
-    init() {
+    init(){
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor.accent
-        
         let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white]
         UISegmentedControl.appearance().setTitleTextAttributes(attributes, for: .selected)
+        
     }
 
     var body: some View {
@@ -87,8 +89,10 @@ struct LoginView: View {
                             if success {
                                 if loginViewModel.model.usersType == .doctor {
                                     navigateToDoctorView = true
+                                    doctorProfileViewModel.setDoctor(loginViewModel.doctorModel)
                                 } else {
                                     navigateToPatientView = true
+                                    patientViewModel.SetPateintData(loginViewModel.patientModel)
                                 }
                             } else {
                                 isErrorAlertPresented = true
@@ -123,11 +127,11 @@ struct LoginView: View {
                 
                 // الانتقال بناءً على نوع المستخدم
                 .navigationDestination(isPresented: $navigateToDoctorView) {
-                    DoctorTabBarView()
+                    DoctorTabBarView(doctorProfileViewModel: doctorProfileViewModel)
                         .navigationBarBackButtonHidden(true)
                 }
                 .navigationDestination(isPresented: $navigateToPatientView) {
-                    PatientTabBarView(Patient: PatiantModel(id: 0, fullName: "", email: ""))
+                    PatientTabBarView(patientViewModel: patientViewModel)
                         .navigationBarBackButtonHidden(true)
                 }
 
@@ -242,5 +246,5 @@ struct LoginView: View {
 
 // MARK: - Preview
 #Preview {
-    LoginView()
+    return LoginView()
 }

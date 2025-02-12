@@ -7,7 +7,10 @@ struct NewPasswordView: View {
     @State private var showLoginView = false
     @State private var isErrorAlertPresented = false
     @AppStorage("appLanguage") private var appLanguage = "ar"
-    
+    @StateObject private var loginViewModel = LoginViewModel()
+    @State private var isLoggedIn = false
+
+
     // Initializer لاستقبال التوكن
     init(token: String) {
         _newPasswordViewModel = StateObject(wrappedValue: NewPasswordViewModel(token: token))

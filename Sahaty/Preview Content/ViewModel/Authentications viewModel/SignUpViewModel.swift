@@ -11,15 +11,7 @@ import Foundation
 class SignUpViewModel: ObservableObject {
     
     // MARK: - Published Properties
-    @Published var model = SignUpModel(
-        fullName: "",
-        email: "",
-        password: "",
-        specialization: nil,
-        licenseNumber: nil,
-        usersType: .patient
-    )
-    
+    @Published var model = SignUpModel(name: "", email: "", password: "", password_confirmation: "", usersType: .patient)
     @Published var fullNameErrorMessage: String = ""
     @Published var emailErrorMessage: String = ""
     @Published var passwordErrorMessage: String = ""
@@ -30,22 +22,23 @@ class SignUpViewModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var isLoading: Bool = false
     
+    
     // MARK: - Validation and API Call
-    func validateAndSignUp(completion: @escaping (Bool) -> Void) {
+    func validateAndSignUp(userType: UsersType,completion: @escaping (Bool) -> Void) {
         clearErrors()
         guard validateSignUp() else {
             completion(false)
             return
         }
-        
+
         // Call API to register user
-        signUpUser(completion: completion)
+        signUpUser(userType: userType)
     }
     
     private func validateSignUp() -> Bool {
         var isValid = true
 
-        if model.fullName.isEmpty || model.fullName.count <= 2 {
+        if model.name.isEmpty || model.name.count <= 2 {
             fullNameErrorMessage = "enter_full_name".localized()
             isValid = false
         }
@@ -61,13 +54,13 @@ class SignUpViewModel: ObservableObject {
         }
 
         if model.usersType == .doctor {
-            if let specialization = model.specialization, specialization.isEmpty {
-                specializationErrorMessage = "enter_specialization".localized()
+            if let jop_specialty_number = model.jop_specialty_number, jop_specialty_number.isEmpty {
+                licenseNumberErrorMessage = "enter_license_number".localized()
                 isValid = false
             }
 
-            if let licenseNumber = model.licenseNumber, licenseNumber.isEmpty {
-                licenseNumberErrorMessage = "enter_license_number".localized()
+            if let specialty_id = model.specialty_id, specialty_id.isEmpty {
+                specializationErrorMessage = "enter_specialization".localized()
                 isValid = false
             }
         }
@@ -83,46 +76,71 @@ class SignUpViewModel: ObservableObject {
         specializationErrorMessage = ""
         licenseNumberErrorMessage = ""
         successMessage = ""
-        errorMessage = "" // Reset general error message
+        errorMessage = ""
     }
     
-    private func signUpUser(completion: @escaping (Bool) -> Void) {
+  
+    private func signUpUser(userType : UsersType) {
         isLoading = true
-        APIManager.shared.sendRequest(
-            endpoint: "/register",
-            method: .post,
-            parameters: model.toDictionary()
-        ) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                switch result {
-                case .success(let data):
-                    do {
-                        // محاولة تحويل البيانات إلى JSON
-                        if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                           let token = json["token"] as? String {
-                            // تعيين التوكن في APIManager
-                            APIManager.shared.setBearerToken(token)
-                            self?.successMessage = "signup_success".localized()
-                            print("SignUp Success: \(json)")
-                            print("Token Saved: \(token)")
-                            completion(true)
-                        } else {
-                            self?.errorMessage = "response_parsing_error".localized()
-                            print("SignUp Failed: Invalid Response")
-                            completion(false)
-                        }
-                    } catch {
-                        self?.errorMessage = "response_parsing_error".localized()
-                        print("SignUp Failed: \(error.localizedDescription)")
-                        completion(false)
-                    }
-                case .failure(let error):
-                    self?.handleAPIError(error)
-                    completion(false)
-                }
-            }
+        let url = "http://127.0.0.1:8000/api/register"
+        let method  : String = "POST"
+        let parameterDoctor = model.toDictionary()
+        let parameterPatient = model.toDictionaryPatient()
+        
+        guard  let urlRequest = URL(string: url) else {
+            print("uri error Not Found!!")
+            return
         }
+        var request = URLRequest(url: urlRequest)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: userType == .doctor  ? parameterDoctor : parameterPatient)
+        
+        print("Request URL: \(request.url?.absoluteString ?? "")")
+        print("Request Headers: \(request.allHTTPHeaderFields ?? [:])")
+        print("Request Body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "error reading Request Body")")
+        
+        
+       let  task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+           
+           guard let response = response as? HTTPURLResponse else {
+               print(APIError.serverError(message: "serverError"))
+               DispatchQueue.main.async {
+                   self?.isLoading = false
+                   self?.successMessage = "error to create account".localized()
+               }
+               return
+           }
+           guard response.statusCode >= 200 && response.statusCode < 300 else {
+               let message = response.statusCode == 401 ? "Unauthorized" : "Server Error"
+               print(APIError.serverError(message: message))
+               DispatchQueue.main.async {
+                   self?.isLoading = false
+                   self?.successMessage = "email is already registered!!".localized()
+               }
+               print("Status Code: \(response.statusCode)")
+               return
+           }
+
+           if let error {
+               print("error to signup :\(error)")
+               return
+           }
+           
+            guard let data = data else {
+                print(APIError.noData)
+                return
+            }
+           
+           DispatchQueue.main.async {
+               self?.isLoading = false
+               self?.successMessage = "signup_success".localized()
+               print("SignUp Success: \(data)")
+           }
+           
+       }
+        task.resume()
     }
     
     private func handleAPIError(_ error: Error) {

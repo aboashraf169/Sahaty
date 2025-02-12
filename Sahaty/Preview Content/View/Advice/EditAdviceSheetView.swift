@@ -1,32 +1,37 @@
-import SwiftUI
-struct AddAdviceSheetView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var adviceViewModel: AdviceViewModel
-    @State var adiveText: String = ""
-    @AppStorage("appLanguage") private var appLanguage = "ar"
+//
+//  EditAdviceSheetView.swift
+//  Sahaty
+//
+//  Created by mido mj on 1/22/25.
+//
 
+import SwiftUI
+
+struct EditAdviceSheetView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @State var advice: AdviceModel
+    @AppStorage("appLanguage") private var appLanguage = "ar"
+    var onSave: (AdviceModel) -> Void
     var body: some View {
         VStack {
             // العنوان
-            Text("create_daily_advice".localized())
+            Text("edit_advice".localized())
                 .font(.title)
                 .padding(.vertical)
-            
 
 //             إدخال النص
-            TextEditor(text: $adviceViewModel.advice.advice)
+            TextEditor(text: $advice.advice)
                 .frame(height: 150)
+                .padding(5)
                 .background(Color(.secondarySystemBackground))
-                .cornerRadius(15)
+                .cornerRadius(5)
 
 //             زر الحفظ
             Button {
-                adviceViewModel.AddAdvices(advice: adviceViewModel.advice) { _ in
-                    print("advice successfully added")
-                }
+                onSave(advice)
                 presentationMode.wrappedValue.dismiss()
             } label: {
-                Text("publish".localized())
+                Text("edit".localized())
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -43,5 +48,5 @@ struct AddAdviceSheetView: View {
 }
 
 #Preview {
-    AddAdviceSheetView(adviceViewModel:  AdviceViewModel())
+    EditAdviceSheetView(advice:AdviceModel(),onSave: { _ in})
 }

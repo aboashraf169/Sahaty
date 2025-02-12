@@ -10,79 +10,77 @@ import SwiftUI
 // واجهة قيد الانشاء
 struct DoctorTabBarView: View {
     @StateObject var appState = AppState()
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    @StateObject private var adviceViewModel = AdviceViewModel()
+    @StateObject private var articalsViewModel = ArticalsViewModel()
+    @ObservedObject var doctorProfileViewModel: DoctorProfileViewModel
+    @AppStorage("appLanguage") private var appLanguage = "ar" 
 
 
     var body: some View {
-        
-        TabView(selection: $appState.selectedTabDoctors){
-            DoctorHomeScreen(adviceViewModel: AdviceViewModel(), articlesViewModel: ArticalsViewModel())
+            TabView(selection: $appState.selectedTabDoctors){
+                DoctorHomeScreen(adviceViewModel: adviceViewModel, articlesViewModel: articalsViewModel, doctorProfileViewModel: doctorProfileViewModel)
+                        .tabItem{
+                            HStack{
+                                Text(("Home").localized())
+                                Image(systemName: "house.fill")
+                            }
+                        }
+                        .tag(TabDoctor.home)
+                ProfileView(viewModel: doctorProfileViewModel, adviceViewModel: adviceViewModel, articalViewModel: articalsViewModel)
+                     .tabItem{
+                         HStack{
+                             Text("Profile".localized())
+                             Image(systemName: "person.fill")
+                         }
+                     }
+                     .tag(TabDoctor.profile)
+
+            
+                Text("Chats".localized())
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
                     .tabItem{
                         HStack{
-                            Text(("Home").localized())
-                            Image(systemName: "house.fill")
+                            Text("Chats".localized())
+                            Image(systemName: "message")
                         }
                     }
-                    .tag(TabDoctor.home)
-            
-            
-            ProfileView(viewModel: DoctorProfileViewModel())
-                 .tabItem{
-                     HStack{
-                         Text("Profile".localized())
-                         Image(systemName: "person.fill")
-                     }
-                 }
-                 .tag(TabDoctor.profile)
+                    .tag(TabDoctor.chat)
+                    .badge(3)
 
-        
-            Text("Chats".localized())
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                
+                NotificationsView()
                 .tabItem{
                     HStack{
-                        Text("Chats".localized())
-                        Image(systemName: "message")
+                        Text("Notifications".localized())
+                        Image(systemName: "heart.fill")
                     }
                 }
-                .tag(TabDoctor.chat)
-                .badge(3)
-
-            
-            NotificationsView()
-            .tabItem{
-                HStack{
-                    Text("Notifications".localized())
-                    Image(systemName: "heart.fill")
-                }
-            }
-            .tag(TabDoctor.Notificatons)
-            .badge(10)
-    
-    
-            DoctorSettingView(viewModel: DoctorProfileViewModel())
-                .padding()
-            .tabItem{
-                HStack{
-                    Text("Settings".localized())
-                    Image(systemName: "gear")
-                }
-            }
-            .tag(TabDoctor.settings)
-  
-            }
-        .environmentObject(appState) // مشاركة حالة التطبيق مع جميع الشاشات
-        .direction(appLanguage) // اتجاه النصوص
-        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
-
+                .tag(TabDoctor.Notificatons)
+                .badge(10)
         
+        
+                DoctorSettingView(viewModel: doctorProfileViewModel)
+                    .padding()
+                .tabItem{
+                    HStack{
+                        Text("Settings".localized())
+                        Image(systemName: "gear")
+                    }
+                }
+                .tag(TabDoctor.settings)
+      
+                }
+            .environmentObject(appState)
+            .direction(appLanguage)
+            .environment(\.locale, .init(identifier: appLanguage))
     }
     
 }
 
 #Preview{
     let appState = AppState()
-    DoctorTabBarView()
+    DoctorTabBarView(doctorProfileViewModel:  DoctorProfileViewModel())
         .environmentObject(appState)
 }
 

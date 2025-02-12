@@ -6,28 +6,35 @@ struct DoctorHomeScreen: View {
     
     var currentUser:String =  ""
     
-    @StateObject var adviceViewModel: AdviceViewModel
-    @StateObject var articlesViewModel: ArticalsViewModel
+    @ObservedObject var adviceViewModel: AdviceViewModel
+    @ObservedObject var articlesViewModel: ArticalsViewModel
+    @ObservedObject var doctorProfileViewModel: DoctorProfileViewModel
     @State private var showAddAdviceView: Bool = false
     @State private var showAddArticleView: Bool = false
     @State private var selectedArticle: ArticleModel? = nil
     @State private var showEditArticleSheet = false
+    @State private var showEditAdviceView: Bool = false
+
+    
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
     
     var body: some View {
+        
         NavigationStack {
             VStack {
                 // MARK: - Header Section
                 HeaderHomeSectionView(
-                    usersType: .doctor,
-                    searchText: .constant(""), // تمرير نص البحث كـ Binding
-                    onProfileTap: {
+                    doctorProfileViewModel: doctorProfileViewModel,
+                    searchText: .constant(""),
+                    onProfileTap:{
                         appState.selectedTabDoctors = .profile
                         print("تم النقر على صورة المستخدم (الدكتور)")
                     },
-                    onAddTap: {
+                    onAddTap:{
                         showAddArticleView.toggle()
-                    }, onSearch: { text in
+                        print("تم النقر على زر الإضافة (الدكتور)")
+                    },
+                    onSearch:{ text in
                         print("تم النقر على البحث المستخدم (الدكتور)")
                     }
                 )
@@ -41,12 +48,14 @@ struct DoctorHomeScreen: View {
                 Spacer()
             }
         }
-        .direction(appLanguage) // اتجاه النصوص
-        .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+        .direction(appLanguage)
+        .environment(\.locale, .init(identifier: appLanguage))
+        .preferredColorScheme(doctorProfileViewModel.isDarkModeDoctor ? .dark : .light)
         .onAppear{
-            adviceViewModel.loadAdvicesFromCoreData()
+            adviceViewModel.fetchAdvices()
+            articlesViewModel.fetchArtical(isDoctor: true)
         }
-        
+
     }
     
     // MARK: - Advice Section
@@ -83,35 +92,62 @@ struct DoctorHomeScreen: View {
                 // في حال عدم وجود نصائح
                 HStack {
                     Text("no_advices".localized())
-                        .fontWeight(.medium)
+                        .fontWeight(.regular)
                         .foregroundStyle(.gray)
                     Spacer()
                 }
-                .padding(.horizontal, 20)
+                .padding(20)
             } else {
                 // في حال وجود نصائح
-                List {
+                List{
                     ForEach(adviceViewModel.advices) { advice in
-                        AdviceView(
-                            advice: advice,
-                            onEdit: { selectedAdvice in
-                                adviceViewModel.startEditing(advice: selectedAdvice) // بدء تعديل النصيحة
-                                showAddAdviceView.toggle()
-                            },
-                            onDelete: { selectedAdvice in
-                                adviceViewModel.deleteAdvice(id: selectedAdvice.id) { success in
-                                    if success {
-                                        print("Advice deleted.")
-                                    }
+                        AdviceView(advice: advice)
+                            .swipeActions(edge:.leading) {
+                                Button(role: .destructive)
+                                {
+                                adviceViewModel.deleteAdvice(
+                                    at: IndexSet(integer:
+                                    adviceViewModel.advices.firstIndex(where: {$0.id == advice.id}) ?? 0)
+                                    )
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                        .tint(.red)
                                 }
+                                Button {
+                                    showEditAdviceView = true
+                                    adviceViewModel.selectedAdvice = advice
+                                    print("Selected advice")
+                                } label: {
+                                    Label("Edit", systemImage: "pencil")
+                                }
+                                .tint(.blue)
                             }
-                        )
+                        
                     }
                 }
                 .listStyle(.plain)
-                .frame(maxHeight: 200) // ضبط أقصى ارتفاع للقائمة
+                .frame(maxHeight: 200)
+
             }
         }
+        .sheet(isPresented: $showEditAdviceView) {
+            if let selectedAdvice =  adviceViewModel.selectedAdvice {
+                EditAdviceSheetView(advice: selectedAdvice,onSave: { advice in
+                adviceViewModel.updateAdvice(advice: advice) { success in
+                                print("advice successfully update : \(advice)")
+                                if success {
+                                    adviceViewModel.fetchAdvices() // تحديث القائمة
+                                }else{
+                                    print("advice error update")
+                                }
+                            }
+                        })
+                        .presentationDetents([.fraction(0.45)])
+                        .presentationCornerRadius(30)
+                    
+            }
+            }
+
     }
 
     // MARK: - Articles Section
@@ -127,47 +163,42 @@ struct DoctorHomeScreen: View {
             .padding(.bottom, 10)
             .sheet(isPresented: $showAddArticleView) {
                 AddArticleSheetView(articalsViewModel: articlesViewModel)
-                    .presentationDetents([.fraction(0.8)])
                     .presentationCornerRadius(30)
             }
             
-            if articlesViewModel.Articals.isEmpty {
+            if articlesViewModel.articals.isEmpty {
                 VStack(spacing: 20) {
-                    
                     Image("noArtical")
                         .resizable()
                         .scaledToFit()
                         .frame(maxWidth: .infinity)
                         .frame(height: 150)
                         .foregroundColor(.gray.opacity(0.7))
-                    //                     title: "no_articles",
-                    //                    description: "add_new_article",
                     Text("no_articles".localized())
                         .font(.title2)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
+                        .fontWeight(.regular)
+                        .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 30)
                     
                 }
             }else {
-                ScrollView {
-                    LazyVStack {
-                        ForEach(articlesViewModel.Articals) { article in
+                ScrollView(.vertical, showsIndicators: false){
+                    VStack(spacing: 12) {
+                        ForEach(articlesViewModel.articals) { article in
                             ArticleView(
-                                articlesModel: article,
-                                articlesViewModel: articlesViewModel,
-                                usersType: .doctor
+                                articleModel: article,
+                                articalViewModel: articlesViewModel,
+                                usersType: .doctor, path: article.img ?? ""
                             )
                         }
                     }
                 }
             }
-        }
-    }
+        }    }
     
     
 }
 #Preview {
-
+    DoctorHomeScreen(adviceViewModel: AdviceViewModel(), articlesViewModel: ArticalsViewModel(), doctorProfileViewModel: DoctorProfileViewModel())
 }

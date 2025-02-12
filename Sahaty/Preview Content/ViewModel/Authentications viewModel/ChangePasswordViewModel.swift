@@ -1,18 +1,18 @@
 //
-//  NewPasswordViewModel.swift
+//  NewPasswordViewModel 2.swift
 //  Sahaty
 //
-//  Created by mido mj on 12/16/24.
+//  Created by mido mj on 1/20/25.
 //
-
 import Foundation
 
-class NewPasswordViewModel: ObservableObject {
+class ChangePasswordViewModel: ObservableObject {
     // MARK: - Model
-    @Published var model = NewPasswordModel(password: "", confirmPassword: "")
+    @Published var model = changePasswordModel(old_password: "", password: "", confirmPassword: "")
 
     // MARK: - Error Messages
     @Published var passwordErrorMessage: String = ""
+    @Published var oldPasswordErrorMessage: String = ""
     @Published var confirmPasswordErrorMessage: String = ""
     @Published var apiErrorMessage: String = ""
 
@@ -22,32 +22,38 @@ class NewPasswordViewModel: ObservableObject {
 
     // MARK: - Error Message
 
-    // MARK: - TOKEN
-    private var token: String
-
-    init(token: String) {
-        self.token = token
-        print("Initializing NewPasswordViewModel with token: \(token)")
-        APIManager.shared.setBearerToken(token) // تعيين التوكن في APIManager
-    }
+    
 
     
     // MARK: - Validation and Change Password
     func validateAndChangePassword(completion: @escaping (Bool) -> Void) {
         clearErrors()
         guard validateNewPassword() else {
-            print("Validation Failed. Password Error: \(passwordErrorMessage), Confirm Password Error: \(confirmPasswordErrorMessage)")
+            print("Validation Failed. Password Error: \(oldPasswordErrorMessage),Validation Failed. Password Error: \(passwordErrorMessage), Confirm Password Error: \(confirmPasswordErrorMessage)")
             completion(false)
             return
         }
 
         print("Validation Successful. Proceeding to change password.")
+        
         // Call API to change password
         changePassword(completion: completion)
     }
 
     func validateNewPassword() -> Bool {
         var isValid = true
+        
+        // Validate old password
+        if model.old_password.isEmpty {
+            oldPasswordErrorMessage = "enter_password".localized()
+            print("Validation Error: \(oldPasswordErrorMessage)")
+            isValid = false
+        } else if model.old_password.count < 6 {
+            oldPasswordErrorMessage = "password_min_length".localized()
+            print("Validation Error: \(oldPasswordErrorMessage)")
+
+            isValid = false
+        }
 
         // Validate new password
         if model.password.isEmpty {
@@ -67,12 +73,7 @@ class NewPasswordViewModel: ObservableObject {
             print("Validation Error: \(confirmPasswordErrorMessage)")
             isValid = false
         }
-
-//        // Validate old password
-//        if let oldPassword = model.oldPassword, oldPassword.isEmpty {
-//            oldPasswordErrorMessage = "enter_old_password".localized()
-//            isValid = false
-//        }
+        
         if !isValid {
             apiErrorMessage = "validation_failed".localized()
             print("Validation Failed: \(apiErrorMessage)")
@@ -87,6 +88,7 @@ class NewPasswordViewModel: ObservableObject {
         confirmPasswordErrorMessage = ""
         apiErrorMessage = ""
         successMessage = ""
+        oldPasswordErrorMessage = ""
     }
 
     // MARK: - API Call for Changing Password
@@ -94,7 +96,7 @@ class NewPasswordViewModel: ObservableObject {
         isLoading = true
         print("Request Parameters: \(model.toDictionary())")
         APIManager.shared.sendRequest(
-            endpoint: "/reset-password",
+            endpoint: "/change-password",
             method: .post,
             parameters: model.toDictionary()
         ) { [weak self] result in
@@ -103,12 +105,14 @@ class NewPasswordViewModel: ObservableObject {
                 switch result {
                 case .success(let data):
                     print("Request Successful. Data Received: \(String(data: data, encoding: .utf8) ?? "No Data")")
-                    let isVerified = self?.handleVerificationSuccess(data: data) ?? false
-                    completion(isVerified)
+                    completion(true)
+                    self?.successMessage = "password_change_success".localized()
                 case .failure(let error):
                     print("Request Failed. Error: \(error.localizedDescription)")
                     self?.handleAPIError(error)
                     completion(false)
+                    self?.apiErrorMessage = "error sending request".localized()
+
                 }
             }
             
@@ -120,7 +124,6 @@ class NewPasswordViewModel: ObservableObject {
             print("Parsing Success Response.")
             if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                let message = json["message"] as? String {
-                print("Token: \(token)")
                 print("Success Message from Server: \(message)")
                 successMessage = "password_change_success".localized()
                 return true

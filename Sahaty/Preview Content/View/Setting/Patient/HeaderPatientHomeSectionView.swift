@@ -1,7 +1,7 @@
 import SwiftUI
 
-struct HeaderHomeSectionView: View {
-    var usersType: UsersType // نوع المستخدم
+struct HeaderPatientHomeSectionView: View {
+    @ObservedObject var patientViewModel : PatientSettingViewModel
     @Binding var searchText: String // نص البحث
     var onProfileTap: () -> Void // الإجراء عند النقر على صورة المستخدم
     var onAddTap: (() -> Void)? = nil // الإجراء عند النقر على زر الإضافة (للدكتور فقط)
@@ -14,15 +14,25 @@ struct HeaderHomeSectionView: View {
             Button {
                 onProfileTap()
             } label: {
-                Image(systemName: "person.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .shadow(radius: 2)
-                    .padding(.top, 5)
-                    .frame(width: 40, height: 40)
-                    .background(Color(.systemGray6))
-                    .clipShape(Circle())
-        
+                if let img = patientViewModel.patient.img {
+                    Image(img)
+                        .resizable()
+                        .scaledToFill()
+                        .shadow(radius: 2)
+                        .padding(.top, 5)
+                        .frame(width: 40, height: 40)
+                        .background(Color(.systemGray6))
+                        .clipShape(Circle())
+                }else{
+                    Image(systemName: "person.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .shadow(radius: 2)
+                        .padding(.top, 5)
+                        .frame(width: 40, height: 40,alignment: .center)
+                        .background(Color(.systemGray6))
+                        .clipShape(Circle())
+                }
             }
 
             // صندوق البحث
@@ -45,23 +55,6 @@ struct HeaderHomeSectionView: View {
                             .padding(.trailing, 10)
                     }
                 )
-
-            // زر إضافة المقال (للدكتور فقط)
-            if usersType == .doctor, let onAddTap = onAddTap {
-                Button {
-                    onAddTap()
-                } label: {
-                    RoundedRectangle(cornerRadius: 15)
-                        .frame(width: 50)
-                        .frame(height: 40)
-                        .foregroundStyle(Color(.systemGray6))
-                        .overlay {
-                            Image(systemName: "text.badge.plus")
-                                .scaledToFit()
-                                .foregroundStyle(.primary)
-                        }
-                }
-            }
         }
         .padding(.horizontal)
         .padding(.vertical, 20)
@@ -72,8 +65,8 @@ struct HeaderHomeSectionView: View {
 
 // MARK: - Preview
 #Preview {
-    HeaderHomeSectionView(
-        usersType: .doctor,
+    HeaderPatientHomeSectionView(
+        patientViewModel: PatientSettingViewModel(),
         searchText: .constant(""),
         onProfileTap: {
             print("Profile tapped")

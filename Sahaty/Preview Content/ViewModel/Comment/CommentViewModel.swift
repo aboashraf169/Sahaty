@@ -1,49 +1,84 @@
 import Foundation
 
 class CommentViewModel: ObservableObject {
-    @Published var comments: [CommentModel] = [] // قائمة التعليقات
-    @Published var newCommentText: String = "" // نص التعليق الجديد
-    @Published var editingComment: CommentModel? // التعليق الذي يتم تعديله
-    @Published var errorMessage: String? = nil // رسالة خطأ
-    @Published var successMessage: String? = nil // رسالة نجاح
-
-    // إضافة تعليق جديد
-    func addComment(author: String) {
-        let trimmedText = newCommentText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedText.isEmpty else {
-            errorMessage = "empty_comment".localized()
-            return
+    @Published var comments: [CommentModel] = []
+    @Published var comment: CommentModel = CommentModel()
+    @Published var alertMessage: String = ""
+    @Published var isLoading: Bool = false
+    @Published var newCommentText : String = ""
+    
+    
+    // MARK: - Fetch Comments
+    func fetchComments(idArtical : Int) {
+        self.isLoading = true
+        APIManager.shared.sendRequest(endpoint: "/article/\(idArtical)/comments", method: .get) { result in
+            DispatchQueue.main.async { [weak self] in
+                self?.isLoading = false
+                switch result {
+                    case .success(let data):
+                    print("get comment artical \(idArtical) successfully!")
+//                    if let responseString = String(data: data, encoding: .utf8) {
+//                               print("Response Data Comment as String:\n\(responseString)")
+//                           }
+                    guard let decodeData = try? JSONDecoder().decode([CommentModel].self, from: data) else {
+                        print("error to decode comment")
+                        return
+                    }
+                        self?.alertMessage = "\(decodeData)"
+                        self?.comments = decodeData
+                    print("added comment artical \(idArtical) successfully in array")
+                    case .failure(let error):
+                        print("error to get comment artical:\(idArtical)")
+                        print("error: get comment:\(error)")
+                        self?.alertMessage = "\(error)"
+                }
+            }
         }
-        
-        if let editingIndex = comments.firstIndex(where: { $0.id == editingComment?.id }) {
-            // تعديل تعليق موجود
-            comments[editingIndex].content = trimmedText
-            editingComment = nil
-            successMessage = "comment_edited".localized()
-        } else {
-            // إضافة تعليق جديد
-            let newComment =
-            CommentModel(id: 0, content: trimmedText, authorName: author, authorImage: "doctor", createdAt: "")
-            comments.append(newComment)
-            successMessage = "comment_added".localized()
+    }
+    
+    
+    // MARK: - Add Comment
+    func addComment(idArtical: Int, comment: String) {
+        self.isLoading = true
+        APIManager.shared.sendRequest(endpoint: "/article/\(idArtical)/comment/store" , method: .post, parameters: ["comment": comment]) { result in
+            DispatchQueue.main.async { [weak self] in
+                self?.isLoading = false
+                switch result {
+                case .success(let data):
+                    print("add comment artical \(idArtical) successfully!")
+                    self?.comment.comment = ""
+                    guard let decodeData = try? JSONDecoder().decode(DataComment.self, from: data) else {
+                    print("error to decode comment")
+                    return
+                }
+                    self?.alertMessage = "\(decodeData)"
+                    self?.comments.append(decodeData.data)
+                case .failure(let error):
+                    print("error to get comment artical:\(idArtical)")
+                    print("error: get comment:\(error)")
+                    self?.alertMessage = "\(error)"
+                }
+            }
         }
-        
-        newCommentText = "" // مسح الحقل بعد الإضافة
     }
-
-    // حذف تعليق
-    func deleteComment(id: UUID) {
-//        if let index = comments.firstIndex(where: { $0.id == id }) {
-//            comments.remove(at: index)
-//            successMessage = "comment_deleted".localized()
-//        } else {
-//            errorMessage = "comment_not_found".localized()
-//        }
+    
+    
+    // MARK: - Delete Comment
+    func deleteComment(idComment: Int) {
+        self.isLoading = true
+        APIManager.shared.sendRequest(endpoint: "/comment/\(idComment)/destroy", method: .delete) { result in
+            DispatchQueue.main.async { [weak self] in
+                self?.isLoading = false
+                switch result {
+                case .success(_):
+                    print("delete comment artical \(idComment) successfully!")
+                    self?.comments.removeAll(where: { $0.id == idComment })
+                case.failure(let error):
+                    print("error to delete comment artical:\(error)")
+                }
+            }
+        }
     }
-
-    // بدء تعديل تعليق
-    func startEditing(comment: CommentModel) {
-        editingComment = comment
-        newCommentText = comment.content
-    }
+    
 }
+

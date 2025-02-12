@@ -7,12 +7,11 @@
 
 import Foundation
 struct PatiantModel: Identifiable, Codable {
-    var id: Int // معرف المريض من السيرفر
-    var fullName: String
-    var email: String
-    var profilePicture: String?
-    var age: Int?
-    var gender: String?
-    var medicalHistory: String?
-    var followedDoctors: [DoctorModel]? // الأطباء المتابعين
+    
+    var id: Int = 0
+    var name :String = ""
+    var email : String = ""
+    var img: String? = nil
+    
 }
+

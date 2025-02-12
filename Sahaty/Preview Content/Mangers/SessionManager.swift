@@ -19,7 +19,6 @@ class SessionManager {
     private let userTypeKey = "userType"
     private let userDataKey = "userData" // Stores user profile data
     
-    private init() {}
     
     // MARK: - Save Session
     func saveSession(token: String, userType: UsersType, userData: [String: Any]) {

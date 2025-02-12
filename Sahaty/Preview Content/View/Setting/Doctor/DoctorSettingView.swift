@@ -11,7 +11,7 @@ import PhotosUI
 
 struct DoctorSettingView: View {
     
-    @ObservedObject var viewModel = DoctorProfileViewModel()
+    @ObservedObject var viewModel : DoctorProfileViewModel
 
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
@@ -22,7 +22,7 @@ struct DoctorSettingView: View {
     @State private var showRestPasswordView = false
     @State private var showLogoutAleart = false
     
-    @AppStorage("isDarkModeDoctor") private var isDarkModeDoctor = false // حفظ الاختيار
+//    @AppStorage("isDarkModeDoctor") private var isDarkModeDoctor = false // حفظ الاختيار
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
 
@@ -32,13 +32,12 @@ struct DoctorSettingView: View {
             VStack{
                 
                 // Header Section
-                ProfileHeaderView(viewModel: viewModel, selectedImage: $selectedImage, showImagePicker: $showImagePicker)
+                ProfileHeaderView(viewModel: viewModel)
                     .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
                     .onChange(of: selectedImageItem) { _, newValue in
-                        loadImage(newValue)
                     }
                 
-                NavigationLink("edit_profile".localized(), destination: EditDoctorDataProfileView())
+                NavigationLink("edit_profile".localized(), destination: EditDoctorDataProfileView(imagePath: viewModel.doctor.img ?? "", viewModel: viewModel))
                     .padding(.horizontal)
                     .foregroundStyle(.white)
                     .padding(10)
@@ -77,9 +76,9 @@ struct DoctorSettingView: View {
                             }
                             Button("cancel".localized(), role: .cancel) {}
                         }
-                    Toggle(isOn: $isDarkModeDoctor) {
+                    Toggle(isOn: $viewModel.isDarkModeDoctor) {
                                 HStack {
-                                    Image(systemName: isDarkModeDoctor ? "moon.fill" : "sun.max.fill")
+                                    Image(systemName: viewModel.isDarkModeDoctor ? "moon.fill" : "sun.max.fill")
                                         .foregroundColor(.blue)
                                         .frame(width: 50, height: 50)
                                         .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
@@ -102,40 +101,20 @@ struct DoctorSettingView: View {
             .padding()
             .navigationBarTitle("profile".localized())
             .navigationBarTitleDisplayMode(.inline)
-            .preferredColorScheme(isDarkModeDoctor ? .dark : .light) // تطبيق المظهر
+            .preferredColorScheme(viewModel.isDarkModeDoctor ? .dark : .light) // تطبيق المظهر
         }
         .direction(appLanguage) // ضبط اتجاه النصوص
         .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
     }
     
-    
-    private func loadImage(_ item: PhotosPickerItem?) {
-        if let item = item {
-            item.loadTransferable(type: ImageTransferable.self) { result in
-                switch result {
-                case .success(let image):
-                    if let image = image {
-                        selectedImage = image.image
-                    }
-                case .failure(let error):
-                    print("Error loading image: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
+
 }
 
 func logout() {
     // إزالة التوكن
     let _ = KeychainManager.shared.deleteToken()
     // ازالة الجلسة
-    SessionManager.shared.clearSession()
-    // ازالة البيانات من كور داتا
-    CoreDataManager.shared.deleteAllDoctors()
-    // ازالة البيانات الكاش
-    CoreDataManager.shared.clearCache()
-    // إزالة البيانات
-    AdviceViewModel().clearLocalData()
+//    SessionManager.shared.clearSession()
     // إعادة التوجيه إلى شاشة تسجيل الدخول
     if let window = UIApplication.shared.connectedScenes
         .compactMap({ $0 as? UIWindowScene })

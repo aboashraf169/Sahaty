@@ -9,24 +9,27 @@ import SwiftUI
 
 
 struct ArticleView: View {
-    var articlesModel: ArticleModel
-    @StateObject var articlesViewModel: ArticalsViewModel
-    var usersType: UsersType // نوع المستخدم (Doctor أو Patient)
-    @State private var showEditSheet = false // التحكم بعرض شاشة التعديل
-    @State private var showDeleteAlert = false // التحكم بعرض التنبيه
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    var articleModel: ArticleModel
+    @ObservedObject var articalViewModel : ArticalsViewModel
+    var usersType: UsersType
+    @State private var showEditSheet = false
+    @State private var showDeleteAlert = false
+    @AppStorage("appLanguage") private var appLanguage = "ar"
+    var path : String
 
     var body: some View {
         VStack(spacing: 20) {
             HStack {
-                // إعدادات المنشور للأطباء فقط
-                
                 // صورة صاحب المنشور
-                if let image = articlesModel.img {
-                    Image(image)
+                
+                if let image = articalViewModel.doctorImage{
+                    Image(uiImage:image)
                         .resizable()
-                        .scaledToFit()
+                        .scaledToFill()
+                        .shadow(radius: 2)
+                        .padding(.top, 5)
                         .frame(width: 40, height: 40)
+                        .background(Color(.systemGray6))
                         .clipShape(Circle())
                 } else {
                     Image(systemName: "person.fill")
@@ -38,22 +41,15 @@ struct ArticleView: View {
                         .clipShape(Circle())
                         .foregroundColor(.white)
                 }
-
+                
                 // بيانات صاحب المنشور
                 VStack(alignment: .leading) {
-                    Text("\(articlesModel.userID)")
+                    Text(articleModel.doctor.name)
                         .font(.headline)
                         .fontWeight(.regular)
-                    
-//                    HStack {
-//                        Text(articlesModel.userName)
-//                            .font(.subheadline)
-//                            .fontWeight(.light)
-//                        Text("\("since".localized()) \(articlesModel.addTime)")
-//                            .font(.subheadline)
-//                            .fontWeight(.light)
-//            
-//                    }
+                    Text(articleModel.doctor.email)
+                        .font(.subheadline)
+                        .fontWeight(.light)
                     .opacity(0.6)
                 }
                 .padding(.horizontal, 5)
@@ -68,19 +64,16 @@ struct ArticleView: View {
                 .fontWeight(.ultraLight)
                 .foregroundStyle(.primary)
                 .alert("delete_article".localized(), isPresented: $showDeleteAlert) {
-                         
-//                               Button("confirm".localized(), role: .destructive) {
-//                                   articlesViewModel.deleteArticle(id: articlesModel.id)
-//                               }
-                               Button("cancel".localized(), role: .cancel) {}
-                           
-                       } message: {
-                           Text("delete_article_confirmation".localized())
+                    Button("confirm".localized(), role: .destructive) {
+                        articalViewModel.deleteAdvice(id: articleModel.id)
+                    }
+                    Button("cancel".localized(), role: .cancel) {}
+                }message:{
+                    Text("delete_article_confirmation".localized())
                        }
                    
                     // زر التعديل
                         Button {
-//                            articlesViewModel.startEditing(article: articlesModel)
                             showEditSheet.toggle() // عرض شاشة التعديل
                         } label: {
                             Label("", systemImage: "pencil.line")
@@ -88,50 +81,53 @@ struct ArticleView: View {
                         .fontWeight(.ultraLight)
                         .foregroundStyle(.primary)
                         .padding(.leading)
-
                 }
-
             }
 
             // وصف المنشور
-            Text(articlesModel.subject)
+            HStack {
+                Text(articleModel.title)
+                    .font(.title3)
+                    .fontWeight(.light)
+                Spacer()
+            }
+            
+            Text(articleModel.subject)
                 .font(.callout)
                 .fontWeight(.light)
-
-            
-            if let image = articlesModel.img {
+        
+            if let image = articalViewModel.loadedImage {
                 Rectangle()
                     .frame(maxWidth: .infinity)
                     .frame(height: 200)
                     .foregroundStyle(Color(.systemGray6)).opacity(0.4)
                     .cornerRadius(10)
                     .overlay {
-                        Image(image)
+                        Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
                             .cornerRadius(10)
                     }
             }
         
-            // خيارات التفاعل
-//            FotterArtical(comments:articlesModel)
+            FotterArtical(articleViewModel: articalViewModel, id: articleModel.id)
 
         }
         .padding(.horizontal)
         .padding(.vertical, 10)
+        .direction(appLanguage)
+        .environment(\.locale, .init(identifier: appLanguage))
         .sheet(isPresented: $showEditSheet) {
-            AddArticleSheetView(articalsViewModel: articlesViewModel)
+            EditArticleSheetView(articalsViewModel: articalViewModel, article: articleModel)
         }
-        .direction(appLanguage) // لضبط اتجاه النصوص بناءً على اللغة
-               .environment(\.locale, .init(identifier: appLanguage)) // تطبيق اللغة المختارة
-        .onAppear {
-            articlesViewModel.fetchArticles()
+        .onAppear{
+            articalViewModel.loadImage(from: path)
+            articalViewModel.doctorImage(from: path)
         }
     }
 }
 
 #Preview {
-    
-//    ArticleView(articlesModel:ArticalModel(id: 0, title: "", description: "", author: "", publishDate: "", likeCount: 0, commentCount: 0), articlesViewModel: ArticalsViewModel(), usersType: .doctor)
+    ArticleView(articleModel: ArticleModel(id: 0, title: "كيفية الوقاية من أمراض القلب", subject: "تتعدد طرق الوقاية من أمراض القلب مثل تقليل التوتر، تناول غذاء صحي غني بالألياف، ممارسة الرياضة بانتظام، والحفاظ على وزن صحي. يجب على الأشخاص الذين لديهم تاريخ عائلي لأمراض القلب أن يتابعوا فحوصاتهم الطبية بشكل دوري.", img: nil, doctor: ArticleDoctor(id: 1, name: "احمد ماهر معين الحناوي", email: "mido@gmail.com", img: "post2")), articalViewModel: ArticalsViewModel(), usersType: .doctor, path: "")
 }
 

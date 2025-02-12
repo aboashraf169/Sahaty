@@ -25,7 +25,9 @@
 // MARK: - ADD ARTICALE VIEW
 "create_new_article" = "Create New Article";
 "edit_article" = "Edit Article";
-"fill_fields_for_article" = "Fill in the fields below to add or edit the article";
+"fill_fields_for_article" = "Fill in the fields below to add the article";
+"fill_EditFields_for_article" = "Fill in the fields below to edit the article";
+
 "topic" = "Topic";
 "upload_image" = "Upload Image";
 "choose_image" = "Choose Image";
@@ -35,7 +37,7 @@
 "error" = "Error";
 "text_empty_error" = "The text cannot be empty.";
 "ok" = "OK";
-
+"title" = "title";
 
 // MARK: - ARTCALE VIEW
 "since" = "Since";
@@ -59,6 +61,7 @@
 "login_with" = "Login with";
 "patient" = "Patient";
 "doctor" = "Doctor";
+"invalid_credentials" = "invalid Email or Password";
 
 // MARK: - FORGET PASSWORD VIEW
 "forgot_password_title" = "Forgot Password";
@@ -106,7 +109,8 @@
 "enter_license_number" = "Enter license number";
 "signup_button" = "Create Account";
 "ok" = "OK";
-
+"specialty" = "Specialty";
+"all_specialty" = "All Specialty";
 
 
 
@@ -162,6 +166,9 @@
 "all_artical" = "all artical";
 "all_advice" = "all advice";
 "noBio" = "no bio";
+"enter_valid_jobSpecialtyNumber" = "Enter 8 Number jobSpecialty";
+"success_update_data" = "Successful Update Doctor Data🥳";
+"unsuccess_update_data" = "erorr Update Doctor Data";
 
 
 
@@ -334,3 +341,7 @@
 "submit"  = "save";
 
 "user_type_mismatch" = "Your user type selection is not compatible with the user type";
+
+"follow" = "follow";
+"Unfollow" = "Unfollow";
+

@@ -2,44 +2,26 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @StateObject var viewModel = DoctorProfileViewModel() // إنشاء viewModel مرة واحدة
-    @ObservedObject var adviceViewModel = AdviceViewModel()
+    @ObservedObject var viewModel: DoctorProfileViewModel
+    @ObservedObject var adviceViewModel : AdviceViewModel
+    @ObservedObject var articalViewModel : ArticalsViewModel
     @State private var isEditingBio = false
     @State private var editedBio: String = ""
     @State private var showImagePicker = false
     @State private var selectedImageItem: PhotosPickerItem? = nil
-    @State private var selectedImage: UIImage? = nil
     @State private var showAllAdvices = false
     @State private var showAllArticles = false
+    @State private var showAlert = false
     @State private var showAddAdviceView: Bool = false
     @State private var showAddArticleView: Bool = false
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
         NavigationStack {
-            if viewModel.isLoading {
-                ProgressView("Loading Profile...".localized())
-                    .progressViewStyle(CircularProgressViewStyle())
-                    .padding()
-            }else if let errorMessage = viewModel.errorMessage {
-                VStack {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                    Button("Retry".localized()) {
-//                        viewModel.fetchDoctorProfile()
-                    }
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
-                .padding()
-            }else {
             ScrollView {
                 VStack {
                     // Header Section
-                    ProfileHeaderView(viewModel: viewModel, selectedImage: $selectedImage, showImagePicker: $showImagePicker)
+                    ProfileHeaderView(viewModel: viewModel)
                     
                     // Doctor Statistics
                     DoctorStatisticsView(viewModel: viewModel)
@@ -51,64 +33,60 @@ struct ProfileView: View {
                         biography: viewModel.doctor.bio,
                         onSave: {
                             viewModel.doctor.bio = editedBio
+                            viewModel.updateData(UpdateData: viewModel.doctor) { result in
+                                if result {
+                                    showAlert = true
+                                    print("updated successfly")
+                                }else{
+                                    print("not update data")
+                                }
+                            }
+                            viewModel.doctor.bio = editedBio
                             isEditingBio = false
                         }
                     )
+                    .alert(viewModel.successMessage, isPresented: $showAlert) {
+                        Button("الغاء",role: .cancel){
+                        }
+                    }
                     
                     Divider()
+                    // Advice Section
                     AdviceSectionView(adviceViewModel: adviceViewModel, showAllAdvices: $showAllAdvices)
                     
                     Divider()
-                    ArticlesSectionView(viewModel: viewModel, showAllArticles: $showAllArticles)
-                    // Advice Section
-                    
-                    
                     // Articles Section
+                    ArticlesSectionView(viewModel: viewModel, articalViewModel: articalViewModel, showAllArticles: $showAllArticles)
+                    
+                    
                     
                 }
                 .padding(.horizontal)
             }
             .navigationTitle("الملف الشخصي")
             .navigationBarTitleDisplayMode(.inline)
-            .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
             .onChange(of: selectedImageItem) { _, newValue in
-                loadImage(newValue)
             }
             // Navigate to All Advices
             .sheet(isPresented: $showAllAdvices) {
                 AllAdvicesView(adviceViewModel: AdviceViewModel())
                 
-                //                AllAdvicesView(advices: viewModel.advices)
             }
             // Navigate to All Articles
             .sheet(isPresented: $showAllArticles) {
-//                AllArticlesView(articles: viewModel.articles)
-            }
-            .direction(appLanguage) // ضبط الاتجاه
-            .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
-            .refreshable {
-                         adviceViewModel.fetchAdvices() // استدعاء التحديث عند السحب
-                     }
-        }
-    }
-    }
-    
-    
-    private func loadImage(_ item: PhotosPickerItem?) {
-        if let item = item {
-            item.loadTransferable(type: ImageTransferable.self) { result in
-                switch result {
-                case .success(let image):
-                    if let image = image {
-                        selectedImage = image.image
-                    }
-                case .failure(let error):
-                    print("Error loading image: \(error.localizedDescription)")
-                }
+                AllArticlesView(articalViewModel: articalViewModel)
             }
         }
+        .direction(appLanguage)
+        .environment(\.locale, .init(identifier: appLanguage))
+        .preferredColorScheme(viewModel.isDarkModeDoctor ? .dark : .light)
+     
+      
     }
+    
+
 }
+
 
 // MARK: - AdviceSectionView
 struct AdviceSectionView: View {
@@ -135,31 +113,28 @@ struct AdviceSectionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(adviceViewModel.advices) { advice in
-                        AdviceView(advice: advice, onEdit: {_ in }, onDelete: {_ in })
-                            .frame(width: 230, height: 80)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
+                        AdviceView(advice: advice)
+                            .frame(width: 300, height: 80)
                     }
                 }
             }
+        }
+        .onAppear{
+            adviceViewModel.fetchAdvices()
         }
     }
 }
 
 // MARK: - AllArticlesView
 struct AllArticlesView: View {
-    let articles: [ArticleModel]
+    @ObservedObject var articalViewModel : ArticalsViewModel
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack {
-                    ForEach(articles) { article in
-                        ArticleView(
-                            articlesModel: article,
-                            articlesViewModel: ArticalsViewModel(),
-                            usersType: .doctor
-                        )
+                    ForEach(articalViewModel.articals) { article in
+                        ArticleView(articleModel: article, articalViewModel: articalViewModel, usersType: .doctor,path: article.img ?? "")
                     }
                 }
             }
@@ -172,6 +147,7 @@ struct AllArticlesView: View {
 // MARK: - ArticlesSectionView
 struct ArticlesSectionView: View {
     @ObservedObject var viewModel: DoctorProfileViewModel
+    @ObservedObject var articalViewModel : ArticalsViewModel
     @Binding var showAllArticles: Bool
 
     var body: some View {
@@ -193,33 +169,49 @@ struct ArticlesSectionView: View {
             
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 12) {
-//                    ForEach(viewModel.articles) { article in
-//                        ArticleView(
-//                            articlesModel: article,
-//                            articlesViewModel: ArticalsViewModel(),
-//                            usersType: .doctor
-//                        )
-//                    }
+                    ForEach(articalViewModel.articals) { article in
+                        ArticleView(
+                            articleModel: article,
+                            articalViewModel: articalViewModel,
+                            usersType: .doctor, path: article.img ?? ""
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+// MARK: - AllAdvicesView
 struct AllAdvicesView: View {
-    @ObservedObject var adviceViewModel: AdviceViewModel
+    @ObservedObject var adviceViewModel : AdviceViewModel
     @State private var showAddAdviceSheet = false // عرض شاشة الإضافة/التعديل
-    @State private var selectedAdvice: AdviceModel? // النصيحة المحددة للتعديل
+    @State private var showEditAdviceSheet = false // عرض شاشة الإضافة/التعديل
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
-
     var body: some View {
         NavigationStack {
-                    ForEach(adviceViewModel.advices) { advice in
-                        AdviceView(advice: advice, onEdit: {_ in }, onDelete: {_ in })
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                    }
-                    .padding()
+            List{
+                ForEach(adviceViewModel.advices) { advice in
+                    AdviceView(advice: advice)
+                        .swipeActions(edge:.leading) {
+                            Button(role: .destructive)
+                            {
+                                adviceViewModel.deleteAdvice(at: IndexSet(integer: adviceViewModel.advices.firstIndex(where: {$0.id == advice.id})!)
+                                )
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            Button(){
+                                adviceViewModel.selectedAdvice = advice
+                                self.showEditAdviceSheet = true
+                            }label:{
+                                Label("Edit",systemImage: "pencil")
+                            }
+                            .tint(Color.blue)
+                        }
+                }
+            }
+            .listStyle(PlainListStyle())
             Spacer()
                 .navigationTitle("all_advice".localized())
                 .navigationBarTitleDisplayMode(.inline)
@@ -227,17 +219,35 @@ struct AllAdvicesView: View {
         }
         .direction(appLanguage) // ضبط الاتجاه
         .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
+
+        .sheet(isPresented: $showEditAdviceSheet) {
+            if let selectedAdvice =  adviceViewModel.selectedAdvice {
+                EditAdviceSheetView(advice: selectedAdvice,onSave: { advice in
+                adviceViewModel.updateAdvice(advice: advice) { success in
+                                print("advice successfully update : \(advice)")
+                                if success {
+                                    adviceViewModel.fetchAdvices() // تحديث القائمة
+                                }else{
+                                    print("advice error update")
+                                }
+                            }
+                        })
+                        .presentationDetents([.fraction(0.45)])
+                        .presentationCornerRadius(30)
+                    
+            }
+            }
+        .onAppear{
+            adviceViewModel.fetchAdvices()
+        }
     }
 }
-
-
 
 
 // MARK: - ProfileHeaderView
 struct ProfileHeaderView: View {
     @ObservedObject var viewModel: DoctorProfileViewModel
-    @Binding var selectedImage: UIImage?
-    @Binding var showImagePicker: Bool
+    @State var showImagePicker: Bool = false
     
     var body: some View {
         VStack() {
@@ -246,7 +256,7 @@ struct ProfileHeaderView: View {
                     .fill(Color.accentColor.opacity(0.1))
                     .frame(width: 120, height: 120)
                 
-                if let selectedImage = selectedImage {
+                if let selectedImage = viewModel.doctorProfileImage {
                     Image(uiImage: selectedImage)
                         .resizable()
                         .scaledToFill()
@@ -254,7 +264,7 @@ struct ProfileHeaderView: View {
                         .clipShape(Circle())
                         .shadow(radius: 5)
                 }
-//                else if let image = viewModel.doctor.profilePicture {
+//                else if let image = viewModel.doctor.img {
 //                    Image(image)
 //                        .resizable()
 //                        .scaledToFill()
@@ -269,46 +279,54 @@ struct ProfileHeaderView: View {
                         .frame(width: 100, height: 100)
                         .foregroundStyle(Color.accentColor)
                         .shadow(radius: 5)
-                    
+                        
                 }
-                Button {
-                    showImagePicker.toggle()
-                } label: {
-                    Image(systemName: "camera.fill")
-                        .foregroundStyle(Color.white)
-                        .padding(8)
-                        .background(Color.accentColor)
-                        .clipShape(Circle())
-                }
-                .offset(x: -40, y: 40)
+               
+                    Button {
+                        showImagePicker.toggle()
+                        if let doctorImage = viewModel.doctorProfileImage {
+                            viewModel.updateProfileImage(newImage: doctorImage)
+                        }
+                    } label: {
+                        Image(systemName: "camera.fill")
+                            .foregroundStyle(Color.white)
+                            .padding(8)
+                            .background(Color.accentColor)
+                            .clipShape(Circle())
+                    }
+                    .offset(x: -40, y: 40)
+                
+     
                 
      
             }
-            
             Text(viewModel.doctor.name)
                 .font(.headline)
                 .fontWeight(.medium)
-            
-//            Text(viewModel.doctor.specialties)
-//                .font(.subheadline)
-//                .foregroundStyle(.secondary)
+        }
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(selectedImage: $viewModel.doctorProfileImage)
         }
     }
+       
 }
+
 
 // MARK: - DoctorStatisticsView
 struct DoctorStatisticsView: View {
     @ObservedObject var viewModel: DoctorProfileViewModel
-    
     var body: some View {
         HStack(spacing: 20) {
-            StatisticView(title: "Followers".localized(), value: "\(0)")
-            StatisticView(title: "Articles".localized(), value: "\(0)")
-            StatisticView(title: "Advices".localized(), value: "\(0)")
+            StatisticView(title: "Followers".localized(), value: "\(viewModel.doctorInfo.number_of_followers)")
+            StatisticView(title: "Articles".localized(), value: "\(viewModel.doctorInfo.number_of_articles)")
+            StatisticView(title: "Advices".localized(), value: "\(viewModel.doctorInfo.number_of_advice)")
         }
-//        .padding(.vertical)
+        .onAppear {
+            viewModel.getInfoData()
+        }
     }
 }
+
 
 // MARK: - StatisticView
 struct StatisticView: View {
@@ -328,6 +346,7 @@ struct StatisticView: View {
         }
     }
 }
+
 
 // MARK: - BioSectionView
 struct BioSectionView: View {
@@ -354,11 +373,6 @@ struct BioSectionView: View {
                             .foregroundColor(.accentColor)
                     }
                 }
-    
-                
-      
-        
-
             }
             
             if isEditingBio {
@@ -403,6 +417,7 @@ struct BioSectionView: View {
 
 
 #Preview {
+    ProfileView(viewModel: DoctorProfileViewModel(), adviceViewModel: AdviceViewModel(), articalViewModel: ArticalsViewModel())
 }
 
 

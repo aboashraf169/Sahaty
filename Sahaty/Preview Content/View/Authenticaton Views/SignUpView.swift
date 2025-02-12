@@ -4,6 +4,10 @@ struct SignUpView: View {
     @StateObject private var signUpViewModel = SignUpViewModel()
     @State private var showLoginView = false
     @State private var isErrorAlertPresented = false
+    @StateObject private var loginViewModel = LoginViewModel()
+    @StateObject private var specializationViewModel = SpecializationViewModel()
+
+
     @AppStorage("appLanguage") private var appLanguage = "ar"
 
     init() {
@@ -25,10 +29,30 @@ struct SignUpView: View {
                 ScrollView {
                     VStack {
                         sharedFields()
-                        
                         if signUpViewModel.model.usersType == .doctor {
                             doctorFields()
+                            Text("specialty".localized())
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            Picker("Select Specialty", selection: $specializationViewModel.selectedSpecialty) {
+                                ForEach(specializationViewModel.specializations) { specialty in
+                                    Text(specialty.name)
+                                        .tag(specialty as spectialties?)
+                                }
+                            }
+                            .pickerStyle(.inline) // اختيار شكل القائمة
+                            .onChange(of: specializationViewModel.selectedSpecialty) { old ,selected in
+                                if let selected = selected {
+                                    signUpViewModel.model.specialty_id = String(selected.id)
+                                }
+                            }
+                            .frame(height : 100)
+                            .padding(.horizontal, 15)
+//                            Spacer()
                         }
+                        
                     }
                 }
                 
@@ -65,6 +89,9 @@ struct SignUpView: View {
             .direction(appLanguage)
             .environment(\.locale, .init(identifier: appLanguage))
         }
+        .onAppear{
+            specializationViewModel.getSpacialties()
+        }
     }
     
     // MARK: - Header
@@ -96,7 +123,7 @@ struct SignUpView: View {
     // MARK: - Shared Fields
     private func sharedFields() -> some View {
         Group {
-            fieldView(label: "name".localized(), placeholder: "enter_full_name".localized(), text: $signUpViewModel.model.fullName)
+            fieldView(label: "name".localized(), placeholder: "enter_full_name".localized(), text: $signUpViewModel.model.name)
                 .padding(.top, 20)
             
             errorMessageView(signUpViewModel.fullNameErrorMessage)
@@ -109,6 +136,11 @@ struct SignUpView: View {
             PasswordField(password: $signUpViewModel.model.password, placeholder: "enter_password".localized(), label: "password".localized())
             
             errorMessageView(signUpViewModel.passwordErrorMessage)
+            
+            
+            PasswordField(password: $signUpViewModel.model.password_confirmation, placeholder: "confirm_password".localized(), label: "confirm_password".localized())
+            errorMessageView(signUpViewModel.confirmPasswordErrorMessage)
+
             }
         .padding(.horizontal, 20)
     }
@@ -117,26 +149,14 @@ struct SignUpView: View {
     private func doctorFields() -> some View {
         Group {
             fieldView(
-                label: "specialization".localized(),
-                placeholder: "enter_specialization".localized(),
-                text: Binding(
-                    get: { signUpViewModel.model.specialization ?? "" },
-                    set: { signUpViewModel.model.specialization = $0.isEmpty ? nil : $0 }
-                )
-            )
-            
-            errorMessageView(signUpViewModel.specializationErrorMessage)
-            
-            fieldView(
                 label: "license_number".localized(),
                 placeholder: "enter_license_number".localized(),
                 text: Binding(
-                    get: { signUpViewModel.model.licenseNumber ?? "" },
-                    set: { signUpViewModel.model.licenseNumber = $0.isEmpty ? nil : $0 }
+                    get: { signUpViewModel.model.jop_specialty_number ?? "" },
+                    set: { signUpViewModel.model.jop_specialty_number = $0.isEmpty ? nil : $0 }
                 )
             )
             .padding(.top, 10)
-            
             errorMessageView(signUpViewModel.licenseNumberErrorMessage)
         }
         .padding(.horizontal, 20)
@@ -146,7 +166,7 @@ struct SignUpView: View {
     private func footerView() -> some View {
         VStack {
             Button(action: {
-                signUpViewModel.validateAndSignUp { success in
+                signUpViewModel.validateAndSignUp(userType : signUpViewModel.model.usersType) { success in
                     if success {
                         showLoginView = true
                     } else {
@@ -197,6 +217,7 @@ struct SignUpView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
+    
 }
 
 // MARK: - Preview

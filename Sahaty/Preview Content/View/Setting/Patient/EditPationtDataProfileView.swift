@@ -15,8 +15,7 @@ struct EditPationtDataProfileView: View {
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
-    
-    @State var viewModel : PatiantModel
+    @ObservedObject var patientViewModel : PatientSettingViewModel
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
     var body: some View {
@@ -35,7 +34,7 @@ struct EditPationtDataProfileView: View {
                             .frame(width: 120, height: 120)
                             .clipShape(Circle())
                             .shadow(radius: 5)
-                    } else if let image = viewModel.profilePicture {
+                    } else if let image = patientViewModel.patient.img {
                         Image(image)
                             .resizable()
                             .scaledToFill()
@@ -65,28 +64,27 @@ struct EditPationtDataProfileView: View {
          
                 }
                 
-                Text(viewModel.fullName)
+                Text(patientViewModel.patient.name)
                     .font(.headline)
                     .fontWeight(.medium)
                 
-                Text(viewModel.email)
+                Text(patientViewModel.patient.email)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
                 .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
                 .onChange(of: selectedImageItem) { _, newValue in
-                    loadImage(newValue)
                 }
             
             Divider()
         ScrollView{
-            EditField(title: "name".localized(), text: $viewModel.fullName)
-            EditField(title: "email".localized(), text: $viewModel.email)
+            EditField(title: "name".localized(), text: $patientViewModel.patient.name)
+            EditField(title: "email".localized(), text: $patientViewModel.patient.email)
             }
             
             // Save Button
             Button(action: {
-                viewModel.fullName = viewModel.fullName
+                
             }) {
                 Text("save_changes".localized())
                     .font(.headline)
@@ -108,21 +106,7 @@ struct EditPationtDataProfileView: View {
     
     
     
-    private func loadImage(_ item: PhotosPickerItem?) {
-        if let item = item {
-            item.loadTransferable(type: ImageTransferable.self) { result in
-                switch result {
-                case .success(let image):
-                    if let image = image {
-                        selectedImage = image.image
-                    }
-                case .failure(let error):
-                    print("Error loading image: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
-    
+
     struct EditField: View {
         
         let title: String
@@ -149,5 +133,5 @@ struct EditPationtDataProfileView: View {
 
 
 #Preview {
-//    EditPationtDataProfileView()    
+    EditPationtDataProfileView(patientViewModel: PatientSettingViewModel())    
 }

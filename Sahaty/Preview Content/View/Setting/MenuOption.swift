@@ -28,13 +28,13 @@ struct MenuOption : View {
 
                     Spacer()
 
-                    Image(systemName: appLanguage == "ar" ? "chevron.left" : "chevron.right") // السهم حسب اللغة
+                    Image(systemName: appLanguage == "ar" ? "chevron.left" : "chevron.right")
                         .foregroundColor(.gray)
                 }
                 .padding(.vertical, 8)
         }
-        .direction(appLanguage) // ضبط اتجاه النصوص
-        .environment(\.locale, .init(identifier: appLanguage)) // ضبط البيئة
+        .direction(appLanguage)
+        .environment(\.locale, .init(identifier: appLanguage))
     
         
     }

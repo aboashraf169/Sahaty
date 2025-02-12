@@ -8,10 +8,24 @@
 
 import Foundation
 
+
+struct DataComment : Codable {
+    var data: CommentModel
+}
+
 struct CommentModel: Identifiable, Codable {
-    var id: Int // معرف التعليق
-    var content: String // نص التعليق
-    var authorName: String // اسم المعلق
-    var authorImage: String? // صورة المعلق
-    var createdAt: String // وقت النشر
+    var id: Int = 0
+    var comment: String = ""
+    var article_id: Int = 0
+    var img: String? = nil
+    var created_at: String = ""
+    var updated_at: String = ""
+    var user : User = User()
+}
+
+struct User: Identifiable, Codable {
+    var id: Int = 0
+    var name: String = ""
+    var email: String = ""
+    var img: String? = nil
 }

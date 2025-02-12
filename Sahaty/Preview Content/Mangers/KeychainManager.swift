@@ -8,9 +8,9 @@
 
 import Security
 import Foundation
+
 class KeychainManager {
     static let shared = KeychainManager()
-    private init() {}
 
     func saveToken(_ token: String, forKey key: String = "BearerToken") -> Bool {
         guard let data = token.data(using: .utf8) else { return false }

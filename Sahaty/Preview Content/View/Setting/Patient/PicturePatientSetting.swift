@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct PicturePatientSetting: View {
-//    var profilePicture: UIImage?
-    var viewModel : PatiantModel
+    @ObservedObject var patientViewModel : PatientSettingViewModel
     @Binding var selectedImage: UIImage?
     @Binding var showImagePicker: Bool
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
@@ -31,7 +30,7 @@ struct PicturePatientSetting: View {
 
                 }
                 
-                else if let image = viewModel.profilePicture {
+                else if let image = patientViewModel.patient.img {
                     Image(image)
                         .resizable()
                         .scaledToFill()

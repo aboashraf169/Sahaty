@@ -6,16 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		ADF1ED612D36870C007D6619 /* AppDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED5F2D36870C007D6619 /* AppDataModel.xcdatamodeld */; };
-		ADF1ED7E2D3857FB007D6619 /* ArticleEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED7B2D3857FB007D6619 /* ArticleEntity+CoreDataProperties.swift */; };
-		ADF1ED7F2D3857FB007D6619 /* AdviceEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED792D3857FB007D6619 /* AdviceEntity+CoreDataProperties.swift */; };
-		ADF1ED802D3857FB007D6619 /* AdviceEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED782D3857FB007D6619 /* AdviceEntity+CoreDataClass.swift */; };
-		ADF1ED812D3857FB007D6619 /* DoctorEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED7C2D3857FB007D6619 /* DoctorEntity+CoreDataClass.swift */; };
-		ADF1ED822D3857FB007D6619 /* ArticleEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED7A2D3857FB007D6619 /* ArticleEntity+CoreDataClass.swift */; };
-		ADF1ED832D3857FB007D6619 /* DoctorEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADF1ED7D2D3857FB007D6619 /* DoctorEntity+CoreDataProperties.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		AD31E7542D01CCE500748293 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -37,13 +27,6 @@
 		AD31E7432D01CCE300748293 /* Sahaty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sahaty.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD31E7532D01CCE500748293 /* SahatyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SahatyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD31E75D2D01CCE500748293 /* SahatyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SahatyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		ADF1ED602D36870C007D6619 /* AppDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = AppDataModel.xcdatamodel; sourceTree = "<group>"; };
-		ADF1ED782D3857FB007D6619 /* AdviceEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdviceEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		ADF1ED792D3857FB007D6619 /* AdviceEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdviceEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		ADF1ED7A2D3857FB007D6619 /* ArticleEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArticleEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		ADF1ED7B2D3857FB007D6619 /* ArticleEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArticleEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		ADF1ED7C2D3857FB007D6619 /* DoctorEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DoctorEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		ADF1ED7D2D3857FB007D6619 /* DoctorEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DoctorEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -92,9 +75,7 @@
 		AD31E73A2D01CCE300748293 = {
 			isa = PBXGroup;
 			children = (
-				ADF1ED5F2D36870C007D6619 /* AppDataModel.xcdatamodeld */,
 				AD31E7452D01CCE300748293 /* Sahaty */,
-				ADF1ED842D38585D007D6619 /* Entities */,
 				AD31E7562D01CCE500748293 /* SahatyTests */,
 				AD31E7602D01CCE500748293 /* SahatyUITests */,
 				AD31E7442D01CCE300748293 /* Products */,
@@ -109,19 +90,6 @@
 				AD31E75D2D01CCE500748293 /* SahatyUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		ADF1ED842D38585D007D6619 /* Entities */ = {
-			isa = PBXGroup;
-			children = (
-				ADF1ED7D2D3857FB007D6619 /* DoctorEntity+CoreDataProperties.swift */,
-				ADF1ED7C2D3857FB007D6619 /* DoctorEntity+CoreDataClass.swift */,
-				ADF1ED7B2D3857FB007D6619 /* ArticleEntity+CoreDataProperties.swift */,
-				ADF1ED7A2D3857FB007D6619 /* ArticleEntity+CoreDataClass.swift */,
-				ADF1ED782D3857FB007D6619 /* AdviceEntity+CoreDataClass.swift */,
-				ADF1ED792D3857FB007D6619 /* AdviceEntity+CoreDataProperties.swift */,
-			);
-			path = Entities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -201,7 +169,7 @@
 		AD31E73B2D01CCE300748293 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
@@ -219,12 +187,12 @@
 				};
 			};
 			buildConfigurationList = AD31E73E2D01CCE300748293 /* Build configuration list for PBXProject "Sahaty" */;
-			developmentRegion = ar;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
 				ar,
+				Base,
 			);
 			mainGroup = AD31E73A2D01CCE300748293;
 			minimizedProjectReferenceProxies = 1;
@@ -269,13 +237,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ADF1ED612D36870C007D6619 /* AppDataModel.xcdatamodeld in Sources */,
-				ADF1ED7E2D3857FB007D6619 /* ArticleEntity+CoreDataProperties.swift in Sources */,
-				ADF1ED7F2D3857FB007D6619 /* AdviceEntity+CoreDataProperties.swift in Sources */,
-				ADF1ED802D3857FB007D6619 /* AdviceEntity+CoreDataClass.swift in Sources */,
-				ADF1ED812D3857FB007D6619 /* DoctorEntity+CoreDataClass.swift in Sources */,
-				ADF1ED822D3857FB007D6619 /* ArticleEntity+CoreDataClass.swift in Sources */,
-				ADF1ED832D3857FB007D6619 /* DoctorEntity+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -600,19 +561,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		ADF1ED5F2D36870C007D6619 /* AppDataModel.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				ADF1ED602D36870C007D6619 /* AppDataModel.xcdatamodel */,
-			);
-			currentVersion = ADF1ED602D36870C007D6619 /* AppDataModel.xcdatamodel */;
-			path = AppDataModel.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = AD31E73B2D01CCE300748293 /* Project object */;
 }

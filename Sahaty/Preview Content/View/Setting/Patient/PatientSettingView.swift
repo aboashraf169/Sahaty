@@ -3,10 +3,10 @@ import PhotosUI
 
 struct PatientSettingView: View {
     
-    var viewModel : PatiantModel
+//    var viewModel : PatiantModel?
     @AppStorage("isDarkModePatient") private var isDarkModePatient = false // حفظ الاختيار
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
-
+    @ObservedObject var patientViewModel : PatientSettingViewModel
     @State private var selectedImage: UIImage? = nil
     @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
@@ -33,7 +33,7 @@ struct PatientSettingView: View {
                                 .frame(width: 120, height: 120)
                                 .clipShape(Circle())
                                 .shadow(radius: 5)
-                        } else if let image = viewModel.profilePicture {
+                        } else if let image = patientViewModel.patient.img {
                             Image(image)
                                 .resizable()
                                 .scaledToFill()
@@ -60,22 +60,22 @@ struct PatientSettingView: View {
                         .offset(x: -40, y: 40)
                     }
                     
-                    Text(viewModel.fullName)
+                    Text(patientViewModel.patient.name)
                         .font(.headline)
                         .fontWeight(.medium)
                     
-                    Text(viewModel.email)
+                    Text(patientViewModel.patient.email)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
                 .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
                 .onChange(of: selectedImageItem) { _, newValue in
-                    loadImage(newValue)
+
                 }
 
                 // Navigation Links
                 NavigationLink("edit_profile".localized(), destination:
-                                EditPationtDataProfileView(viewModel: PatiantModel(id: 0, fullName: "", email: "")))
+                                EditPationtDataProfileView(patientViewModel: patientViewModel))
                     .padding(.horizontal)
                     .foregroundStyle(.white)
                     .padding(10)
@@ -102,7 +102,7 @@ struct PatientSettingView: View {
                     
                     MenuOption(title: "saved_items".localized(), icon: "bookmark", action: { showSavedView.toggle() })
                         .sheet(isPresented: $showSavedView) {
-                            patientSavedArticalvView(articles: [])
+                            patientSavedArticalvView(patientViewModel: patientViewModel)
                         }
                     
                     MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
@@ -148,22 +148,8 @@ struct PatientSettingView: View {
         }
     }
 
-    private func loadImage(_ item: PhotosPickerItem?) {
-        if let item = item {
-            item.loadTransferable(type: ImageTransferable.self) { result in
-                switch result {
-                case .success(let image):
-                    if let image = image {
-                        selectedImage = image.image
-                    }
-                case .failure(let error):
-                    print("Error loading image: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
 }
 
 #Preview {
-//    PatientSettingView(viewModel: Pa)
+    PatientSettingView(patientViewModel: PatientSettingViewModel())
 }

@@ -10,8 +10,9 @@ import SwiftUI
 import PhotosUI
 
 
-struct AddArticleSheetView: View {
+struct EditArticleSheetView: View {
     @ObservedObject var articalsViewModel: ArticalsViewModel
+    @State var article: ArticleModel
     @Environment(\.dismiss) private var dismiss
     @State var ShowImagePicker: Bool = false
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
@@ -20,12 +21,12 @@ struct AddArticleSheetView: View {
         VStack {
             // MARK: - Header Section
             VStack(spacing: 10) {
-                Text("create_new_article".localized())
+                Text("edit_article".localized())
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
 
-                Text("fill_fields_for_article".localized())
+                Text("fill_EditFields_for_article".localized())
                     .font(.callout)
                     .foregroundColor(.secondary)
             }
@@ -39,7 +40,7 @@ struct AddArticleSheetView: View {
                     Spacer()
                 }
 
-                TextEditor(text: $articalsViewModel.article.title)
+                TextEditor(text: $article.title)
                     .frame(height: 40)
                     .padding(10)
                     .cornerRadius(10)
@@ -54,7 +55,7 @@ struct AddArticleSheetView: View {
                     Spacer()
                 }
 
-                TextEditor(text: $articalsViewModel.article.subject)
+                TextEditor(text: $article.subject)
                     .frame(height: 120)
                     .padding(10)
                     .cornerRadius(10)
@@ -129,13 +130,13 @@ struct AddArticleSheetView: View {
 
             // MARK: - Publish Button
             Button(action: {
-                articalsViewModel.addArtical(artical: articalsViewModel.article) { result in
+                articalsViewModel.updateArtical(artical: article){ result in
                     print(result)
                     print("article successfully added")
                 }
                 dismiss()
             }){
-                Text("publish".localized())
+                Text("save_changes".localized())
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -164,5 +165,5 @@ struct AddArticleSheetView: View {
 }
 
 #Preview {
-    AddArticleSheetView(articalsViewModel: ArticalsViewModel())
+    EditArticleSheetView(articalsViewModel: ArticalsViewModel(), article: ArticleModel())
 }

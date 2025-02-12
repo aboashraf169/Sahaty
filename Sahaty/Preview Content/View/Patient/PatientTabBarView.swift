@@ -9,62 +9,78 @@ import SwiftUI
 
 struct PatientTabBarView: View {
     @StateObject var appState = AppState()
-    @State var Patient: PatiantModel
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    @StateObject var adviceViewModel = AdviceViewModel()
+    @StateObject var articlesViewModel = ArticalsViewModel()
+    @ObservedObject var patientViewModel : PatientSettingViewModel
+    @AppStorage("appLanguage") private var appLanguage = "ar"
 
     var body: some View {
         TabView(selection: $appState.selectedTabPatients) {
             // MARK: - Home Tab
-            PatientHomeScreen(adviceViewModel: AdviceViewModel(), articlesViewModel: ArticalsViewModel())
+            PatientHomeScreen(adviceViewModel: adviceViewModel, articlesViewModel: articlesViewModel, patientViewModel: patientViewModel)
                 .tabItem {
                     HStack {
-                        Text("home".localized()) // الرئيسية
+                        Text("home".localized())
                         Image(systemName: "house.fill")
                     }
                 }
                 .tag(TabPatient.home)
 
             // MARK: - Doctors Tab
-            SpecializationsDoctorsView()
+            SpecializationsDoctorsView(patientViewModel: patientViewModel)
                 .tabItem {
                     HStack {
-                        Text("doctors".localized()) // الاطباء
+                        Text("doctors".localized())
                         Image(systemName: "person.2")
                     }
                 }
                 .tag(TabPatient.Doctors)
 
+            
+            Text("Chats".localized())
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                .tabItem{
+                    HStack{
+                        Text("Chats".localized())
+                        Image(systemName: "message")
+                    }
+                }
+                .tag(TabPatient.chat)
+                .badge(3)
+            
             // MARK: - Notifications Tab
             NotificationsView()
                 .tabItem {
                     HStack {
-                        Text("notifications".localized()) // الاشعارات
+                        Text("notifications".localized())
                         Image(systemName: "heart.fill")
                     }
                 }
                 .tag(TabPatient.Notificatons)
                 .badge(5) // عدد الإشعارات
 
+            
             // MARK: - Settings Tab
-            PatientSettingView(viewModel: PatiantModel(id: 0, fullName: "mido", email: "mido@gmail.com"))
+            PatientSettingView(patientViewModel: patientViewModel)
                 .padding()
                 .tabItem {
                     HStack {
-                        Text("settings".localized()) // الاعدادات
+                        Text("settings".localized())
                         Image(systemName: "gear")
                     }
                 }
                 .tag(TabPatient.settings)
         }
-        .direction(appLanguage) // ضبط اتجاه النصوص
-        .environmentObject(appState) // مشاركة حالة التطبيق مع جميع الشاشات
-        .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة المختارة
+        .direction(appLanguage)
+        .environmentObject(appState)
+        .environment(\.locale, .init(identifier: appLanguage))
     }
 }
 
 // MARK: - Preview
 #Preview {
-    PatientTabBarView(Patient: PatiantModel(id: 0, fullName: "mido", email: "asdvdsv@gmail.com"))
+    PatientTabBarView(patientViewModel: PatientSettingViewModel())
 }
 
 

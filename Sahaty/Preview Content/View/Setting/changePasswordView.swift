@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct changePasswordView: View {
+    @Environment(\.presentationMode) var presentationMode
     var usersType: UsersType // نوع المستخدم
-    @StateObject private var newPasswordViewModel = NewPasswordViewModel(token: "")
+    @StateObject private var changePasswordViewModel = ChangePasswordViewModel()
     @State private var isSuccessAlertPresented = false
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
@@ -24,33 +25,38 @@ struct changePasswordView: View {
             .padding(.vertical)
             
             // MARK: - Old Password Field
-    
             VStack{
-//                PasswordField(
-//                    password: Binding(
-//                        get: { newPasswordViewModel.model.oldPassword ?? ""},
-//                        set: { newPasswordViewModel.model.oldPassword = $0.isEmpty ? nil : $0}
-//                    ),
-//                    placeholder: "enter_old_password".localized(),
-//                    label: "old_password".localized()
-//                )
-//                
-        
+                PasswordField(
+                    password: $changePasswordViewModel.model.old_password,
+                    placeholder: "enter_old_password".localized(),
+                    label: "old_password".localized()
+                )
                 
+                // Error Message for Password
+                if !changePasswordViewModel.passwordErrorMessage.isEmpty {
+                    Text(changePasswordViewModel.passwordErrorMessage)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    
             }
+            }
+            .padding(.top)
+
 
 
             // MARK: - New Password Field
             VStack{
                 PasswordField(
-                    password: $newPasswordViewModel.model.password,
+                    password: $changePasswordViewModel.model.password,
                     placeholder: "enter_password".localized(),
                     label: "password".localized()
                 )
 
             // Error Message for Password
-            if !newPasswordViewModel.passwordErrorMessage.isEmpty {
-                Text(newPasswordViewModel.passwordErrorMessage)
+            if !changePasswordViewModel.passwordErrorMessage.isEmpty {
+                Text(changePasswordViewModel.passwordErrorMessage)
                     .font(.caption)
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -65,13 +71,13 @@ struct changePasswordView: View {
             // MARK: - Confirm Password Field
             VStack{
                 PasswordField(
-                    password: $newPasswordViewModel.model.confirmPassword,
+                    password: $changePasswordViewModel.model.confirmPassword,
                     placeholder: "confirm_password".localized(),
                     label: "confirm_password_label".localized()
                 )
             // Error Message for Confirm Password
-            if !newPasswordViewModel.confirmPasswordErrorMessage.isEmpty {
-                Text(newPasswordViewModel.confirmPasswordErrorMessage)
+            if !changePasswordViewModel.confirmPasswordErrorMessage.isEmpty {
+                Text(changePasswordViewModel.confirmPasswordErrorMessage)
                     .font(.caption)
                     .foregroundColor(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -83,10 +89,10 @@ struct changePasswordView: View {
             
             // MARK: - Submit Button
             Button(action: {
-                if newPasswordViewModel.validateNewPassword() {
-                    isSuccessAlertPresented = true
+                changePasswordViewModel.validateAndChangePassword { _ in
+                    self.isSuccessAlertPresented = true
                 }
-            }) {
+            }){
                 Text("confirm".localized())
                     .font(.headline)
                     .foregroundColor(.white)
@@ -98,8 +104,9 @@ struct changePasswordView: View {
             .padding(.top,30)
             
             // Success Alert
-            .alert(newPasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
+            .alert(changePasswordViewModel.successMessage, isPresented: $isSuccessAlertPresented) {
                 Button("ok", role: .cancel) {
+                    presentationMode.wrappedValue.dismiss()
                 }
             }
             

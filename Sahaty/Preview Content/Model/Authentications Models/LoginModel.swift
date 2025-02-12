@@ -9,18 +9,17 @@
 import Foundation
 
 struct LoginModel: Codable {
-    var email: String
-    var password: String
-    var usersType: UsersType
-}
-
+    var email: String = ""
+    var password: String = ""
+    var usersType: UsersType = .doctor
+    
 // MARK: - API Request Body
-extension LoginModel {
-    func toDictionary() -> [String: Any] {
+func toDictionary() -> [String: Any] {
         return [
             "email": email,
             "password": password,
             "is_doctor": usersType == .doctor ? 1 : 0
         ]
     }
+    
 }

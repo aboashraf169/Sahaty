@@ -9,54 +9,62 @@
 import SwiftUI
 
 class SpecializationViewModel: ObservableObject {
-    @Published var specializations: [Specialization] = []
-
-    init(){
-//        // بيانات افتراضية
-//        specializations = [
-//            Specialization(
-//                name: "طب الأطفال",
-//                doctors: [
-//                    DoctorModel(  id: "",fullName: "محمد", email: "abo.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(  id: "",fullName: "احمد", email: "mido.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(  id: "",fullName: "عيسى", email: "abo.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321",profilePicture: "doctor", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(  id: "",fullName: "ماجد", email: "mido.ashraf@gmail.com",specialization: "طب الأطفال", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35)
-//    
-//                ]
-//            ),
-//            Specialization(
-//                name: "طب القلب",
-//                doctors: [
-//                    DoctorModel(id: "",fullName: "عبد الله", email: "abo.ashraf@gmail.com",specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(id: "",fullName: "حسن", email: "mido.ashraf@gmail.com", specialization:  "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(id: "",fullName: "حاتم", email: "abo.ashraf@gmail.com", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(id: "",fullName: "مهدي", email: "mido.ashraf@gmail.com",specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35)
-//    
-//                ]
-//            ),
-//            Specialization(
-//                name: "طب العيون",
-//                doctors: [
-//                    DoctorModel(id: "",fullName: "رشدي", email: "abo.ashraf@gmail.com", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(id: "",fullName: "خليل", email: "mido.ashraf@gmail.com",specialization:  "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(id: "",fullName: "خالد", email: "abo.ashraf@gmail.com", specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35),
-//                    DoctorModel(id: "",fullName: "منصور", email: "mido.ashraf@gmail.com",specialization: "طب القلب", licenseNumber: "55664321", articlesCount: 32, advicesCount: 32, followersCount: 35)
-//    
-//                ]
-//            )
-//        ]
-    }
     
-//    func filteredSpecializations(searchText: String) -> [Specialization] {
-//        if searchText.isEmpty {
-//            return specializations
-//        } else {
-//            return specializations.map { specialization in
-//                let filteredDoctors = specialization.doctors.filter {
-//                    $0.name.contains(searchText) || $0.jobSpecialtyNumber.contains(searchText)
-//                }
-//                return Specialization(name: specialization.name, doctors: filteredDoctors)
-//            }.filter { !$0.doctors.isEmpty }
-//        }
-//    }
+    @Published var specializations: [spectialties] = []
+    @Published var selectedSpecialty: spectialties? // التخصص المختار
+
+    
+    func getSpacialties() {
+       let url = "http://127.0.0.1:8000/api/specialties"
+       let method : String = "GET"
+       guard let  urlRequest = URL(string: url) else {
+           print("uri error Not Found!!")
+           return
+       }
+       var request = URLRequest(url: urlRequest)
+       request.httpMethod = method
+       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+       request.setValue("application/json", forHTTPHeaderField: "Accept")
+       
+        print("Request URL: \(request.url?.absoluteString ?? "")")
+        print("Request Headers: \(request.allHTTPHeaderFields ?? [:])")
+        
+       let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+           
+           guard let response = response as? HTTPURLResponse else {
+               print(APIError.serverError(message: "serverError"))
+               return
+           }
+           guard response.statusCode >= 200 && response.statusCode < 300 else {
+               let message = response.statusCode == 401 ? "Unauthorized" : "Server Error"
+               print(APIError.serverError(message: message))
+               print("Status Code: \(response.statusCode)")
+               return
+           }
+
+           if let error {
+               print("error to signup :\(error)")
+               return
+           }
+           guard let data = data else {
+               print(APIError.noData)
+               return
+           }
+          
+          DispatchQueue.main.async {
+              guard let decodedData = try? JSONDecoder().decode(dataSpectialties.self, from: data) else {
+                  print("error fetch data!!!!!")
+                  return
+              }
+              self?.specializations = decodedData.data
+              self?.selectedSpecialty = self?.specializations.first // تعيين أول تخصص كافتراضي
+              print("fetch specialties successfully!: \(decodedData)")
+
+          }
+
+       }
+       task.resume()
+   }
+   
 }
+    

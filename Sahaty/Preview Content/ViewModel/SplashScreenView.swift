@@ -12,29 +12,32 @@ struct SplashScreenView: View {
     @State private var navigateToDoctor = false
     @State private var navigateToPatient = false
     @State private var navigateToLogin = false
-
+    @StateObject private var loginViewModel = LoginViewModel()
+    @ObservedObject var doctorProfileViewModel: DoctorProfileViewModel
+    @ObservedObject var PatientViewModel: PatientSettingViewModel
     var body: some View {
         VStack {
             Text("Loading...")
-                .onAppear {
-                    if SessionManager.shared.isUserLoggedIn() {
-                        if let userType = SessionManager.shared.getUserType() {
-                            if userType == .doctor {
-                                navigateToDoctor = true
-                            } else {
-                                navigateToPatient = true
-                            }
-                        }
-                    } else {
-                        navigateToLogin = true
-                    }
-                }
+//                .onAppear {
+                    
+//                    if SessionManager.shared.isUserLoggedIn() {
+//                        if let userType = SessionManager.shared.getUserType() {
+//                            if userType == .doctor {
+//                                navigateToDoctor = true
+//                            } else {
+//                                navigateToPatient = true
+//                            }
+//                        }
+//                    } else {
+//                        navigateToLogin = true
+//                    }
+//                }
         }
         .navigationDestination(isPresented: $navigateToDoctor) {
-            DoctorTabBarView()
+            DoctorTabBarView(doctorProfileViewModel: doctorProfileViewModel)
         }
         .navigationDestination(isPresented: $navigateToPatient) {
-            PatientTabBarView(Patient: PatiantModel(id: 0, fullName: "", email: ""))
+            PatientTabBarView(patientViewModel: PatientViewModel)
         }
         .navigationDestination(isPresented: $navigateToLogin) {
             LoginView()

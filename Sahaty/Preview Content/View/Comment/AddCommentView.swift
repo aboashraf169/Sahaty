@@ -1,26 +1,36 @@
 import SwiftUI
 
 struct AddCommentView: View {
-    @StateObject private var viewModel = CommentViewModel()
-//    var currentUser: CommentAuthor // المستخدم الحالي (طبيب أو مريض)
-    @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
+    @ObservedObject  var viewModel : CommentViewModel
+    @State var id : Int
+    @AppStorage("appLanguage") private var appLanguage = "ar"
+    @State var showAlert = false
+    let currentUserID = UserDefaults.standard.integer(forKey: "currentUserID")
 
     var body: some View {
         NavigationStack {
             VStack {
-                // قائمة التعليقات
                 List {
                     ForEach(viewModel.comments) { comment in
                         CommentView(comment: comment)
-                            .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                                swipeActions(for: comment)
+                            .swipeActions(edge: .leading) {
+                                if comment.user.id == currentUserID{
+                                    Button("delete", role: .destructive) {
+                                        viewModel.deleteComment(idComment: comment.id)
+                                    }
+                                }
                             }
+
+//                            .swipeActions(edge: .leading){
+//                                    Button("delete", role: .destructive) {
+//                                        viewModel.deleteComment(idComment: comment.id)
+//                                    }
+//                                }
                     }
                 }
                 
-                // إضافة أو تعديل تعليق
                 HStack {
-                    TextField("add_comment_placeholder".localized(), text: $viewModel.newCommentText) // أضف تعليقًا...
+                    TextField("add_comment_placeholder".localized(), text: $viewModel.comment.comment)
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
                         .padding(.horizontal)
@@ -28,7 +38,7 @@ struct AddCommentView: View {
                         .cornerRadius(10)
                     Spacer()
                     Button(action: {
-                        viewModel.addComment(author: "mido")
+                        viewModel.addComment(idArtical: id, comment: viewModel.comment.comment)
                     }) {
                         Image(systemName: "paperplane.fill")
                             .resizable()
@@ -53,26 +63,14 @@ struct AddCommentView: View {
             .navigationBarTitleDisplayMode(.inline)
             .direction(appLanguage) // اتجاه النصوص
             .environment(\.locale, .init(identifier: appLanguage))
-        }
-    }
-
-    private func swipeActions(for comment: CommentModel) -> some View {
-        Group {
-            // تعديل
-            Button {
-                viewModel.startEditing(comment: comment)
-            } label: {
-                Label("edit".localized(), systemImage: "pencil") // تعديل
-            }
-            .tint(.accent)
-
-            // حذف
-            Button() {
-//                viewModel.deleteComment(id: comment.id)
-            } label: {
-                Label("delete".localized(), systemImage: "trash") // حذف
-            }
-            .tint(.red)
+//            .alert("حذف التعليق", isPresented: $showAlert) {
+//                Button("delete".localized(), role: .destructive) {
+//                    viewModel.deleteComment(idComment: viewModel.comment.id)
+//                }
+//                Button("cancel", role: .cancel){}
+//            }message: {
+//              Text("هل انت متاكد انك تريد الحذف")
+//            }
         }
     }
 }
@@ -80,6 +78,5 @@ struct AddCommentView: View {
 
 
 #Preview {
-
-//    AddCommentView(currentUser: .doctor(currentUser))
+    AddCommentView(viewModel: CommentViewModel(), id: 0)
 }

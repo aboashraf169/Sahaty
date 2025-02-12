@@ -15,6 +15,7 @@ class ResetPasswordViewModel: ObservableObject {
     @Published var successMessage: String = ""
     @Published var isLoading: Bool = false
 
+    
     // MARK: - Validate and Send Email
     func validateAndSendEmail(completion: @escaping (Bool) -> Void) {
         clearErrors()
@@ -22,7 +23,6 @@ class ResetPasswordViewModel: ObservableObject {
             completion(false)
             return
         }
-
         isLoading = true
         APIManager.shared.sendRequest(
             endpoint: "/forget-password",
@@ -43,34 +43,6 @@ class ResetPasswordViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Validate and Reset Password
-    func resetPasswordWithValidation(completion: @escaping (Bool) -> Void) {
-        clearErrors()
-        guard validateNewPassword() else {
-            completion(false)
-            return
-        }
-
-        isLoading = true
-        APIManager.shared.sendRequest(
-            endpoint: "/reset-password",
-            method: .post,
-            parameters: model.toDictionary()
-        ) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                switch result {
-                case .success(let data):
-                    self?.handleSuccessPasswordResponse(data: data)
-                    completion(true)
-                case .failure(let error):
-                    self?.handleAPIError(error)
-                    completion(false)
-                }
-            }
-        }
-    }
-
     // MARK: - Validate Email
     private func validateEmail() -> Bool {
         var isValid = true
@@ -106,7 +78,38 @@ class ResetPasswordViewModel: ObservableObject {
         return isValid
     }
 
-    // MARK: - Handle Success Responses
+
+    // MARK: - Validate and Reset Password
+    func resetPasswordWithValidation(completion: @escaping (Bool) -> Void) {
+        clearErrors()
+        guard validateNewPassword() else {
+            completion(false)
+            return
+        }
+
+        isLoading = true
+        APIManager.shared.sendRequest(
+            endpoint: "/reset-password",
+            method: .post,
+            parameters: model.toDictionary()
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success(let data):
+                    self?.handleSuccessPasswordResponse(data: data)
+                    completion(true)
+                case .failure(let error):
+                    self?.handleAPIError(error)
+                    completion(false)
+                }
+            }
+        }
+    }
+
+
+    
+    // MARK: - Handle Success Email Responses
     private func handleEmailValidationResponse(data: Data) -> Bool {
         // تحويل البيانات إلى نص
         if let responseString = String(data: data, encoding: .utf8) {
@@ -128,14 +131,12 @@ class ResetPasswordViewModel: ObservableObject {
         return false
     }
 
-    
-
-    
+    // MARK: - Handle Success Password Responses
     private func handleSuccessPasswordResponse(data: Data) {
         successMessage = "password_reset_success".localized()
         print("Password Reset Response: \(String(data: data, encoding: .utf8) ?? "")")
     }
-
+    
     // MARK: - Handle API Error
     private func handleAPIError(_ error: Error) {
         if let apiError = error as? APIError {
@@ -174,11 +175,6 @@ class ResetPasswordViewModel: ObservableObject {
         // طباعة الخطأ للتطوير
         print("API Error: \(apiErrorMessage)")
     }
-
-
-
-
-    
 
     // MARK: - Clear Errors
     private func clearErrors() {

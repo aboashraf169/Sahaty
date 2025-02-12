@@ -1,220 +1,143 @@
 import Foundation
 import SwiftUI
-import Combine
 
-import Foundation
-import Combine
 
 class AdviceViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var advices: [AdviceModel] = [] // النصائح
-    @Published var isLoading: Bool = false // حالة التحميل
-    @Published var errorMessage: String? = nil // رسالة الخطأ
-    @Published var newAdviceText: String = "" // النص الجديد/المعدل
-    @Published var editingAdvice: AdviceModel? = nil // النصيحة التي يتم تعديلها
+    @Published var advices: [AdviceModel] = []
+    @Published var userAdvices: [UserAdviceModel] = []
+    @Published var advice: AdviceModel = AdviceModel()
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String? = nil
+    @Published var SuccessMessage: String? = nil
+    @Published var selectedAdvice: AdviceModel?
 
-    private var cancellables = Set<AnyCancellable>()
     
-    init() {
-        fetchAdvices() // جلب النصائح من الخادم وحفظها في Core Data
-        loadAdvicesFromCoreData() // تحميل النصائح من Core Data عند عدم وجود اتصال
-        
-    }
-
-    deinit {
-        cancellables.forEach { $0.cancel() }
-    }
-    
-    // MARK: - Add or Update Advice
-    func addOrUpdateAdvice() {
-        let trimmedAdvice = newAdviceText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedAdvice.isEmpty else {
-            errorMessage = "Advice content cannot be empty."
-            return
-        }
-
-        if let editingAdvice = editingAdvice {
-            // تعديل نصيحة
-            updateAdvice(id: editingAdvice.id, newContent: trimmedAdvice) { [weak self] success in
-                if success {
-                    self?.clearEditing()
-                } else {
-                    self?.errorMessage = "Failed to update advice."
-                }
-            }
-        } else {
-            // إضافة نصيحة جديدة
-            addAdvice(trimmedAdvice) { [weak self] success in
-                if success {
-                    self?.clearEditing()
-                }
-            }
-        }
-    }
-    
-    // MARK: - Add Advice
-    func addAdvice(_ adviceContent: String, completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:8000/api/doctor/advice/store") else {
-            completion(false)
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body: [String: Any] = ["advice": adviceContent]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            if let error = error {
-                print("Error adding advice: \(error.localizedDescription)")
-                completion(false)
-                return
-            }
-
-            guard let data = data else {
-                print("No data received.")
-                completion(false)
-                return
-            }
-
-            do {
-                let advice = try JSONDecoder().decode(AdviceModel.self, from: data)
-                DispatchQueue.main.async {
-                    self?.advices.append(advice)
-                    CoreDataManager.shared.saveAdvicesToCoreData(self?.advices ?? [])
-                    completion(true)
-                }
-            } catch {
-                print("Decoding error: \(error.localizedDescription)")
-                completion(false)
-            }
-        }.resume()
-    }
-
-    // MARK: - Update Advice
-    func updateAdvice(id: Int, newContent: String, completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:8000/api/doctor/advice/\(id)/update") else {
-            completion(false)
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body: [String: Any] = ["advice": newContent]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            if let error = error {
-                print("Error updating advice: \(error.localizedDescription)")
-                completion(false)
-                return
-            }
-
-            DispatchQueue.main.async {
-                self?.fetchAdvices() // إعادة جلب النصائح من الخادم
-                completion(true)
-            }
-        }.resume()
-    }
-
-    // MARK: - Get Advices
-    
+    // MARK: - fetch Advices
     func fetchAdvices() {
         isLoading = true
-
-        // استخدام APIManager لإرسال الطلب
-        APIManager.shared.sendRequest(
-            endpoint: "/doctor/get-today-advice", // مسار الـ API
-            method: .get // نوع الطلب GET
-        ) { [weak self] result in
-            DispatchQueue.main.async {
+        APIManager.shared.sendRequest(endpoint: "/doctor/get-today-advice", method: .get) { result in
+          switch result {
+            case .success (let data):
+              guard let advices = try? JSONDecoder().decode(AdviceResponse.self, from: data)
+              else{
+                  print("error to decding advice")
+                  return
+              }
+                  DispatchQueue.main.async{ [weak self]  in
+                    self?.isLoading = false
+                      self?.advices = advices.data
+                  }
+                  print("fetch Advices successfully")
+              
+            case .failure(let error):
+              print("error to get advice")
+              print("error :\(error)")
+            }
+        }
+        
+    }
+    
+    
+    // MARK: - Add Advice
+    func AddAdvices(advice : AdviceModel,complitien : @escaping (Bool) -> Void){
+        self.isLoading = true
+        APIManager.shared.sendRequest(endpoint: "/doctor/advice/store", method: .post, parameters: advice.toDictionary()) { Result in
+            DispatchQueue.main.async { [weak self] in
                 self?.isLoading = false
-                switch result {
-                case .success(let data):
-                    // طباعة البيانات الخام للتحقق
-                    do {
-                        // فك ترميز البيانات
-                        let response = try JSONDecoder().decode(AdviceResponse.self, from: data)
-                        // تحديث النصائح في ViewModel
-                        self?.advices = response.data
-                        // حفظ النصائح في Core Data
-                        CoreDataManager.shared.saveAdvicesToCoreData(response.data)
-                        self?.advices = CoreDataManager.shared.fetchAdvices() // إعادة تحميل البيانات من Core Data
 
-                        
-                    } catch {
-                        // التعامل مع أخطاء فك الترميز
-                        print("Decoding error: \(error.localizedDescription)")
-                        self?.errorMessage = "Failed to parse advice data."
-                        self?.advices = CoreDataManager.shared.fetchAdvices()
+                switch Result {
+                    case .success(let data):
+                    self?.SuccessMessage = "added advice successfully"
+                    print("added advice successfully")
+                    self?.advice.advice = ""
+                    complitien(true)
+                    guard let data = try? JSONDecoder().decode(AdviceModel.self, from: data) else {
+                        print("Could not decode JSON")
+                        complitien(false)
+                        return
                     }
-                case .failure(let error):
-                    // التعامل مع أخطاء الشبكة أو الخادم
-                    print("Error fetching advices: \(error.localizedDescription)")
-                    self?.errorMessage = error.localizedDescription
-                    self?.advices = CoreDataManager.shared.fetchAdvices()
+                    self?.advices.append(data)
+                    case .failure(let error):
+                    self?.errorMessage = "error add advice!!"
+                    print("error to add advice")
+                    print("error :\(error)")
+                    complitien(false)
+                }
+                
+            }
+        }
+    }
+    
+    
+    // MARK: - Update Advice
+    func updateAdvice(advice : AdviceModel, complitien : @escaping (Bool) -> Void){
+        self.isLoading = true
+        APIManager.shared.sendRequest(
+            endpoint: "/doctor/advice/\(advice.id)/update",
+            method: .post,
+            parameters: ["advice" : advice.advice]
+        ) { Result in
+            DispatchQueue.main.async { [weak self] in
+                self?.isLoading = false
+                switch Result {
+                case .success(let data):
+                    self?.SuccessMessage = "Update Advice Success"
+                    print("update success \(data)")
+                    complitien(true)
+                    if let index =
+                        self?.advices.firstIndex(where: { $0.id == advice.id }){
+                        self?.advices[index] = advice
+                    }
+                case.failure(let error):
+                    self?.errorMessage = "error update advice!!"
+                    print("erorr update adivce: \(error)")
+                    complitien(false)
                 }
             }
         }
     }
-
-
+    
+    
     // MARK: - Delete Advice
-    func deleteAdvice(id: Int, completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://127.0.0.1:8000/api/doctor/advice/\(id)/destroy") else {
-            completion(false)
-            return
+    func deleteAdvice(at indexSet: IndexSet) {
+        guard let index = indexSet.first else { return }
+        let item = advices[index]
+        APIManager.shared.sendRequest(endpoint: "/doctor/advice/\(item.id)/destroy", method: .delete) { result in
+            DispatchQueue.main.async { [weak self] in
+                switch result {
+                case .success(_):
+                    self?.advices.remove(at: index)
+                    print("Item deleted successfully")
+                    self?.SuccessMessage = "Delete Advice Success"
+                case .failure(let error):
+                    print("error Advice Success\(error.localizedDescription)")
+                }
+                
+            }
         }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            if let error = error {
-                print("Error deleting advice: \(error.localizedDescription)")
-                completion(false)
-                return
-            }
-
-            DispatchQueue.main.async {
-                self?.advices.removeAll { $0.id == id }
-                CoreDataManager.shared.saveAdvicesToCoreData(self?.advices ?? [])
-                completion(true)
-            }
-        }.resume()
     }
     
-   // MARK: - Clear Local Data
-    func clearLocalData() {
-        advices.removeAll()
-        CoreDataManager.shared.deleteAllAdvices()
+    
+    // MARK: - get User Advices
+    func getUserAdvice() {
+        APIManager.shared.sendRequest(endpoint: "/user/get-today-advice", method: .get) { result in
+            DispatchQueue.main.async { [weak self] in
+                switch result {
+                case .success(let data):
+                    guard let decodeData = try? JSONDecoder().decode(ResponseUserAdvice.self, from: data)else {
+                        print("error to decode  user data advice")
+                        return
+                    }
+                    self?.userAdvices = decodeData.data
+                    print("get user advicies Success!!!")
+                case .failure(let error):
+                    print("error to Advice:\(error)")
+
+                }
+                
+            }
+        }
     }
     
-    // MARK: - Clear Editing
-    func clearEditing() {
-        editingAdvice = nil
-        newAdviceText = ""
-    }
-
-    // MARK: - Start Editing
-    func startEditing(advice: AdviceModel) {
-        editingAdvice = advice
-        newAdviceText = advice.advice
-    }
-}
-
-
-// Response Model
-struct AdviceResponse: Decodable {
-    let data: [AdviceModel]
-}
-
-extension AdviceViewModel {
-    func loadAdvicesFromCoreData() {
-        advices = CoreDataManager.shared.fetchAdvices()
-    }
 }
