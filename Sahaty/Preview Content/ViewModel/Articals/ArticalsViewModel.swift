@@ -1,19 +1,56 @@
 import Foundation
 import SwiftUI
+import Combine
 
 class ArticalsViewModel: ObservableObject {
     // MARK: - Properties
     @Published var articals: [ArticleModel] = []
+    @Published var filteredArticals: [ArticleModel] = []
     @Published var article : ArticleModel = ArticleModel()
-    @Published var loadedImage: UIImage? = nil
-    @Published var doctorImage: UIImage? = nil
-    @Published var image: UIImage? = nil
+    @Published var loadedImages: [Int: UIImage] = [:]
+    @Published var doctorImages: [Int: UIImage] = [:]
+    @Published var addImage: UIImage? = nil
     @Published var savedArticals : [ArticleModel] = []
     @Published var showAlert: Bool = false
     @Published var isLodeing: Bool = false
     @Published var alertTitle: String = ""
     @Published var alertMessage: String = ""
+    @Published var searchText: String = ""
+    private var cancellables = Set<AnyCancellable>()
+
+    var isSearching: Bool {
+        !searchText.isEmpty
+    }
+
+    init() {
+        addSubscribers()
+    }
     
+    private func addSubscribers() {
+        $searchText
+            .debounce(for: 0.3, scheduler: DispatchQueue.main)
+            .sink { [weak self] searchText in
+                self?.filterRestaurants(searchText: searchText)
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func filterRestaurants(searchText: String) {
+        guard !searchText.isEmpty else {
+            filteredArticals = []
+            return
+        }
+        
+        // Filter on search text
+        let search = searchText.lowercased()
+        filteredArticals = articals.filter({ articals in
+            let titleContainsSearch = articals.title.lowercased().contains(search)
+            let subjectContainsSearch = articals.subject.lowercased().contains(search)
+            let doctorNameContainsSearch = articals.doctor.name.lowercased().contains(search)
+
+            return titleContainsSearch || subjectContainsSearch || doctorNameContainsSearch
+        })
+    }
 
     // MARK: - Fetch Article
     func fetchArtical(isDoctor: Bool){
@@ -92,7 +129,7 @@ class ArticalsViewModel: ObservableObject {
             print("error Bearer Token")
         }
         
-        if let image = self.image {
+        if let image = self.addImage {
             let httpBody = APIManager.shared.createMultipartBody(
                 parameters: ["title": artical.title, "subject": artical.subject],
                 image: image,
@@ -121,7 +158,7 @@ class ArticalsViewModel: ObservableObject {
                 }
                 self.article.subject = ""
                 self.article.title = ""
-                self.image = nil
+                self.addImage = nil
                 
                 completion(true)
 //                guard let decodeData = try? JSONDecoder().decode(ArticleModel.self, from: data) else {
@@ -229,18 +266,18 @@ class ArticalsViewModel: ObservableObject {
             }
         }
     }
-    
-    func loadImage(from path: String) {
+
+    func loadImage(from path: String, for articleId: Int) {
         ImageManager.shared.fetchImage(imagePath: path) { image in
-            DispatchQueue.main.async {[weak self] in
-                self?.loadedImage = image
+            DispatchQueue.main.async { [weak self] in
+                self?.loadedImages[articleId] = image
             }
         }
     }
-    func doctorImage(from path: String) {
+    func doctorImage(from path: String,for doctorId: Int) {
         ImageManager.shared.fetchImage(imagePath: path) { image in
             DispatchQueue.main.async {[weak self] in
-                self?.doctorImage = image
+                self?.doctorImages[doctorId] = image
             }
         }
     }

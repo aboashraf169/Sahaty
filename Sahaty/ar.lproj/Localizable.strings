@@ -34,6 +34,7 @@
 
 // MARK: - ADD ARTCALE VIEW
 "create_new_article" = "إنشاء مقالة جديدة";
+"new_article" = "إنشاء مقالة";
 "edit_article" = "تعديل المقالة";
 "fill_fields_for_article" = "املأ الحقول أدناه لإضافة المقالة";
 "fill_EditFields_for_article" = "املأ الحقول أدناه لتعديل المقالة";

@@ -19,14 +19,14 @@ class AdviceViewModel: ObservableObject {
         APIManager.shared.sendRequest(endpoint: "/doctor/get-today-advice", method: .get) { result in
           switch result {
             case .success (let data):
-              guard let advices = try? JSONDecoder().decode(AdviceResponse.self, from: data)
+              guard let advices = try? JSONDecoder().decode(ResponseUserAdvice.self, from: data)
               else{
                   print("error to decding advice")
                   return
               }
                   DispatchQueue.main.async{ [weak self]  in
                     self?.isLoading = false
-                      self?.advices = advices.data
+                      self?.userAdvices = advices.data
                   }
                   print("fetch Advices successfully")
               
@@ -35,7 +35,6 @@ class AdviceViewModel: ObservableObject {
               print("error :\(error)")
             }
         }
-        
     }
     
     

@@ -1,8 +1,9 @@
 import Foundation
-
+import SwiftUI
 class CommentViewModel: ObservableObject {
     @Published var comments: [CommentModel] = []
     @Published var comment: CommentModel = CommentModel()
+    @Published var autherCommentImage: UIImage? = nil
     @Published var alertMessage: String = ""
     @Published var isLoading: Bool = false
     @Published var newCommentText : String = ""
@@ -17,9 +18,6 @@ class CommentViewModel: ObservableObject {
                 switch result {
                     case .success(let data):
                     print("get comment artical \(idArtical) successfully!")
-//                    if let responseString = String(data: data, encoding: .utf8) {
-//                               print("Response Data Comment as String:\n\(responseString)")
-//                           }
                     guard let decodeData = try? JSONDecoder().decode([CommentModel].self, from: data) else {
                         print("error to decode comment")
                         return
@@ -53,6 +51,7 @@ class CommentViewModel: ObservableObject {
                 }
                     self?.alertMessage = "\(decodeData)"
                     self?.comments.append(decodeData.data)
+                    self?.loadImage(from: decodeData.data.user.img ?? "")
                 case .failure(let error):
                     print("error to get comment artical:\(idArtical)")
                     print("error: get comment:\(error)")
@@ -79,6 +78,16 @@ class CommentViewModel: ObservableObject {
             }
         }
     }
+    // MARK: - Load image
+    func loadImage(from path: String) {
+        ImageManager.shared.fetchImage(imagePath: path){[weak self] image in
+            DispatchQueue.main.async {
+                self?.autherCommentImage = image
+                print("image auther Comment : \(path)")
+            }
+        }
+    }
+    
     
 }
 

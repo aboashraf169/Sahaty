@@ -18,13 +18,6 @@ class DoctorProfileViewModel: ObservableObject {
          self.doctor = doctor
      }
     
-
-//    init () {
-//        if let img = doctor.img{
-//            loadImage(from: img)
-//        }
-//    }
-//    
     func updateData(UpdateData: DoctorModel,completien : @escaping (Bool) -> Void){
     clearErrors()
     guard validateData() else{
@@ -126,19 +119,26 @@ class DoctorProfileViewModel: ObservableObject {
     }
     
     func updateProfileImage(newImage: UIImage) {
-                
-        let uploadURL = "http://127.0.0.1:8000/api/profile/update-image"
+        let uploadURL = "http://127.0.0.1:8000/api/doctor/update-img"
         isLoading = true
-        
         imageManager.uploadImage(image: newImage, url: uploadURL) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
-                
                 switch result {
                 case .success(let newPath):
-                    self?.doctor.img = newPath
-                    self?.loadImage(from: newPath)
                     
+                    print("susses update image : \(newPath)")
+                    guard let decodedData = try? JSONDecoder().decode(responseDoctorImg.self, from: newPath) else {
+                        print("error to decode response doctor img!!!")
+                        return
+                    }
+//                    let baseURL = "http://127.0.0.1:8000"
+//                    let fullImageURL = baseURL + decodedData.image_url
+                    self?.doctor.img = decodedData.image_url
+                    self?.loadImage(from: decodedData.image_url)
+                    self?.successMessage = decodedData.message
+                    print("susses update image  in loadImage: \(decodedData.image_url)")
+
                 case .failure(let error):
                     self?.errorMessage = error.localizedDescription
                 }
@@ -146,4 +146,9 @@ class DoctorProfileViewModel: ObservableObject {
         }
     }
 
+}
+
+struct responseDoctorImg : Codable {
+    var message: String
+    var image_url : String
 }

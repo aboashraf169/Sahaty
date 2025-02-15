@@ -38,5 +38,5 @@ struct AdviceView: View {
     
 }
 #Preview {
-    AdviceView(advice: AdviceModel(id: 0, advice: "انا محمد اشرف المجايدة حبيب القلب", doctorID: 1, createdAt: "", updatedAt: ""))
+    AdviceView(advice: AdviceModel(id: 0, advice: "انا محمد اشرف المجايدة", doctorID: 1, createdAt: "", updatedAt: ""))
 }

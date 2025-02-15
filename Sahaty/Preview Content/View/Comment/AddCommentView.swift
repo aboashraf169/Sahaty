@@ -12,7 +12,7 @@ struct AddCommentView: View {
             VStack {
                 List {
                     ForEach(viewModel.comments) { comment in
-                        CommentView(comment: comment)
+                        CommentView(comment: comment, viewModel: viewModel)
                             .swipeActions(edge: .leading) {
                                 if comment.user.id == currentUserID{
                                     Button("delete", role: .destructive) {
@@ -20,12 +20,6 @@ struct AddCommentView: View {
                                     }
                                 }
                             }
-
-//                            .swipeActions(edge: .leading){
-//                                    Button("delete", role: .destructive) {
-//                                        viewModel.deleteComment(idComment: comment.id)
-//                                    }
-//                                }
                     }
                 }
                 

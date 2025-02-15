@@ -1,21 +1,16 @@
 import SwiftUI
-import PhotosUI
-
 struct PatientSettingView: View {
     
-//    var viewModel : PatiantModel?
     @AppStorage("isDarkModePatient") private var isDarkModePatient = false // حفظ الاختيار
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
     @ObservedObject var patientViewModel : PatientSettingViewModel
-    @State private var selectedImage: UIImage? = nil
-    @State private var selectedImageItem: PhotosPickerItem? = nil
     @State private var showImagePicker = false
     @State private var showNotificationView = false
     @State private var showNotificationToggle = false
     @State private var showSavedView = false
     @State private var showRestPasswordView = false
     @State private var showLogoutAlert = false
-
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -25,22 +20,16 @@ struct PatientSettingView: View {
                         Circle()
                             .fill(Color.accentColor.opacity(0.1))
                             .frame(width: 120, height: 120)
-                        
-                        if let selectedImage = selectedImage {
+
+                        if let selectedImage = patientViewModel.patientProfileImage {
                             Image(uiImage: selectedImage)
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 120, height: 120)
                                 .clipShape(Circle())
                                 .shadow(radius: 5)
-                        } else if let image = patientViewModel.patient.img {
-                            Image(image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 120, height: 120)
-                                .clipShape(Circle())
-                                .shadow(radius: 5)
-                        } else {
+                        }
+                        else {
                             Image(systemName: "person.fill")
                                 .resizable()
                                 .scaledToFit()
@@ -48,6 +37,7 @@ struct PatientSettingView: View {
                                 .foregroundStyle(Color.accentColor)
                                 .shadow(radius: 5)
                         }
+                        
                         Button {
                             showImagePicker.toggle()
                         } label: {
@@ -68,20 +58,15 @@ struct PatientSettingView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
-                .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
-                .onChange(of: selectedImageItem) { _, newValue in
-
-                }
-
                 // Navigation Links
                 NavigationLink("edit_profile".localized(), destination:
                                 EditPationtDataProfileView(patientViewModel: patientViewModel))
-                    .padding(.horizontal)
-                    .foregroundStyle(.white)
-                    .padding(10)
-                    .background(Color.accentColor)
-                    .cornerRadius(15)
-                    .padding(.vertical)
+                .padding(.horizontal)
+                .foregroundStyle(.white)
+                .padding(10)
+                .background(Color.accentColor)
+                .cornerRadius(15)
+                .padding(.vertical)
                 
                 Divider()
                 
@@ -143,11 +128,15 @@ struct PatientSettingView: View {
             .navigationBarTitle("profile".localized())
             .navigationBarTitleDisplayMode(.inline)
             .preferredColorScheme(isDarkModePatient ? .dark : .light)
-            .direction(appLanguage) // ضبط اتجاه النصوص
-            .environment(\.locale, .init(identifier: appLanguage)) // ضبط البيئة
+            .direction(appLanguage)
+            .environment(\.locale, .init(identifier: appLanguage))
+            .sheet(isPresented: $showImagePicker){
+                ImagePicker(selectedImage: $patientViewModel.patientProfileImage, onImagePicked: { image in
+                    patientViewModel.updateProfileImage(newImage: image)
+                })
+            }
         }
     }
-
 }
 
 #Preview {

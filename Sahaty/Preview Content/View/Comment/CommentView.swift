@@ -9,12 +9,14 @@ import SwiftUI
 struct CommentView: View {
     
     let comment: CommentModel
+    @ObservedObject  var viewModel : CommentViewModel
+
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
 
             // الصورة الرمزية
-            if let image = comment.user.img {
-                Image(image)
+            if let image = viewModel.autherCommentImage {
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 40, height: 40)
@@ -51,5 +53,5 @@ struct CommentView: View {
 }
 
 #Preview {
-    CommentView(comment: CommentModel())
+    CommentView(comment: CommentModel(), viewModel: CommentViewModel())
 }

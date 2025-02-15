@@ -27,29 +27,24 @@ struct EditPationtDataProfileView: View {
                         .fill(Color.accentColor.opacity(0.1))
                         .frame(width: 120, height: 120)
                     
-                    if let selectedImage = selectedImage {
+          
+                    if let selectedImage = patientViewModel.patientProfileImage {
                         Image(uiImage: selectedImage)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 120, height: 120)
                             .clipShape(Circle())
                             .shadow(radius: 5)
-                    } else if let image = patientViewModel.patient.img {
-                        Image(image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 120, height: 120)
-                            .clipShape(Circle())
-                            .shadow(radius: 5)
-                    } else {
+                    }
+                    else {
                         Image(systemName: "person.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 100, height: 100)
                             .foregroundStyle(Color.accentColor)
                             .shadow(radius: 5)
-                        
                     }
+                    
                     Button {
                         showImagePicker.toggle()
                     } label: {
@@ -72,10 +67,6 @@ struct EditPationtDataProfileView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-                .photosPicker(isPresented: $showImagePicker, selection: $selectedImageItem)
-                .onChange(of: selectedImageItem) { _, newValue in
-                }
-            
             Divider()
         ScrollView{
             EditField(title: "name".localized(), text: $patientViewModel.patient.name)
@@ -99,6 +90,11 @@ struct EditPationtDataProfileView: View {
         }
         .direction(appLanguage) // ضبط الاتجاه
         .environment(\.locale, .init(identifier: appLanguage)) // اللغة المختارة
+        .sheet(isPresented: $showImagePicker){
+            ImagePicker(selectedImage: $patientViewModel.patientProfileImage) { image in
+                patientViewModel.updateProfileImage(newImage: image)
+            }
+        }
 
 
      

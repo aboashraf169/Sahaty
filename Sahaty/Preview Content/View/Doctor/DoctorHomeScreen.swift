@@ -33,10 +33,10 @@ struct DoctorHomeScreen: View {
                     onAddTap:{
                         showAddArticleView.toggle()
                         print("تم النقر على زر الإضافة (الدكتور)")
-                    },
-                    onSearch:{ text in
-                        print("تم النقر على البحث المستخدم (الدكتور)")
                     }
+//                    onSearch:{ text in
+//                        print("تم النقر على البحث المستخدم (الدكتور)")
+//                    }
                 )
                 
                 // MARK: - Advice Section
@@ -47,6 +47,7 @@ struct DoctorHomeScreen: View {
                 
                 Spacer()
             }
+        
         }
         .direction(appLanguage)
         .environment(\.locale, .init(identifier: appLanguage))
@@ -185,11 +186,11 @@ struct DoctorHomeScreen: View {
             }else {
                 ScrollView(.vertical, showsIndicators: false){
                     VStack(spacing: 12) {
-                        ForEach(articlesViewModel.articals) { article in
+                        ForEach(articlesViewModel.isSearching ?  articlesViewModel.filteredArticals : articlesViewModel.articals) { article in
                             ArticleView(
                                 articleModel: article,
                                 articalViewModel: articlesViewModel,
-                                usersType: .doctor, path: article.img ?? ""
+                                usersType: .doctor, pathImgArtical: article.img ?? "",pathImgDoctor: article.doctor.img ?? ""
                             )
                         }
                     }

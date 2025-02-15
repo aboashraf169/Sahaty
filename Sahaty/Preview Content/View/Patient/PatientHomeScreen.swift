@@ -12,51 +12,52 @@ struct PatientHomeScreen: View {
 
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             VStack {
-                // MARK: - Header Section
-                HeaderPatientHomeSectionView(
-                    patientViewModel : patientViewModel,
-                    searchText: $searchText, // تمرير نص البحث كـ Binding
-                    onProfileTap: {
-                        appState.selectedTabPatients = .settings
-                        print("تم النقر على صورة المستخدم (الدكتور)")
-                    },
-                    onAddTap: {
-                    }, onSearch: {_ in 
-                    }
-                )
                 ScrollView {
+                // MARK: - Header Section
+//                HeaderPatientHomeSectionView(
+//                    patientViewModel : patientViewModel, articlesViewModel: articlesViewModel,
+//                    searchText: $searchText, // تمرير نص البحث كـ Binding
+//                    onProfileTap: {
+//                        appState.selectedTabPatients = .settings
+//                        print("تم النقر على صورة المستخدم (الدكتور)")
+//                    },
+//                    onAddTap: {
+//                    }, onSearch: {_ in 
+//                    }
+//                )
+             
                     // MARK: - Daily Advice Section
                         titleCategory(title: "daily_advices".localized())
-                        dailyAdviceSection
+                    DailyAdviceSection(adviceViewModel: adviceViewModel)
                                     
                     // MARK: - Categories Section
-                    HStack {
-                        Text("categories".localized())
-                            .font(.headline)
-                            .fontWeight(.regular)
-                        Spacer()
-                        Button {
-                            showAllSpecializations.toggle()
-                        } label: {
-                            Text("Show All".localized())
-                                .font(.headline)
-                                .fontWeight(.regular)
-                                .foregroundStyle(Color.accent)
-                        }
-
-                       
-                    }
-                    .multilineTextAlignment(.leading)
-                    .padding(.vertical,10)
-                    .cornerRadius(10)
-                    .padding(.horizontal,10)
-                    .sheet(isPresented: $showAllSpecializations) {
-                        AllSpecializationsView(specializationViewModel: specializationViewModel)
-                    }
+//                    HStack {
+//                        Text("categories".localized())
+//                            .font(.headline)
+//                            .fontWeight(.regular)
+//                        Spacer()
+//                        Button {
+//                            showAllSpecializations.toggle()
+//                        } label: {
+//                            Text("Show All".localized())
+//                                .font(.headline)
+//                                .fontWeight(.regular)
+//                                .foregroundStyle(Color.accent)
+//                        }
+//
+//                       
+//                    }
+//                    .multilineTextAlignment(.leading)
+//                    .padding(.vertical,10)
+//                    .cornerRadius(10)
+//                    .padding(.horizontal,10)
+//                    .sheet(isPresented: $showAllSpecializations) {
+//                        AllSpecializationsView(specializationViewModel: specializationViewModel)
+//                    }
                     
-                    categoriesSection
+//                    categoriesSection
                 
                     // MARK: - Articles Section
                     titleCategory(title: "new_articles".localized())
@@ -79,19 +80,21 @@ struct PatientHomeScreen: View {
                                 }
                         } else {
                             VStack(spacing: 10) {
-                                ForEach(articlesViewModel.articals) { article in
-                                    ArticleView(articleModel: article, articalViewModel: articlesViewModel, usersType: .patient,path: article.img ?? "")
+                                ForEach(articlesViewModel.isSearching ?  articlesViewModel.filteredArticals : articlesViewModel.articals) {article in
+                                    ArticleView(articleModel: article, articalViewModel: articlesViewModel, usersType: .patient,pathImgArtical: article.img ?? "",pathImgDoctor: article.doctor.img ?? "")
                                 }
                             }
                         }
                     
                 }
             }
+           
 
         }
         .direction(appLanguage)
         .environment(\.locale, .init(identifier: appLanguage))
         .preferredColorScheme(patientViewModel.isDarkModePatient ? .dark : .light)
+        .searchable(text: $articlesViewModel.searchText, placement: .automatic, prompt: Text("search_placeholder".localized()))
         .onAppear{
             articlesViewModel.fetchArtical(isDoctor: false)
             specializationViewModel.getSpacialties()
@@ -99,59 +102,20 @@ struct PatientHomeScreen: View {
         }
     }
     
-    // MARK: - Daily Advice Section
-    private var dailyAdviceSection: some View {
-        Group {
-            if let advice = adviceViewModel.userAdvices.last {
-                Button {
-                    print("عرض تفاصيل النصيحة: \(advice.advice) - \( advice.id)")
-                } label: {
-                    Rectangle()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 80)
-                        .foregroundStyle(Color.accentColor)
-                        .overlay(
-                            HStack {
-                                Image("idea")
-                                ViewThatFits {
-                                    Text((advice.advice))
-                                        .font(.callout)
-                                        .foregroundColor(.white)
-                                }
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
-                                Spacer()
-                            }
-                            .padding()
-                        )
-                }
-                .buttonStyle(.plain)
-            } else {
-                HStack {
-                    Text("no_advices".localized())
-                        .fontWeight(.medium)
-                        .foregroundStyle(.gray)
-                    Spacer()
-                }
-                .padding(.horizontal,20)
-            }
-        }
-    }
-    
-    // MARK: - Categories Section
-    private var categoriesSection: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                ForEach(specializationViewModel.specializations){ specialist in
-                    CategorySpecializaton(specialization: specialist){action in
-                    }
-                }
-            }
-            .padding(.horizontal)
-        }
-        .frame(maxHeight: 100)
-       
-    }
+//    // MARK: - Categories Section
+//    private var categoriesSection: some View {
+//        ScrollView(.horizontal, showsIndicators: false) {
+//            HStack {
+//                ForEach(specializationViewModel.specializations){ specialist in
+//                    CategorySpecializaton(specialization: specialist){action in
+//                    }
+//                }
+//            }
+//            .padding(.horizontal)
+//        }
+//        .frame(maxHeight: 100)
+//       
+//    }
     
     // MARK: - Title Category
     private func titleCategory(title: String) -> some View {
@@ -240,3 +204,6 @@ struct CategorySpecializaton: View {
 #Preview {
     PatientHomeScreen(adviceViewModel: AdviceViewModel(), articlesViewModel: ArticalsViewModel(), patientViewModel: PatientSettingViewModel())
 }
+
+
+

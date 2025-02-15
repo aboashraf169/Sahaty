@@ -12,8 +12,7 @@ struct SpecializationsDoctorsView: View {
     @AppStorage("appLanguage") private var appLanguage = "ar"
     @State private var expandedSections: [Int: Bool] = [:]
     @State var follower : folower = .AllDoctors
-    
-    
+
     
     var body: some View {
         NavigationStack {
@@ -39,7 +38,6 @@ struct SpecializationsDoctorsView: View {
         }
         .onAppear {
             viewModel.getSpacialties()
-            patientViewModel.getDoctorsFollowers()
         }
     }
     
@@ -80,7 +78,8 @@ struct SpecializationsDoctorsView: View {
                             if patientViewModel.expandedSpecializations[data.id] == true {
                                 if let doctors = patientViewModel.doctorsBySpecialization[data.id] {
                                     ForEach(doctors) { doctor in
-                                        doctorRowData(patientViewModel: patientViewModel, doctor: doctor)
+                                        doctorRowData(patientViewModel: patientViewModel, doctor: doctor,
+                                                      pathImgDoctor: doctor.img ?? "")
                                         Divider()
                                     }
                                     .padding(.horizontal,30)
@@ -100,12 +99,14 @@ struct SpecializationsDoctorsView: View {
         ScrollView{
             LazyVStack{
                 ForEach(patientViewModel.doctorFollowers) {doctor in
-                    doctorRowData(patientViewModel: patientViewModel, doctor: doctor)
+                    doctorRowData(patientViewModel: patientViewModel, doctor: doctor, pathImgDoctor: doctor.img ?? "")
                     Divider()
                 }
             }
             .padding(.vertical)
             .padding()
+        }.onAppear {
+            patientViewModel.getDoctorsFollowers()
         }
     }
 }
@@ -114,15 +115,15 @@ struct SpecializationsDoctorsView: View {
 struct doctorRowData: View {
     @ObservedObject var patientViewModel : PatientSettingViewModel
     @State var doctor : DoctorModel
+    var pathImgDoctor : String
     var body: some View {
         HStack {
             HStack(alignment: .center, spacing: 10) {
-                if let img =  doctor.img {
-                    Image(img)
+                if let img =  patientViewModel.doctorImages[doctor.id] {
+                    Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
                         .shadow(radius: 2)
-                        .padding(.top, 5)
                         .frame(width: 40, height: 40)
                         .background(Color(.systemGray6))
                         .clipShape(Circle())
@@ -143,18 +144,30 @@ struct doctorRowData: View {
                 }
                 
                 Spacer()
-                
                 Button(action: {
-//                    patientViewModel.isFollowed.toggle()
                     patientViewModel.actionFollowDoctor(doctorId: doctor.id)
-//                    print("تم الضغط على الزر لمتابعة \(doctor.name)")
+                    patientViewModel.getDoctorsFollowers()
                 }) {
-                    Text("follow".localized())
+                    Text(patientViewModel.doctorsIsFollow[doctor.id] == true ? "Unfollow".localized() : "follow".localized())
                         .foregroundColor(.white)
                         .padding(.horizontal)
                         .padding(.vertical, 7)
-                        .background(Color.accentColor)
+                        .background(patientViewModel.doctorsIsFollow[doctor.id] == true ? Color.accentColor : Color.accentColor)
                         .cornerRadius(8)
+                }
+
+//                Button(action: {
+//                    patientViewModel.actionFollowDoctor(doctorId: doctor.id)
+//                }) {
+//                    Text("follow".localized())
+//                        .foregroundColor(.white)
+//                        .padding(.horizontal)
+//                        .padding(.vertical, 7)
+//                        .background(Color.accentColor)
+//                        .cornerRadius(8)
+//                }
+                .onAppear {
+                    patientViewModel.doctorImage(from: pathImgDoctor, for: doctor.id)
                 }
             }
         }

@@ -35,6 +35,7 @@ class APIManager {
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        
         // Add Bearer Token if available
         if let token = bearerToken {
             print("Bearer Token being sent: \(token)")

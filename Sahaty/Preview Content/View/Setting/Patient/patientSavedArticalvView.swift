@@ -18,7 +18,8 @@ struct patientSavedArticalvView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(articalsViewModel.savedArticals) { savedArticals in
-                        ArticleView(articleModel: savedArticals, articalViewModel: articalsViewModel, usersType: .patient, path: articalsViewModel.article.img ?? "")
+                        ArticleView(articleModel: savedArticals, articalViewModel: articalsViewModel, usersType: .patient, pathImgArtical: savedArticals.img ?? ""
+                                    ,pathImgDoctor: savedArticals.doctor.img ?? "")
                     }
                 }
             }

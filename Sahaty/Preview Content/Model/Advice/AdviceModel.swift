@@ -100,6 +100,6 @@ struct AdviceLink: Codable {
     let first: String
     let last: String
     let prev: Int?
-    let next: String
+    let next: String?
 }
 

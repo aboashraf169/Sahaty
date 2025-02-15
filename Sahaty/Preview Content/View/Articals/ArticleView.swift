@@ -15,19 +15,18 @@ struct ArticleView: View {
     @State private var showEditSheet = false
     @State private var showDeleteAlert = false
     @AppStorage("appLanguage") private var appLanguage = "ar"
-    var path : String
+    var pathImgArtical : String
+    var pathImgDoctor : String
 
     var body: some View {
         VStack(spacing: 20) {
             HStack {
                 // صورة صاحب المنشور
-                
-                if let image = articalViewModel.doctorImage{
+                if let image = articalViewModel.doctorImages[articleModel.doctor.id]{
                     Image(uiImage:image)
                         .resizable()
                         .scaledToFill()
                         .shadow(radius: 2)
-                        .padding(.top, 5)
                         .frame(width: 40, height: 40)
                         .background(Color(.systemGray6))
                         .clipShape(Circle())
@@ -35,11 +34,12 @@ struct ArticleView: View {
                     Image(systemName: "person.fill")
                         .resizable()
                         .scaledToFit()
-                        .padding(.top,3)
+                        .shadow(radius: 2)
+                        .padding(.top, 5)
                         .frame(width: 40, height: 40)
-                        .background(Color.accentColor)
+                        .background(Color(.systemGray6))
+                        .foregroundStyle(.accent)
                         .clipShape(Circle())
-                        .foregroundColor(.white)
                 }
                 
                 // بيانات صاحب المنشور
@@ -96,7 +96,7 @@ struct ArticleView: View {
                 .font(.callout)
                 .fontWeight(.light)
         
-            if let image = articalViewModel.loadedImage {
+            if let image = articalViewModel.loadedImages[articleModel.id] {
                 Rectangle()
                     .frame(maxWidth: .infinity)
                     .frame(height: 200)
@@ -110,7 +110,7 @@ struct ArticleView: View {
                     }
             }
         
-            FotterArtical(articleViewModel: articalViewModel, id: articleModel.id)
+            FotterArtical(type: usersType, articleViewModel: articalViewModel, id: articleModel.id)
 
         }
         .padding(.horizontal)
@@ -121,13 +121,13 @@ struct ArticleView: View {
             EditArticleSheetView(articalsViewModel: articalViewModel, article: articleModel)
         }
         .onAppear{
-            articalViewModel.loadImage(from: path)
-            articalViewModel.doctorImage(from: path)
+            articalViewModel.loadImage(from: pathImgArtical, for: articleModel.id)
+            articalViewModel.doctorImage(from: pathImgDoctor, for: articleModel.doctor.id)
         }
     }
 }
 
 #Preview {
-    ArticleView(articleModel: ArticleModel(id: 0, title: "كيفية الوقاية من أمراض القلب", subject: "تتعدد طرق الوقاية من أمراض القلب مثل تقليل التوتر، تناول غذاء صحي غني بالألياف، ممارسة الرياضة بانتظام، والحفاظ على وزن صحي. يجب على الأشخاص الذين لديهم تاريخ عائلي لأمراض القلب أن يتابعوا فحوصاتهم الطبية بشكل دوري.", img: nil, doctor: ArticleDoctor(id: 1, name: "احمد ماهر معين الحناوي", email: "mido@gmail.com", img: "post2")), articalViewModel: ArticalsViewModel(), usersType: .doctor, path: "")
+    ArticleView(articleModel: ArticleModel(id: 0, title: "كيفية الوقاية من أمراض القلب", subject: "تتعدد طرق الوقاية من أمراض القلب مثل تقليل التوتر، تناول غذاء صحي غني بالألياف، ممارسة الرياضة بانتظام، والحفاظ على وزن صحي. يجب على الأشخاص الذين لديهم تاريخ عائلي لأمراض القلب أن يتابعوا فحوصاتهم الطبية بشكل دوري.", img: nil, doctor: ArticleDoctor(id: 1, name: "احمد ماهر معين الحناوي", email: "mido@gmail.com", img: "post2")), articalViewModel: ArticalsViewModel(), usersType: .doctor, pathImgArtical: "", pathImgDoctor: "")
 }
 

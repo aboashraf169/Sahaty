@@ -14,8 +14,8 @@ struct HeaderPatientHomeSectionView: View {
             Button {
                 onProfileTap()
             } label: {
-                if let img = patientViewModel.patient.img {
-                    Image(img)
+                if let selectedImage = patientViewModel.patientProfileImage {
+                    Image(uiImage: selectedImage)
                         .resizable()
                         .scaledToFill()
                         .shadow(radius: 2)

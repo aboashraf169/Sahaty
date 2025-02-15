@@ -5,6 +5,8 @@ struct FotterArtical: View {
     @State private var stateSave = false
     @State private var showCommentView = false
     @State private var showShereSheet = false
+    var type : UsersType
+    @State var showSavedButton = false
     @State var articleViewModel : ArticalsViewModel
     @State var id : Int
     @StateObject var commentsViewModel = CommentViewModel()
@@ -65,17 +67,20 @@ struct FotterArtical: View {
                         .fontWeight(.ultraLight)
                 }
                 .foregroundStyle(.primary)
-                // زر الحفظ
-                Button {
-                    stateSave.toggle()
-                    articleViewModel.savedArtical(id: self.id)
-                } label: {
-                    Image(systemName: stateSave ? "bookmark.fill" : "bookmark")
-                        .font(.title2)
-                        .fontWeight(.ultraLight)
-                        .foregroundStyle(stateSave ? .accent : .primary)
+                
+                if type == .patient {
+                    // زر الحفظ
+                    Button {
+                        stateSave.toggle()
+                        articleViewModel.savedArtical(id: self.id)
+                    } label: {
+                        Image(systemName: stateSave ? "bookmark.fill" : "bookmark")
+                            .font(.title2)
+                            .fontWeight(.ultraLight)
+                            .foregroundStyle(stateSave ? .accent : .primary)
+                    }
                 }
-     
+           
                 
             }
             
@@ -108,5 +113,5 @@ struct FotterArtical: View {
 }
 
 #Preview {
-    FotterArtical(articleViewModel: ArticalsViewModel(), id: 0)
+    FotterArtical(type: .patient, articleViewModel: ArticalsViewModel(), id: 0)
 }

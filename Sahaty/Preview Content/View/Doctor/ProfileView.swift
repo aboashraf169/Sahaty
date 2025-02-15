@@ -134,7 +134,7 @@ struct AllArticlesView: View {
             ScrollView {
                 LazyVStack {
                     ForEach(articalViewModel.articals) { article in
-                        ArticleView(articleModel: article, articalViewModel: articalViewModel, usersType: .doctor,path: article.img ?? "")
+                        ArticleView(articleModel: article, articalViewModel: articalViewModel, usersType: .doctor,pathImgArtical: article.img ?? "",pathImgDoctor: article.doctor.img ?? "")
                     }
                 }
             }
@@ -173,7 +173,7 @@ struct ArticlesSectionView: View {
                         ArticleView(
                             articleModel: article,
                             articalViewModel: articalViewModel,
-                            usersType: .doctor, path: article.img ?? ""
+                            usersType: .doctor, pathImgArtical: article.img ?? "",pathImgDoctor: article.doctor.img ?? ""
                         )
                     }
                 }
@@ -250,7 +250,7 @@ struct ProfileHeaderView: View {
     @State var showImagePicker: Bool = false
     
     var body: some View {
-        VStack() {
+        VStack{
             ZStack {
                 Circle()
                     .fill(Color.accentColor.opacity(0.1))
@@ -264,14 +264,6 @@ struct ProfileHeaderView: View {
                         .clipShape(Circle())
                         .shadow(radius: 5)
                 }
-//                else if let image = viewModel.doctor.img {
-//                    Image(image)
-//                        .resizable()
-//                        .scaledToFill()
-//                        .frame(width: 120, height: 120)
-//                        .clipShape(Circle())
-//                        .shadow(radius: 5)
-//                }
                 else {
                     Image(systemName: "person.fill")
                         .resizable()
@@ -279,14 +271,10 @@ struct ProfileHeaderView: View {
                         .frame(width: 100, height: 100)
                         .foregroundStyle(Color.accentColor)
                         .shadow(radius: 5)
-                        
                 }
                
                     Button {
                         showImagePicker.toggle()
-                        if let doctorImage = viewModel.doctorProfileImage {
-                            viewModel.updateProfileImage(newImage: doctorImage)
-                        }
                     } label: {
                         Image(systemName: "camera.fill")
                             .foregroundStyle(Color.white)
@@ -296,16 +284,17 @@ struct ProfileHeaderView: View {
                     }
                     .offset(x: -40, y: 40)
                 
-     
-                
-     
             }
             Text(viewModel.doctor.name)
                 .font(.headline)
                 .fontWeight(.medium)
+
+
         }
         .sheet(isPresented: $showImagePicker) {
-            ImagePicker(selectedImage: $viewModel.doctorProfileImage)
+            ImagePicker(selectedImage: $viewModel.doctorProfileImage, onImagePicked: { image in
+                        viewModel.updateProfileImage(newImage: image)
+                    })
         }
     }
        
@@ -316,11 +305,11 @@ struct ProfileHeaderView: View {
 struct DoctorStatisticsView: View {
     @ObservedObject var viewModel: DoctorProfileViewModel
     var body: some View {
-        HStack(spacing: 20) {
-            StatisticView(title: "Followers".localized(), value: "\(viewModel.doctorInfo.number_of_followers)")
-            StatisticView(title: "Articles".localized(), value: "\(viewModel.doctorInfo.number_of_articles)")
-            StatisticView(title: "Advices".localized(), value: "\(viewModel.doctorInfo.number_of_advice)")
-        }
+            HStack(spacing: 20) {
+                StatisticView(title: "Followers".localized(), value: "\(viewModel.doctorInfo.number_of_followers)")
+                StatisticView(title: "Articles".localized(), value: "\(viewModel.doctorInfo.number_of_articles)")
+                StatisticView(title: "Advices".localized(), value: "\(viewModel.doctorInfo.number_of_advice)")
+            }
         .onAppear {
             viewModel.getInfoData()
         }
@@ -391,7 +380,7 @@ struct BioSectionView: View {
                     onSave()
 
                     }
-                    .foregroundColor(.red)
+                    .foregroundColor(.accentColor)
 
                     Button("Cancel".localized()) {
                         isEditingBio = false
@@ -419,5 +408,4 @@ struct BioSectionView: View {
 #Preview {
     ProfileView(viewModel: DoctorProfileViewModel(), adviceViewModel: AdviceViewModel(), articalViewModel: ArticalsViewModel())
 }
-
 

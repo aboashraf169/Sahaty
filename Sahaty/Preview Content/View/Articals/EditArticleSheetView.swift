@@ -103,7 +103,7 @@ struct EditArticleSheetView: View {
                         .frame(height: 170)
                         .overlay {
                             VStack {
-                                if let imageSelected = articalsViewModel.image {
+                                if let imageSelected = articalsViewModel.addImage {
                                     Image(uiImage: imageSelected)
                                         .resizable()
                                         .scaledToFit()
@@ -159,7 +159,7 @@ struct EditArticleSheetView: View {
         .direction(appLanguage)
         .environment(\.locale, .init(identifier: appLanguage))
         .sheet(isPresented: $ShowImagePicker) {
-            ImagePicker(selectedImage: $articalsViewModel.image)
+            ImagePicker(selectedImage: $articalsViewModel.addImage, onImagePicked: {_ in})
         }
     }
 }
