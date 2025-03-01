@@ -36,21 +36,8 @@ struct PatientTabBarView: View {
                 }
                 .tag(TabPatient.Doctors)
 
-            
-//            Text("Chats".localized())
-//                        .font(.largeTitle)
-//                        .fontWeight(.bold)
-//                .tabItem{
-//                    HStack{
-//                        Text("Chats".localized())
-//                        Image(systemName: "message")
-//                    }
-//                }
-//                .tag(TabPatient.chat)
-//                .badge(3)
-//            
             // MARK: - Notifications Tab
-            NotificationsView()
+            patientNotificationsView()
                 .tabItem {
                     HStack {
                         Text("notifications".localized())
@@ -75,6 +62,7 @@ struct PatientTabBarView: View {
         .direction(appLanguage)
         .environmentObject(appState)
         .environment(\.locale, .init(identifier: appLanguage))
+    
     }
 }
 

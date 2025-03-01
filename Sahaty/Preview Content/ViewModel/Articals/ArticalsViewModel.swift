@@ -5,18 +5,24 @@ import Combine
 class ArticalsViewModel: ObservableObject {
     // MARK: - Properties
     @Published var articals: [ArticleModel] = []
+    @Published var doctorsArticals : [ArticleModel] = []
     @Published var filteredArticals: [ArticleModel] = []
+    @Published var savedArticals : [ArticleModel] = []
     @Published var article : ArticleModel = ArticleModel()
     @Published var loadedImages: [Int: UIImage] = [:]
     @Published var doctorImages: [Int: UIImage] = [:]
-    @Published var addImage: UIImage? = nil
-    @Published var savedArticals : [ArticleModel] = []
+    @Published var actionLike: [Int: Bool] = [0 : false]
+    @Published var actionSaved: [Int: Bool] = [0:false]
     @Published var showAlert: Bool = false
     @Published var isLodeing: Bool = false
+    @Published var isLoading: Bool = false
     @Published var alertTitle: String = ""
     @Published var alertMessage: String = ""
     @Published var searchText: String = ""
+    @Published var addImage: UIImage? = nil
+    @Published var articleUpdateImage : UIImage? = nil
     private var cancellables = Set<AnyCancellable>()
+    private let imageManager = ImageManager.shared
 
     var isSearching: Bool {
         !searchText.isEmpty
@@ -26,6 +32,7 @@ class ArticalsViewModel: ObservableObject {
         addSubscribers()
     }
     
+    // MARK: - Manage Search
     private func addSubscribers() {
         $searchText
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
@@ -34,7 +41,6 @@ class ArticalsViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-    
     private func filterRestaurants(searchText: String) {
         guard !searchText.isEmpty else {
             filteredArticals = []
@@ -78,6 +84,30 @@ class ArticalsViewModel: ObservableObject {
         }
     }
     
+    func fetchArticalsDoctors(){
+        isLodeing = true
+        APIManager.shared.sendRequest(endpoint:"/doctors-articles", method: .get) {result in
+            switch result {
+            case .success(let data) :
+               print("get data success")
+                guard let decodeData = try? JSONDecoder().decode(responseArticals.self, from: data) else {
+                    print("error to decode data!!!!")
+                    return
+                }
+                print("success to decode data \(decodeData.data)")
+                DispatchQueue.main.async { [weak self] in
+                    self?.isLodeing = false
+                    self?.doctorsArticals = decodeData.data
+                    print("var Articals\(decodeData.data)")
+                }
+                print("fetch Articals successfully")
+
+                
+            case .failure(let error) :
+                print("error to get data:\(error)")
+            }
+        }
+    }
     
     // MARK: - fetch Artical Saved
     func fetchArticalSaved(){
@@ -104,7 +134,6 @@ class ArticalsViewModel: ObservableObject {
             }
         }
     }
-    
     
     // MARK: - Add Article
     func addArtical(artical : ArticleModel , completion : @escaping (Bool)-> Void){
@@ -176,8 +205,6 @@ class ArticalsViewModel: ObservableObject {
 
     }
     
-    
-    
     // MARK: - update Article
     func updateArtical(artical : ArticleModel , completion : @escaping (Bool) -> Void) {
         self.isLodeing = true
@@ -210,9 +237,6 @@ class ArticalsViewModel: ObservableObject {
         
     }
     
-    
-    
-    
     // MARK: - Delete Article
     func deleteAdvice(id : Int) {
         self.isLodeing = true
@@ -234,15 +258,20 @@ class ArticalsViewModel: ObservableObject {
     
     
     // MARK: - Save Article
-    
     func savedArtical(id : Int) {
         self.isLodeing = true
         APIManager.shared.sendRequest(endpoint: "/article/\(id)/save", method: .post) { result in
             DispatchQueue.main.async {[weak self] in
                 self?.isLodeing = false
                 switch result {
-                case .success(_):
+                case .success(let data):
                     print("artical is saved")
+                    guard let  decodedData = try? JSONDecoder().decode(ResopnseSavedAction.self, from: data)else {
+                         print("error to decode like Artical")
+                        return
+                    }
+                    print("success saved article data \(id):\(decodedData.message)")
+                    self?.actionSaved[id] = decodedData.saved
                 case .failure(let error) :
                     print("error to save artical:\(error)")
                 }
@@ -258,8 +287,15 @@ class ArticalsViewModel: ObservableObject {
             DispatchQueue.main.async {[weak self] in
                 self?.isLodeing = false
                 switch result {
-                case .success(_):
+                case .success(let data):
                     print("artical is liked")
+                    guard let  decodedData = try? JSONDecoder().decode(ResopnseLikeAction.self, from: data)else {
+                         print("error to decode like Artical")
+                        return
+                    }
+                    print("success liked article data \(id):\(decodedData.message)")
+                    self?.actionLike[id] = decodedData.like
+                                    
                 case .failure(let error) :
                     print("error to like artical:\(error)")
                 }
@@ -267,13 +303,34 @@ class ArticalsViewModel: ObservableObject {
         }
     }
 
-    func loadImage(from path: String, for articleId: Int) {
+    
+    // MARK: - Manage Image
+    func updateArticalImage(newImage: UIImage,articleId : Int) {
+        let uploadURL = "http://127.0.0.1:8000/api/doctor/article/\(articleId)/update-img"
+        isLoading = true
+        imageManager.uploadImage(image: newImage, url: uploadURL) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                switch result {
+                case .success(_):
+                    self?.loadedImages[articleId] = self?.articleUpdateImage
+                    self?.articleUpdateImage = nil
+                    print("susses update image  in loadImage")
+                case .failure(let error):
+                    print("error update image  in loadImage :\(error)")
+                }
+            }
+        }
+    }
+
+    func loadImages(from path: String, for articleId: Int) {
         ImageManager.shared.fetchImage(imagePath: path) { image in
             DispatchQueue.main.async { [weak self] in
                 self?.loadedImages[articleId] = image
             }
         }
     }
+    
     func doctorImage(from path: String,for doctorId: Int) {
         ImageManager.shared.fetchImage(imagePath: path) { image in
             DispatchQueue.main.async {[weak self] in
@@ -287,8 +344,15 @@ class ArticalsViewModel: ObservableObject {
 
 
 
+struct ResopnseLikeAction : Codable {
+    var message : String
+    var like : Bool
+}
 
-
+struct ResopnseSavedAction : Codable {
+    var message : String
+    var saved : Bool
+}
 
 
 

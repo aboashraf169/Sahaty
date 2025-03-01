@@ -13,7 +13,10 @@ struct ArticleModel: Identifiable, Codable {
     var subject: String = ""
     var img: String? = nil
     var doctor: ArticleDoctor = ArticleDoctor()
-    
+    var num_comments: Int = 0
+    var num_likes: Int = 0
+    var created_at: String = ""
+
     
     // MARK: - API Request Body
     func toDictionary() -> [String : Any] {

@@ -25,7 +25,6 @@ struct DoctorHomeScreen: View {
                 // MARK: - Header Section
                 HeaderHomeSectionView(
                     doctorProfileViewModel: doctorProfileViewModel,
-                    searchText: .constant(""),
                     onProfileTap:{
                         appState.selectedTabDoctors = .profile
                         print("تم النقر على صورة المستخدم (الدكتور)")
@@ -34,9 +33,6 @@ struct DoctorHomeScreen: View {
                         showAddArticleView.toggle()
                         print("تم النقر على زر الإضافة (الدكتور)")
                     }
-//                    onSearch:{ text in
-//                        print("تم النقر على البحث المستخدم (الدكتور)")
-//                    }
                 )
                 
                 // MARK: - Advice Section
@@ -45,7 +41,14 @@ struct DoctorHomeScreen: View {
                 // MARK: - Articles Section
                 articlesSection
                 
-                Spacer()
+//                Spacer()
+                           
+                HStack {
+                    FloatingChatButton()
+                        .padding(.bottom,10)
+                    Spacer()
+                }.zIndex(0)
+            
             }
         
         }
@@ -54,7 +57,8 @@ struct DoctorHomeScreen: View {
         .preferredColorScheme(doctorProfileViewModel.isDarkModeDoctor ? .dark : .light)
         .onAppear{
             adviceViewModel.fetchAdvices()
-            articlesViewModel.fetchArtical(isDoctor: true)
+            articlesViewModel.fetchArticalsDoctors()
+            doctorProfileViewModel.getInfoData()
         }
 
     }
@@ -89,7 +93,7 @@ struct DoctorHomeScreen: View {
             .padding(.bottom, 10)
             
             // عرض النصائح
-            if adviceViewModel.advices.isEmpty {
+            if adviceViewModel.doctorAdvices.isEmpty {
                 // في حال عدم وجود نصائح
                 HStack {
                     Text("no_advices".localized())
@@ -101,14 +105,14 @@ struct DoctorHomeScreen: View {
             } else {
                 // في حال وجود نصائح
                 List{
-                    ForEach(adviceViewModel.advices) { advice in
+                    ForEach(adviceViewModel.doctorAdvices) { advice in
                         AdviceView(advice: advice)
                             .swipeActions(edge:.leading) {
                                 Button(role: .destructive)
                                 {
                                 adviceViewModel.deleteAdvice(
                                     at: IndexSet(integer:
-                                    adviceViewModel.advices.firstIndex(where: {$0.id == advice.id}) ?? 0)
+                                                    adviceViewModel.doctorAdvices.firstIndex(where: {$0.id == advice.id}) ?? 0)
                                     )
                                 } label: {
                                     Label("Delete", systemImage: "trash")
@@ -126,8 +130,8 @@ struct DoctorHomeScreen: View {
                         
                     }
                 }
-                .listStyle(.plain)
-                .frame(maxHeight: 200)
+//                .listStyle()
+                .frame(maxHeight: 100)
 
             }
         }
@@ -162,13 +166,15 @@ struct DoctorHomeScreen: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 10)
+            .padding(.top, 15)
             .sheet(isPresented: $showAddArticleView) {
                 AddArticleSheetView(articalsViewModel: articlesViewModel)
                     .presentationCornerRadius(30)
             }
             
-            if articlesViewModel.articals.isEmpty {
+            if articlesViewModel.doctorsArticals.isEmpty {
                 VStack(spacing: 20) {
+                    Spacer()
                     Image("noArtical")
                         .resizable()
                         .scaledToFit()
@@ -181,16 +187,17 @@ struct DoctorHomeScreen: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 30)
+                    Spacer()
                     
                 }
             }else {
                 ScrollView(.vertical, showsIndicators: false){
                     VStack(spacing: 12) {
-                        ForEach(articlesViewModel.isSearching ?  articlesViewModel.filteredArticals : articlesViewModel.articals) { article in
+                        ForEach(articlesViewModel.doctorsArticals) { article in
                             ArticleView(
                                 articleModel: article,
                                 articalViewModel: articlesViewModel,
-                                usersType: .doctor, pathImgArtical: article.img ?? "",pathImgDoctor: article.doctor.img ?? ""
+                                usersType: .patient, pathImgArtical: article.img ?? "",pathImgDoctor: article.doctor.img ?? ""
                             )
                         }
                     }

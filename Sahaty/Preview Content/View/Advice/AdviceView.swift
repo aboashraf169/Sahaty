@@ -18,15 +18,15 @@ struct AdviceView: View {
             VStack(alignment: .leading, spacing: 5) {
                 // محتوى النصيحة
                 Text(advice.advice)
-                    .font(.title3)
-                    .fontWeight(.light)
+                    .font(.headline)
+                    .fontWeight(.regular)
                     .lineLimit(3)
                     .foregroundColor(.primary)
                 
-                // وقت الإنشاء أو التحديث
-                Text("\(advice.updatedAt)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+//                // وقت الإنشاء أو التحديث
+//                Text("\(advice.updatedAt)")
+//                    .font(.caption)
+//                    .foregroundColor(.secondary)
             }
             
             Spacer()
@@ -38,5 +38,5 @@ struct AdviceView: View {
     
 }
 #Preview {
-    AdviceView(advice: AdviceModel(id: 0, advice: "انا محمد اشرف المجايدة", doctorID: 1, createdAt: "", updatedAt: ""))
+    AdviceView(advice: AdviceModel(id: 0, advice: "انا محمد اشرف المجايدة"))
 }

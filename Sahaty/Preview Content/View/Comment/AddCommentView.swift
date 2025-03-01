@@ -2,7 +2,9 @@ import SwiftUI
 
 struct AddCommentView: View {
     @ObservedObject  var viewModel : CommentViewModel
+    @ObservedObject var articalViewModel : ArticalsViewModel
     @State var id : Int
+    var type : UsersType
     @AppStorage("appLanguage") private var appLanguage = "ar"
     @State var showAlert = false
     let currentUserID = UserDefaults.standard.integer(forKey: "currentUserID")
@@ -12,7 +14,7 @@ struct AddCommentView: View {
             VStack {
                 List {
                     ForEach(viewModel.comments) { comment in
-                        CommentView(comment: comment, viewModel: viewModel)
+                        CommentView(comment: comment, viewModel: viewModel, pathImgComment: comment.user.img ?? "")
                             .swipeActions(edge: .leading) {
                                 if comment.user.id == currentUserID{
                                     Button("delete", role: .destructive) {
@@ -33,6 +35,8 @@ struct AddCommentView: View {
                     Spacer()
                     Button(action: {
                         viewModel.addComment(idArtical: id, comment: viewModel.comment.comment)
+                        articalViewModel.fetchArtical(isDoctor:  type == .doctor ? true : false)
+
                     }) {
                         Image(systemName: "paperplane.fill")
                             .resizable()
@@ -53,18 +57,10 @@ struct AddCommentView: View {
                 .padding(.vertical, 10)
                 .padding(.horizontal)
             }
-            .navigationTitle("comments".localized()) // التعليقات
+            .navigationTitle("comments".localized())
             .navigationBarTitleDisplayMode(.inline)
-            .direction(appLanguage) // اتجاه النصوص
+            .direction(appLanguage)
             .environment(\.locale, .init(identifier: appLanguage))
-//            .alert("حذف التعليق", isPresented: $showAlert) {
-//                Button("delete".localized(), role: .destructive) {
-//                    viewModel.deleteComment(idComment: viewModel.comment.id)
-//                }
-//                Button("cancel", role: .cancel){}
-//            }message: {
-//              Text("هل انت متاكد انك تريد الحذف")
-//            }
         }
     }
 }
@@ -72,5 +68,5 @@ struct AddCommentView: View {
 
 
 #Preview {
-    AddCommentView(viewModel: CommentViewModel(), id: 0)
+    AddCommentView(viewModel: CommentViewModel(), articalViewModel: ArticalsViewModel(), id: 0, type: .doctor)
 }

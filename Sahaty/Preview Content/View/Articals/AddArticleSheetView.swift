@@ -132,6 +132,7 @@ struct AddArticleSheetView: View {
                 articalsViewModel.addArtical(artical: articalsViewModel.article) { result in
                     print(result)
                     print("article successfully added")
+                    articalsViewModel.fetchArtical(isDoctor: true)
                 }
                 dismiss()
             }){

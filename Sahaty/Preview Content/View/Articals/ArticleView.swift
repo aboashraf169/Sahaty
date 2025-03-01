@@ -35,7 +35,6 @@ struct ArticleView: View {
                         .resizable()
                         .scaledToFit()
                         .shadow(radius: 2)
-                        .padding(.top, 5)
                         .frame(width: 40, height: 40)
                         .background(Color(.systemGray6))
                         .foregroundStyle(.accent)
@@ -44,9 +43,14 @@ struct ArticleView: View {
                 
                 // بيانات صاحب المنشور
                 VStack(alignment: .leading) {
-                    Text(articleModel.doctor.name)
-                        .font(.headline)
-                        .fontWeight(.regular)
+                    HStack {
+                        Text(articleModel.doctor.name)
+                            .font(.headline)
+                            .fontWeight(.regular)
+                        Text(articleModel.created_at)
+                            .font(.subheadline)
+                            .fontWeight(.light)
+                    }
                     Text(articleModel.doctor.email)
                         .font(.subheadline)
                         .fontWeight(.light)
@@ -110,7 +114,7 @@ struct ArticleView: View {
                     }
             }
         
-            FotterArtical(type: usersType, articleViewModel: articalViewModel, id: articleModel.id)
+            FotterArtical(type: usersType, articleViewModel: articalViewModel, id: articleModel.id, articleModel: articleModel)
 
         }
         .padding(.horizontal)
@@ -121,7 +125,7 @@ struct ArticleView: View {
             EditArticleSheetView(articalsViewModel: articalViewModel, article: articleModel)
         }
         .onAppear{
-            articalViewModel.loadImage(from: pathImgArtical, for: articleModel.id)
+            articalViewModel.loadImages(from: pathImgArtical, for: articleModel.id)
             articalViewModel.doctorImage(from: pathImgDoctor, for: articleModel.doctor.id)
         }
     }

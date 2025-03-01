@@ -48,5 +48,5 @@ struct EditAdviceSheetView: View {
 }
 
 #Preview {
-    EditAdviceSheetView(advice:AdviceModel(),onSave: { _ in})
+    EditAdviceSheetView(advice: AdviceModel(id: 0, advice: ""), onSave: {_ in})
 }

@@ -35,21 +35,7 @@ struct DoctorTabBarView: View {
                      }
                      .tag(TabDoctor.profile)
 
-            
-//                Text("Chats".localized())
-//                            .font(.largeTitle)
-//                            .fontWeight(.bold)
-//                    .tabItem{
-//                        HStack{
-//                            Text("Chats".localized())
-//                            Image(systemName: "message")
-//                        }
-//                    }
-//                    .tag(TabDoctor.chat)
-//                    .badge(3)
-
-                
-                NotificationsView()
+                doctorNotificationsView()
                 .tabItem{
                     HStack{
                         Text("Notifications".localized())

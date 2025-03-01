@@ -80,7 +80,9 @@ struct ProfileView: View {
         .direction(appLanguage)
         .environment(\.locale, .init(identifier: appLanguage))
         .preferredColorScheme(viewModel.isDarkModeDoctor ? .dark : .light)
-     
+        .onAppear{
+            articalViewModel.fetchArtical(isDoctor: true)
+        }
       
     }
     
@@ -112,7 +114,7 @@ struct AdviceSectionView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(adviceViewModel.advices) { advice in
+                    ForEach(adviceViewModel.userAdvices) { advice in
                         AdviceView(advice: advice)
                             .frame(width: 300, height: 80)
                     }
@@ -128,7 +130,6 @@ struct AdviceSectionView: View {
 // MARK: - AllArticlesView
 struct AllArticlesView: View {
     @ObservedObject var articalViewModel : ArticalsViewModel
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -141,6 +142,7 @@ struct AllArticlesView: View {
             .navigationTitle("all_artical".localized())
             .navigationBarTitleDisplayMode(.inline)
         }
+       
     }
 }
 
@@ -191,12 +193,12 @@ struct AllAdvicesView: View {
     var body: some View {
         NavigationStack {
             List{
-                ForEach(adviceViewModel.advices) { advice in
+                ForEach(adviceViewModel.doctorAdvices) { advice in
                     AdviceView(advice: advice)
                         .swipeActions(edge:.leading) {
                             Button(role: .destructive)
                             {
-                                adviceViewModel.deleteAdvice(at: IndexSet(integer: adviceViewModel.advices.firstIndex(where: {$0.id == advice.id})!)
+                                adviceViewModel.deleteAdvice(at: IndexSet(integer: adviceViewModel.doctorAdvices.firstIndex(where: {$0.id == advice.id})!)
                                 )
                             } label: {
                                 Label("Delete", systemImage: "trash")
@@ -282,7 +284,7 @@ struct ProfileHeaderView: View {
                             .background(Color.accentColor)
                             .clipShape(Circle())
                     }
-                    .offset(x: -40, y: 40)
+                    .offset(x:  -40, y: 40)
                 
             }
             Text(viewModel.doctor.name)

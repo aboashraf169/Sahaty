@@ -21,6 +21,7 @@ class LoginViewModel: ObservableObject {
     @Published var successMessage: String = ""
     @Published var isLoading: Bool = false
 
+
     
     // التحقق من تسجيل الدخول
     func validateAndLogin(completion: @escaping (Bool) -> Void) {
@@ -39,11 +40,14 @@ class LoginViewModel: ObservableObject {
 
         if model.email.isEmpty || !model.email.contains("@") {
             emailErrorMessage = "enter_valid_email".localized()
+            apiErrorMessage = "nodata".localized()
+
             isValid = false
         }
 
         if model.password.isEmpty || model.password.count < 6 {
             passwordErrorMessage = "password_min_length".localized()
+            apiErrorMessage = "nodata".localized()
             isValid = false
         }
 
@@ -72,6 +76,7 @@ class LoginViewModel: ObservableObject {
                     self?.handleLoginSuccess(data: data, completion: completion)
                 case .failure(let error):
                     self?.handleAPIError(error)
+                    self?.apiErrorMessage = "invalid_credentials".localized()
                     completion(false)
                 }
             }
@@ -112,6 +117,9 @@ class LoginViewModel: ObservableObject {
                     return }
                 print("Doctor:\(doctor)")
                     self.doctorModel = doctor
+                sessionManager.saveDocotrSession(token: token, doctorData: doctor)
+                UserDefaults.standard.set(token, forKey: "userToken")
+                
                 UserDefaults.standard.set(doctor.id, forKey: "currentUserID")
                 print("تم حفظ معرف المستخدم:", doctor.id)
             }else{
@@ -124,7 +132,10 @@ class LoginViewModel: ObservableObject {
                     return}
                 print("Patiant:\(Patiant)")
                     self.patientModel = Patiant
+                sessionManager.savePatientSession(token: token, patientData: Patiant)
                 UserDefaults.standard.set(Patiant.id, forKey: "currentUserID")
+                UserDefaults.standard.set(token, forKey: "userToken")
+
                 print("تم حفظ معرف المستخدم:", Patiant.id)
 
             }
@@ -170,7 +181,7 @@ class LoginViewModel: ObservableObject {
         case .serverError(let message):
             apiErrorMessage = message // رسالة الخطأ القادمة من الخادم
         default:
-            apiErrorMessage = "unknown_error".localized()
+            apiErrorMessage = "server error send request".localized()
         }
     } else {
         apiErrorMessage = error.localizedDescription

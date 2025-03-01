@@ -10,12 +10,13 @@ struct CommentView: View {
     
     let comment: CommentModel
     @ObservedObject  var viewModel : CommentViewModel
+    var pathImgComment : String
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
 
             // الصورة الرمزية
-            if let image = viewModel.autherCommentImage {
+            if let image = viewModel.authersCommentImages[comment.user.id] {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -49,9 +50,12 @@ struct CommentView: View {
   
         }
         .padding(.vertical, 5)
+        .onAppear {
+            viewModel.loadImages(from: pathImgComment, for: comment.user.id)
+        }
     }
 }
 
 #Preview {
-    CommentView(comment: CommentModel(), viewModel: CommentViewModel())
+    CommentView(comment: CommentModel(), viewModel: CommentViewModel(), pathImgComment: "")
 }

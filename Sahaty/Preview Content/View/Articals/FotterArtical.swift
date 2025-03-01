@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct FotterArtical: View {
-    @State private var stateLike = false
-    @State private var stateSave = false
     @State private var showCommentView = false
     @State private var showShereSheet = false
     var type : UsersType
@@ -10,11 +8,9 @@ struct FotterArtical: View {
     @State var articleViewModel : ArticalsViewModel
     @State var id : Int
     @StateObject var commentsViewModel = CommentViewModel()
+    var articleModel: ArticleModel
     @AppStorage("appLanguage") private var appLanguage = "ar"
 
-    var commentCount: Int {
-        commentsViewModel.comments.count
-    }
     
     var body: some View {
         VStack {
@@ -22,17 +18,17 @@ struct FotterArtical: View {
                 
                 // زر الإعجاب
                 Button {
-                stateLike.toggle()
                 articleViewModel.likeArtical(id: self.id)
+                    articleViewModel.fetchArtical(isDoctor:  type == .doctor ? true : false)
                 } label: {
                     HStack {
-                        Image(systemName: stateLike ? "heart.fill" : "heart")
+                        Image(systemName: articleViewModel.actionLike[self.id] ?? false ? "heart.fill" : "heart")
                             .font(.title2)
                             .fontWeight(.ultraLight)
-                            .foregroundStyle(stateLike ? .accent : .primary)
-//                        Text("\(commentCount)")
-//                            .font(.callout)
-//                            .fontWeight(.ultraLight)
+                            .foregroundStyle(articleViewModel.actionLike[self.id]  ?? false ? .accent : .primary)
+                        Text("\(articleModel.num_likes)")
+                            .font(.callout)
+                            .fontWeight(.ultraLight)
                     }
                 }
                 .foregroundStyle(.primary)
@@ -48,9 +44,9 @@ struct FotterArtical: View {
                             .font(.title2)
                             .fontWeight(.ultraLight)
                             .foregroundStyle(.primary)
-//                        Text("\(commentCount)") // عرض عدد التعليقات
-//                            .font(.callout)
-//                            .fontWeight(.ultraLight)
+                        Text("\(articleModel.num_comments)") // عرض عدد التعليقات
+                            .font(.callout)
+                            .fontWeight(.ultraLight)
                     }
                 }
                 .foregroundStyle(.primary)
@@ -71,13 +67,12 @@ struct FotterArtical: View {
                 if type == .patient {
                     // زر الحفظ
                     Button {
-                        stateSave.toggle()
                         articleViewModel.savedArtical(id: self.id)
                     } label: {
-                        Image(systemName: stateSave ? "bookmark.fill" : "bookmark")
+                        Image(systemName:   articleViewModel.actionSaved[self.id] ?? false ? "bookmark.fill" : "bookmark")
                             .font(.title2)
                             .fontWeight(.ultraLight)
-                            .foregroundStyle(stateSave ? .accent : .primary)
+                            .foregroundStyle( articleViewModel.actionSaved[self.id] ?? false ? .accent : .primary)
                     }
                 }
            
@@ -89,7 +84,7 @@ struct FotterArtical: View {
                 getActionSheet()
             }
             .sheet(isPresented: $showCommentView) {
-                AddCommentView(viewModel: commentsViewModel,id: id)
+                AddCommentView(viewModel: commentsViewModel, articalViewModel: articleViewModel, id: id, type: type)
                     .presentationDragIndicator(.visible)
                     .presentationDetents([.fraction(0.7)])
             }
@@ -113,5 +108,5 @@ struct FotterArtical: View {
 }
 
 #Preview {
-    FotterArtical(type: .patient, articleViewModel: ArticalsViewModel(), id: 0)
+    FotterArtical(type: .patient, articleViewModel: ArticalsViewModel(), id: 0, articleModel: ArticleModel())
 }

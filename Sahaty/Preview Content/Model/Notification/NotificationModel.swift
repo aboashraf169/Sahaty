@@ -8,9 +8,11 @@
 
 import SwiftUI
 
-struct NotificationModel: Identifiable {
-    let id = UUID()
-    let senderName: String
-    let senderEmail: String
-    let message: String
+struct NotificationModel: Codable ,Hashable{
+    var type: String
+    var title: String
+    var description: String
+    var created_at: String
 }
+
+

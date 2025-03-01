@@ -7,10 +7,8 @@
 */
 
 
-
-
-
-
+// MARK: - splach screen
+"sahaty" = "Sahaty";
 
 
 
@@ -52,7 +50,7 @@
 
 //3-Authenticaton Views
 // MARK: - LOGIN
-"login_now" = "Login Now";
+"login_now" = "Login";
 "email" = "Email";
 "enter_email" = "Enter your email address...";
 "password" = "Password";
@@ -64,6 +62,8 @@
 "patient" = "Patient";
 "doctor" = "Doctor";
 "invalid_credentials" = "invalid Email or Password";
+"nodata" = "Empty Email or Password";
+
 
 // MARK: - FORGET PASSWORD VIEW
 "forgot_password_title" = "Forgot Password";
@@ -216,6 +216,9 @@
 "settings" = "Settings";
 
 
+"followers" = "Followers";
+"specialties" = "Specialties";
+"languageـchange" = "Language Change";
 
 
 
@@ -347,3 +350,5 @@
 "follow" = "follow";
 "Unfollow" = "Unfollow";
 
+"write_here" = "Write here...";
+"chat" = "Chat";

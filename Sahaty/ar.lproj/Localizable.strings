@@ -5,7 +5,8 @@
   Created by mido mj on 12/29/24.
   
 */
-
+// MARK: - splach screen 
+"sahaty" = "صحتي";
 
 //1- Advice
 
@@ -75,7 +76,7 @@
 //3-Authenticaton Views
 
 // MARK: - LOGIN
-"login_now" = "تسجيل الدخول الآن";
+"login_now" = "تسجيل الدخول";
 "email" = "البريد الإلكتروني";
 "enter_email" = "أدخل عنوان بريدك الإلكتروني...";
 "password" = "كلمة المرور";
@@ -87,6 +88,7 @@
 "patient" = "مريض";
 "doctor" = "طبيب";
 "invalid_credentials" = "البريد الالكتروني أو كلمة السر غير صحيحة";
+"nodata" = "البريد الالكتروني أو كلمة السر فارغين ";
 
 
 // MARK: - FORGET PASSWORD VIEW
@@ -257,6 +259,10 @@
 "notifications" = "الاشعارات";
 "settings" = "الاعدادات";
 
+"followers" = "متابعين";
+"specialties" = "التخصصات";
+"languageـchange" = "تغير اللغة";
+
 
 
 
@@ -399,3 +405,9 @@
 "invalid_otp" = "OTP غير صحيح";
 "submit"  = "حفظ";
 "user_type_mismatch" = "اختيارك لنوع المستخدم غير مطابق لنوع الحساب المسجل.";
+
+"write_here" = "اكتب هنا...";
+"chat" = "الدردشة";
+
+
+

@@ -3,6 +3,7 @@ import SwiftUI
 class CommentViewModel: ObservableObject {
     @Published var comments: [CommentModel] = []
     @Published var comment: CommentModel = CommentModel()
+    @Published var authersCommentImages: [Int: UIImage] = [:]
     @Published var autherCommentImage: UIImage? = nil
     @Published var alertMessage: String = ""
     @Published var isLoading: Bool = false
@@ -51,7 +52,7 @@ class CommentViewModel: ObservableObject {
                 }
                     self?.alertMessage = "\(decodeData)"
                     self?.comments.append(decodeData.data)
-                    self?.loadImage(from: decodeData.data.user.img ?? "")
+//                    self?.loadImage(from: decodeData.data.user.img ?? "")
                 case .failure(let error):
                     print("error to get comment artical:\(idArtical)")
                     print("error: get comment:\(error)")
@@ -79,15 +80,22 @@ class CommentViewModel: ObservableObject {
         }
     }
     // MARK: - Load image
-    func loadImage(from path: String) {
-        ImageManager.shared.fetchImage(imagePath: path){[weak self] image in
-            DispatchQueue.main.async {
-                self?.autherCommentImage = image
-                print("image auther Comment : \(path)")
+//    func loadImage(from path: String) {
+//        ImageManager.shared.fetchImage(imagePath: path){[weak self] image in
+//            DispatchQueue.main.async {
+//                self?.autherCommentImage = image
+//                print("image auther Comment : \(path)")
+//            }
+//        }
+//    }
+    // MARK: - Load images
+    func loadImages(from path: String, for commentId: Int) {
+        ImageManager.shared.fetchImage(imagePath: path) { image in
+            DispatchQueue.main.async { [weak self] in
+                self?.authersCommentImages[commentId] = image
             }
         }
     }
-    
-    
 }
+
 

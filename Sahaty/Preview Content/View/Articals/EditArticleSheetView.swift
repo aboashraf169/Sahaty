@@ -103,7 +103,7 @@ struct EditArticleSheetView: View {
                         .frame(height: 170)
                         .overlay {
                             VStack {
-                                if let imageSelected = articalsViewModel.addImage {
+                                if let imageSelected = articalsViewModel.articleUpdateImage {
                                     Image(uiImage: imageSelected)
                                         .resizable()
                                         .scaledToFit()
@@ -134,6 +134,7 @@ struct EditArticleSheetView: View {
                     print(result)
                     print("article successfully added")
                 }
+                articalsViewModel.updateArticalImage(newImage: articalsViewModel.articleUpdateImage ?? UIImage.onboarding2, articleId: article.id)
                 dismiss()
             }){
                 Text("save_changes".localized())
@@ -159,7 +160,7 @@ struct EditArticleSheetView: View {
         .direction(appLanguage)
         .environment(\.locale, .init(identifier: appLanguage))
         .sheet(isPresented: $ShowImagePicker) {
-            ImagePicker(selectedImage: $articalsViewModel.addImage, onImagePicked: {_ in})
+            ImagePicker(selectedImage: $articalsViewModel.articleUpdateImage, onImagePicked: {_ in})
         }
     }
 }

@@ -11,9 +11,39 @@ import SwiftUI
 class SpecializationViewModel: ObservableObject {
     
     @Published var specializations: [spectialties] = []
-    @Published var selectedSpecialty: spectialties? // التخصص المختار
-
     
+    let specialtiesTranslation: [String: String] = [
+        "أمراض القلب والشرايين": "Cardiology and Vascular Diseases",
+        "الجراحة العامة": "General Surgery",
+        "الأمراض الباطنية": "Internal Medicine",
+        "الأمراض الجلدية": "Dermatology",
+        "الأمراض العصبية": "Neurology",
+        "الأمراض النفسية": "Psychiatry",
+        "الأمراض النسائية والتوليد": "Obstetrics and Gynecology",
+        "الأطفال": "Pediatrics",
+        "الأورام": "Oncology",
+        "الأعصاب والجراحة العصبية": "Neurology and Neurosurgery"
+    ]
+    @Published var selectedSpecialty: spectialties? // التخصص المختار
+    @AppStorage("appLanguage") private var appLanguage = "ar"
+    
+    @Published var ranslatedSpecialties: [spectialties] = []
+
+   
+    func getTranslatedSpecialties() -> [spectialties] {
+            if appLanguage == "en" {
+                // تحويل التخصصات إلى الإنجليزية باستخدام القاموس
+                return specializations.compactMap { specialty in
+                    if let translatedName = specialtiesTranslation[specialty.name] {
+                        return spectialties(id: specialty.id, name: translatedName)
+                    }
+                    return nil
+                }
+            } else {
+                // إرجاع التخصصات كما هي (باللغة العربية)
+                return specializations
+            }
+        }
     func getSpacialties() {
        let url = "http://127.0.0.1:8000/api/specialties"
        let method : String = "GET"

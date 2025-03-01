@@ -4,8 +4,8 @@ import SwiftUI
 
 class AdviceViewModel: ObservableObject {
     // MARK: - Properties
-    @Published var advices: [AdviceModel] = []
-    @Published var userAdvices: [UserAdviceModel] = []
+    @Published var doctorAdvices: [AdviceModel] = []
+    @Published var userAdvices: [AdviceModel] = []
     @Published var advice: AdviceModel = AdviceModel()
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
@@ -19,14 +19,14 @@ class AdviceViewModel: ObservableObject {
         APIManager.shared.sendRequest(endpoint: "/doctor/get-today-advice", method: .get) { result in
           switch result {
             case .success (let data):
-              guard let advices = try? JSONDecoder().decode(ResponseUserAdvice.self, from: data)
+              guard let decodeData = try? JSONDecoder().decode(ResponseAdvice.self, from: data)
               else{
                   print("error to decding advice")
                   return
               }
                   DispatchQueue.main.async{ [weak self]  in
                     self?.isLoading = false
-                      self?.userAdvices = advices.data
+                      self?.doctorAdvices = decodeData.data
                   }
                   print("fetch Advices successfully")
               
@@ -51,12 +51,12 @@ class AdviceViewModel: ObservableObject {
                     print("added advice successfully")
                     self?.advice.advice = ""
                     complitien(true)
-                    guard let data = try? JSONDecoder().decode(AdviceModel.self, from: data) else {
+                    guard let decodeData = try? JSONDecoder().decode(ResponAddUpdateAdvice.self, from: data) else {
                         print("Could not decode JSON")
                         complitien(false)
                         return
                     }
-                    self?.advices.append(data)
+                    self?.doctorAdvices.append(decodeData.data)
                     case .failure(let error):
                     self?.errorMessage = "error add advice!!"
                     print("error to add advice")
@@ -85,8 +85,8 @@ class AdviceViewModel: ObservableObject {
                     print("update success \(data)")
                     complitien(true)
                     if let index =
-                        self?.advices.firstIndex(where: { $0.id == advice.id }){
-                        self?.advices[index] = advice
+                        self?.doctorAdvices.firstIndex(where: { $0.id == advice.id }){
+                        self?.doctorAdvices[index] = advice
                     }
                 case.failure(let error):
                     self?.errorMessage = "error update advice!!"
@@ -101,12 +101,12 @@ class AdviceViewModel: ObservableObject {
     // MARK: - Delete Advice
     func deleteAdvice(at indexSet: IndexSet) {
         guard let index = indexSet.first else { return }
-        let item = advices[index]
+        let item = doctorAdvices[index]
         APIManager.shared.sendRequest(endpoint: "/doctor/advice/\(item.id)/destroy", method: .delete) { result in
             DispatchQueue.main.async { [weak self] in
                 switch result {
                 case .success(_):
-                    self?.advices.remove(at: index)
+                    self?.doctorAdvices.remove(at: index)
                     print("Item deleted successfully")
                     self?.SuccessMessage = "Delete Advice Success"
                 case .failure(let error):
@@ -124,7 +124,7 @@ class AdviceViewModel: ObservableObject {
             DispatchQueue.main.async { [weak self] in
                 switch result {
                 case .success(let data):
-                    guard let decodeData = try? JSONDecoder().decode(ResponseUserAdvice.self, from: data)else {
+                    guard let decodeData = try? JSONDecoder().decode(ResponseAdvice.self, from: data)else {
                         print("error to decode  user data advice")
                         return
                     }

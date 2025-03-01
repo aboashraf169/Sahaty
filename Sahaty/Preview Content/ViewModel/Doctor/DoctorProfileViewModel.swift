@@ -104,6 +104,8 @@ class DoctorProfileViewModel: ObservableObject {
             
         }
     }
+    
+    
 
     private func clearErrors() {
         errorMessage = ""

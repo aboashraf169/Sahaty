@@ -21,8 +21,6 @@ struct DoctorSettingView: View {
     @State private var showSavedView = false
     @State private var showRestPasswordView = false
     @State private var showLogoutAleart = false
-    
-//    @AppStorage("isDarkModeDoctor") private var isDarkModeDoctor = false // حفظ الاختيار
     @AppStorage("appLanguage") private var appLanguage = "ar" // اللغة المفضلة
 
 
@@ -48,20 +46,9 @@ struct DoctorSettingView: View {
                 Divider()
                 
                 VStack(spacing:20){
-                    MenuOption(title: "manage_notifications".localized(), icon: "bell", action: { showNotificationView.toggle() })
-                        .sheet(isPresented: $showNotificationView) {
-                            
-                            Toggle(isOn: $showNotificationToggle){
-                                Text("enable_notifications".localized())
-                                    .font(.headline)
-                                    .foregroundStyle(.accent)
-                            }
-                            .tint(.accent)
-                            .padding()
-                            .presentationDetents([.fraction(0.1)])
-                            .presentationCornerRadius(30)
-                   
-                        }
+
+                    MenuOption(title: "languageـchange".localized(), icon: "globe", action: {toggleLanguage()})
+                        
                     MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
                         .sheet(isPresented: $showRestPasswordView) {
                             changePasswordView(usersType: .doctor)
@@ -90,12 +77,10 @@ struct DoctorSettingView: View {
                                 .padding(.vertical, 8)
 
                            }
-                    .toggleStyle(SwitchToggleStyle(tint: .accent)) // تخصيص لون التبديل
+                    .toggleStyle(SwitchToggleStyle(tint: .accent))
                     .frame(maxWidth: .infinity)
                     .padding(0)
                 }
-            
-
                 Spacer()
             }
             .padding()
@@ -107,14 +92,17 @@ struct DoctorSettingView: View {
         .environment(\.locale, .init(identifier: appLanguage)) // ضبط اللغة
     }
     
-
+    private func toggleLanguage() {
+        appLanguage = (appLanguage == "ar") ? "en" : "ar"
+        UserDefaults.standard.set(appLanguage, forKey: "appLanguage")
+    }
 }
 
 func logout() {
     // إزالة التوكن
     let _ = KeychainManager.shared.deleteToken()
     // ازالة الجلسة
-//    SessionManager.shared.clearSession()
+    SessionManager.shared.clearSession()
     // إعادة التوجيه إلى شاشة تسجيل الدخول
     if let window = UIApplication.shared.connectedScenes
         .compactMap({ $0 as? UIWindowScene })
@@ -129,3 +117,4 @@ func logout() {
 #Preview {
     DoctorSettingView(viewModel: DoctorProfileViewModel())
 }
+

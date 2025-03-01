@@ -9,6 +9,10 @@ struct LoginView: View {
     @State private var navigateToPatientView = false
     @State private var isErrorAlertPresented = false
 
+    
+    @State private var isAnimating: Bool = false
+    @State private var imageOffset: CGSize = .zero
+    
     init(){
         UISegmentedControl.appearance().selectedSegmentTintColor = UIColor.accent
         let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white]
@@ -20,26 +24,33 @@ struct LoginView: View {
         NavigationStack {
             VStack {
                 // MARK: - Header
-                HStack {
-                    Spacer()
-
-                    Button {
-                        toggleLanguage()
-                    } label: {
-                        Image(systemName: "globe")
-                            .font(.title)
-                            .foregroundStyle(.accent)
-                        Text("".localized())
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 10)
-
+//
+                    Image("logo-img")
+                        .resizable()
+                        .frame(width: 110, height: 110)
+                        .cornerRadius(55)
+                        .padding(.vertical,35)
+                        .opacity(isAnimating ? 1 : 0)
+                        .offset(y: isAnimating ? 0 : 70)
+                        .animation(.easeIn(duration: 1.1), value: isAnimating)
+                        .clipShape(Circle())
+                
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("login_now".localized())
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(Color.accentColor)
+                    HStack {
+                        Text("login_now".localized())
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(Color.accentColor)
+                        Spacer()
+                        Button {
+                            toggleLanguage()
+                        } label: {
+                            Image(systemName: "globe")
+                                .font(.title)
+                                .foregroundStyle(.accent)
+                            Text("".localized())
+                        }
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
@@ -90,6 +101,7 @@ struct LoginView: View {
                                 if loginViewModel.model.usersType == .doctor {
                                     navigateToDoctorView = true
                                     doctorProfileViewModel.setDoctor(loginViewModel.doctorModel)
+                                    
                                 } else {
                                     navigateToPatientView = true
                                     patientViewModel.SetPateintData(loginViewModel.patientModel)
@@ -124,8 +136,7 @@ struct LoginView: View {
                 } message: {
                     Text(loginViewModel.apiErrorMessage.localized())
                 }
-                
-                // الانتقال بناءً على نوع المستخدم
+                              // الانتقال بناءً على نوع المستخدم
                 .navigationDestination(isPresented: $navigateToDoctorView) {
                     DoctorTabBarView(doctorProfileViewModel: doctorProfileViewModel)
                         .navigationBarBackButtonHidden(true)
@@ -136,7 +147,7 @@ struct LoginView: View {
                 }
 
                 // MARK: - Footer
-                footerView()
+//                footerView()
 
                 // الانتقال لشاشة إنشاء حساب
                 NavigationLink("sign_up".localized(), destination: SignUpView())
@@ -151,7 +162,15 @@ struct LoginView: View {
             } message: {
                 Text(loginViewModel.apiErrorMessage.localized())
             }
+            Spacer()
         }
+        .onAppear{
+          isAnimating = true
+        }
+        .opacity(isAnimating ? 1 : 0)
+        .offset(y: isAnimating ? 0 : 70)
+        .animation(.easeIn(duration: 1.1), value: isAnimating)
+    
     }
 
     // MARK: - Helper Views
@@ -189,53 +208,6 @@ struct LoginView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 10)
-    }
-
-    private func footerView() -> some View {
-        VStack(spacing: 10) {
-            HStack {
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(.secondary.opacity(0.4))
-                Text("login_with".localized())
-                    .font(.system(size: 15))
-                    .foregroundColor(.secondary).opacity(0.7)
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(.secondary.opacity(0.4))
-            }
-            .padding(.horizontal, 30)
-            .padding(.top, 20)
-
-            HStack(spacing: 15) {
-                socialButton(imageName: "googel", action: {
-                    // Google login
-                })
-                socialButton(imageName: "facebook", action: {
-                    // Facebook login
-                })
-                socialButton(imageName: "twitter", action: {
-                    // Twitter login
-                })
-            }
-            .padding(.top)
-        }
-    }
-
-    private func socialButton(imageName: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 25, height: 25)
-        }
-        .frame(width: 100, height: 60)
-        .background(Color.clear)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.secondary, lineWidth: 1).opacity(0.5)
-        )
-        .cornerRadius(10)
     }
 
     private func toggleLanguage() {

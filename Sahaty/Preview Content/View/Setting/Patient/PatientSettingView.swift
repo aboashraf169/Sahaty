@@ -71,57 +71,52 @@ struct PatientSettingView: View {
                 Divider()
                 
                 // Settings Options
-                VStack(spacing: 20) {
-                    MenuOption(title: "manage_notifications".localized(), icon: "bell", action: { showNotificationView.toggle() })
-                        .sheet(isPresented: $showNotificationView) {
-                            Toggle(isOn: $showNotificationToggle) {
-                                Text("enable_notifications".localized())
-                                    .font(.headline)
-                                    .foregroundStyle(.accent)
+                ScrollView(){
+                    VStack(spacing: 20) {
+                        MenuOption(title: "languageـchange".localized(), icon: "globe", action: {toggleLanguage()})
+                        
+                        MenuOption(title: "saved_items".localized(), icon: "bookmark", action: { showSavedView.toggle() })
+                            .sheet(isPresented: $showSavedView) {
+                                patientSavedArticalvView(patientViewModel: patientViewModel)
                             }
-                            .tint(.accent)
-                            .padding()
-                            .presentationDetents([.fraction(0.1)])
-                            .presentationCornerRadius(30)
-                        }
-                    
-                    MenuOption(title: "saved_items".localized(), icon: "bookmark", action: { showSavedView.toggle() })
-                        .sheet(isPresented: $showSavedView) {
-                            patientSavedArticalvView(patientViewModel: patientViewModel)
-                        }
-                    
-                    MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
-                        .sheet(isPresented: $showRestPasswordView) {
-                            changePasswordView(usersType: .patient)
-                                .presentationDetents([.fraction(0.65)])
-                                .presentationCornerRadius(30)
-                        }
-                    
-                    MenuOption(title: "logout".localized(), icon: "arrowshape.turn.up.left", action: { showLogoutAlert.toggle() })
-                        .alert("confirm_logout".localized(), isPresented: $showLogoutAlert) {
-                            Button("confirm".localized(), role: .destructive) {
-                                logout()
+                        
+                        MenuOption(title: "change_password".localized(), icon: "key", action: { showRestPasswordView.toggle() })
+                            .sheet(isPresented: $showRestPasswordView) {
+                                changePasswordView(usersType: .patient)
+                                    .presentationDetents([.fraction(0.65)])
+                                    .presentationCornerRadius(30)
                             }
-                            Button("cancel".localized(), role: .cancel) {}
+                        
+                        MenuOption(title: "logout".localized(), icon: "arrowshape.turn.up.left", action:
+                                    {
+                            showLogoutAlert.toggle()                            
+                        })
+                            .alert("confirm_logout".localized(), isPresented: $showLogoutAlert) {
+                                Button("confirm".localized(), role: .destructive) {
+                                    logout()
+                                }
+                                Button("cancel".localized(), role: .cancel) {}
+                            }
+                        
+                        Toggle(isOn: $isDarkModePatient) {
+                            HStack {
+                                Image(systemName: isDarkModePatient ? "moon.fill" : "sun.max.fill")
+                                    .foregroundColor(.blue)
+                                    .frame(width: 50, height: 50)
+                                    .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
+                                
+                                Text("dark_mode".localized())
+                                    .font(.body)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.vertical, 8)
                         }
-                    
-                    Toggle(isOn: $isDarkModePatient) {
-                        HStack {
-                            Image(systemName: isDarkModePatient ? "moon.fill" : "sun.max.fill")
-                                .foregroundColor(.blue)
-                                .frame(width: 50, height: 50)
-                                .background(Color.accentColor.opacity(0.2)).cornerRadius(10)
-                            
-                            Text("dark_mode".localized())
-                                .font(.body)
-                                .foregroundColor(.gray)
-                        }
-                        .padding(.vertical, 8)
+                        .toggleStyle(SwitchToggleStyle(tint: .accent))
+                        .frame(maxWidth: .infinity)
+                        .padding(0)
                     }
-                    .toggleStyle(SwitchToggleStyle(tint: .accent))
-                    .frame(maxWidth: .infinity)
-                    .padding(0)
                 }
+                .scrollIndicators(.hidden, axes: .vertical)
                 Spacer()
             }
             .padding()
@@ -137,8 +132,40 @@ struct PatientSettingView: View {
             }
         }
     }
+    private func toggleLanguage() {
+        appLanguage = (appLanguage == "ar") ? "en" : "ar"
+        UserDefaults.standard.set(appLanguage, forKey: "appLanguage")
+    }
 }
 
 #Preview {
     PatientSettingView(patientViewModel: PatientSettingViewModel())
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+//MenuOption(title: "manage_notifications".localized(), icon: "bell", action: { showNotificationView.toggle() })
+//                            .sheet(isPresented: $showNotificationView) {
+//                                Toggle(isOn: $showNotificationToggle) {
+//                                    Text("enable_notifications".localized())
+//                                        .font(.headline)
+//                                        .foregroundStyle(.accent)
+//                                }
+//                                .tint(.accent)
+//                                .padding()
+//                                .presentationDetents([.fraction(0.1)])
+//                                .presentationCornerRadius(30)
+//                            }

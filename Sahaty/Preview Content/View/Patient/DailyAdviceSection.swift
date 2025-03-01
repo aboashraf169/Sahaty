@@ -34,7 +34,7 @@ import SwiftUI
     }
 // ✅ **تصميم بطاقة النصيحة**
 private extension DailyAdviceSection {
-    func adviceCard(_ advice: UserAdviceModel) -> some View {
+    func adviceCard(_ advice: AdviceModel) -> some View {
             HStack(spacing: 10) {
                 Image(systemName: "lightbulb.fill")
                     .font(.system(size: 20))

@@ -41,6 +41,7 @@ class PatientSettingViewModel : ObservableObject {
 
         
     }
+    
     // MARK: - get doctor Follow data
     func getDoctorsFollowers(){
         self.isLoading = true

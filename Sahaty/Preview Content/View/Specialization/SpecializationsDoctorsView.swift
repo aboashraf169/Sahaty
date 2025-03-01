@@ -18,8 +18,8 @@ struct SpecializationsDoctorsView: View {
         NavigationStack {
             VStack {
                 Picker("", selection: self.$follower) {
-                    Text("التخصصات".localized()).tag(folower.AllDoctors)
-                    Text("متابعين".localized()).tag(folower.AllFollowerDoctors)
+                    Text("specialties".localized()).tag(folower.AllDoctors)
+                    Text("followers".localized()).tag(folower.AllFollowerDoctors)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(20)
@@ -45,18 +45,9 @@ struct SpecializationsDoctorsView: View {
         VStack {
             ScrollView {
                 LazyVStack {
-                    ForEach(viewModel.specializations) { data in
+                    ForEach(viewModel.getTranslatedSpecialties()) { data in
                         VStack {
                             // عرض التخصص
-                            HStack {
-                                Text(".\(data.id)")
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                                Text(data.name)
-                                    .fontWeight(.light)
-                                    .font(.headline)
-                                    .foregroundStyle(.primary)
-                                Spacer()
                                 Button {
                                     if let isExpanded = patientViewModel.expandedSpecializations[data.id] {
                                         // تغيير حالة التوسيع
@@ -70,10 +61,21 @@ struct SpecializationsDoctorsView: View {
                                         patientViewModel.getSpeciatyDoctors(speciatyid: data.id)
                                     }
                                 }label: {
+                                    HStack {
+                                        Text(".\(data.id)")
+                                            .font(.footnote)
+                                            .foregroundColor(.gray)
+                                        Text(data.name)
+                                            .fontWeight(.light)
+                                            .font(.headline)
+                                        Spacer()
                                     Image(systemName: patientViewModel.expandedSpecializations[data.id] == true ? "chevron.down" : "chevron.left")
+                                            .foregroundStyle(Color.accentColor)
+
                                 }
                             }
                             .padding()
+                            .foregroundStyle(Color.primary)
                             // عرض الأطباء إذا تم التوسيع
                             if patientViewModel.expandedSpecializations[data.id] == true {
                                 if let doctors = patientViewModel.doctorsBySpecialization[data.id] {
@@ -99,7 +101,7 @@ struct SpecializationsDoctorsView: View {
         ScrollView{
             LazyVStack{
                 ForEach(patientViewModel.doctorFollowers) {doctor in
-                    doctorRowData(patientViewModel: patientViewModel, doctor: doctor, pathImgDoctor: doctor.img ?? "")
+                    followDoctorRowData(patientViewModel: patientViewModel, doctor: doctor, pathImgDoctor: doctor.img ?? "")
                     Divider()
                 }
             }
@@ -155,17 +157,57 @@ struct doctorRowData: View {
                         .background(patientViewModel.doctorsIsFollow[doctor.id] == true ? Color.accentColor : Color.accentColor)
                         .cornerRadius(8)
                 }
+                .onAppear {
+                    patientViewModel.doctorImage(from: pathImgDoctor, for: doctor.id)
+                }
+            }
+        }
+    }
+}
 
-//                Button(action: {
-//                    patientViewModel.actionFollowDoctor(doctorId: doctor.id)
-//                }) {
-//                    Text("follow".localized())
-//                        .foregroundColor(.white)
-//                        .padding(.horizontal)
-//                        .padding(.vertical, 7)
-//                        .background(Color.accentColor)
-//                        .cornerRadius(8)
-//                }
+struct followDoctorRowData: View {
+    @ObservedObject var patientViewModel : PatientSettingViewModel
+    @State var doctor : DoctorModel
+    var pathImgDoctor : String
+    var body: some View {
+        HStack {
+            HStack(alignment: .center, spacing: 10) {
+                if let img =  patientViewModel.doctorImages[doctor.id] {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                        .shadow(radius: 2)
+                        .frame(width: 40, height: 40)
+                        .background(Color(.systemGray6))
+                        .clipShape(Circle())
+                }else{
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.accentColor)
+                }
+                
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(doctor.name)
+                        .font(.headline)
+                        .fontWeight(.light)
+                    Text(doctor.email)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                Button(action: {
+                    patientViewModel.actionFollowDoctor(doctorId: doctor.id)
+                    patientViewModel.getDoctorsFollowers()
+                }) {
+                    Text("Unfollow".localized())
+                        .foregroundColor(.white)
+                        .padding(.horizontal)
+                        .padding(.vertical, 7)
+                        .background(patientViewModel.doctorsIsFollow[doctor.id] == true ? Color.accentColor : Color.accentColor)
+                        .cornerRadius(8)
+                }
                 .onAppear {
                     patientViewModel.doctorImage(from: pathImgDoctor, for: doctor.id)
                 }
