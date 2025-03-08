@@ -79,3 +79,17 @@ Watch the demo of the app in action:
   <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.42.00%E2%80%AFPM.png" width="30%" />
 </p>
 
+<p align="center">
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.43.06%E2%80%AFPM.png" width="30%" />
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.43.16%E2%80%AFPM.png" width="30%" />
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.43.20%E2%80%AFPM.png" width="30%" />
+</p>
+
+
+<p align="center">
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.44.11%E2%80%AFPM.png" width="30%" />
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.44.29%E2%80%AFPM.png" width="30%" />
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.44.48%E2%80%AFPM.png" width="30%" />
+</p>
+
+
