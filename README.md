@@ -71,7 +71,7 @@ Watch the demo of the app in action:
 [![Watch the video](https://img.youtube.com/vi/https://www.youtube.com/watch?v=6w36W1DZI6s/0.jpg)](https://www.youtube.com/watch?v=6w36W1DZI6s)
 
 ## App Screen
-![App Screenshot](https://github.com/aboashraf169/Sahaty/raw/main/assets/screenshot.png)
+![App Screenshot](https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.39.40%E2%80%AFPM.png)
 
 
 
