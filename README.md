@@ -70,13 +70,12 @@ Watch the demo of the app in action:
 
 [![Watch the video](https://img.youtube.com/vi/https://www.youtube.com/watch?v=6w36W1DZI6s/0.jpg)](https://www.youtube.com/watch?v=6w36W1DZI6s)
 
-## App Screenshots
-![App Screenshot](https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.39.40%E2%80%AFPM.png)
 
-![Screenshot 1](https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.39.40%E2%80%AFPM.png)
+## Screenshots
 
-![Screenshot 2](https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.40.04%E2%80%AFPM.png)
-
-![Screenshot 3](https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.42.00%E2%80%AFPM.png)
-
+<p align="center">
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.39.40%E2%80%AFPM.png" width="30%" />
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.40.04%E2%80%AFPM.png" width="30%" />
+  <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.42.00%E2%80%AFPM.png" width="30%" />
+</p>
 
