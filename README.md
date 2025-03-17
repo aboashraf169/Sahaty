@@ -3,8 +3,6 @@
 
 An advanced AI-powered interactive platform designed to bridge the gap between doctors and patients. The platform enables doctors to publish valuable articles, health tips, and medical advice, while allowing patients to follow their preferred doctors, interact with the content through likes, comments, and shares, and save important articles for future reference.
 
-## Screenshots
-
 <p align="center">
   <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.39.40%E2%80%AFPM.png" width="30%" />
   <img src="https://github.com/aboashraf169/Sahaty/blob/main/Sahaty/Screenshot%202025-03-08%20at%203.40.04%E2%80%AFPM.png" width="30%" />
